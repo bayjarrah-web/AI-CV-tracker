@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Tracker AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="global-language-switch" aria-label="Language switcher">
+    <button class="language-option active" type="button" data-language-option="ar">عربي</button>
+    <button class="language-option" type="button" data-language-option="en">English</button>
+  </div>
+
+  <div class="app-shell">
+    <section id="onboarding-screen" class="onboarding-screen" aria-live="polite">
+      <div class="onboarding-card glass-card">
+        <div class="step-indicator" aria-label="Onboarding progress">
+          <span class="step-dot active" data-step-dot="1"></span>
+          <span class="step-dot" data-step-dot="2"></span>
+          <span class="step-dot" data-step-dot="3"></span>
+        </div>
+
+        <div class="onboarding-step active" data-step="1">
+          <div class="brand-mark brand-mark-large">CV</div>
+          <p class="eyebrow" data-i18n="onboarding.step1.eyebrow">رفيقك الذكي للبحث عن عمل</p>
+          <h1 data-i18n="onboarding.step1.title">مرحباً بك في CV Tracker AI</h1>
+          <p class="onboarding-copy" data-i18n="onboarding.step1.subtitle">نظم طلباتك، تابع مقابلاتك، وافهم تقدمك من مكان واحد.</p>
+          <button class="btn btn-primary" type="button" data-next-step>
+            <span data-i18n="onboarding.step1.cta">هيا نبدأ</span>
+          </button>
+        </div>
+
+        <div class="onboarding-step" data-step="2">
+          <p class="eyebrow" data-i18n="onboarding.step2.eyebrow">إعداد الملف الشخصي</p>
+          <h2 data-i18n="onboarding.step2.title">أخبرنا عنك قليلاً</h2>
+          <p class="onboarding-copy" data-i18n="onboarding.step2.subtitle">سنستخدم هذه المعلومات لتخصيص تجربتك داخل التطبيق.</p>
+
+          <form class="form-grid" id="onboarding-profile-form">
+            <label class="field">
+              <span data-i18n="onboarding.step2.name">الاسم</span>
+              <input id="user-name" type="text" autocomplete="name" placeholder="مثال: سارة أحمد" data-i18n-placeholder="onboarding.step2.namePlaceholder">
+            </label>
+
+            <label class="field">
+              <span data-i18n="onboarding.step2.specialty">التخصص</span>
+              <input id="user-specialty" type="text" list="specialty-options" autocomplete="off" placeholder="اكتب أول كم حرف من تخصصك" data-i18n-placeholder="onboarding.step2.specialtyPlaceholder">
+              <datalist id="specialty-options"></datalist>
+            </label>
+
+            <label class="field">
+              <span data-i18n="onboarding.step2.country">البلد</span>
+              <input id="user-country" type="text" list="country-options" autocomplete="country-name" placeholder="اكتب أول كم حرف من اسم البلد" data-i18n-placeholder="onboarding.step2.countryPlaceholder">
+              <datalist id="country-options"></datalist>
+            </label>
+          </form>
+
+          <div class="button-row">
+            <button class="btn btn-secondary" type="button" data-prev-step>
+              <span data-i18n="common.back">رجوع</span>
+            </button>
+            <button class="btn btn-primary" type="button" data-next-step>
+              <span data-i18n="common.next">التالي</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="onboarding-step" data-step="3">
+          <p class="eyebrow" data-i18n="onboarding.step3.eyebrow">السيرة الذاتية</p>
+          <h2 data-i18n="onboarding.step3.title">ارفع سيرتك الذاتية اختيارياً</h2>
+          <p class="onboarding-copy" data-i18n="onboarding.step3.subtitle">يمكنك إضافة ملف PDF الآن أو تخطي هذه الخطوة والعودة لها لاحقاً.</p>
+
+          <label class="upload-box" for="cv-file">
+            <span class="upload-icon">PDF</span>
+            <strong data-i18n="onboarding.step3.uploadTitle">اختر ملف PDF</strong>
+            <small id="cv-file-name" data-i18n="onboarding.step3.uploadHint">لم يتم اختيار ملف بعد</small>
+            <input id="cv-file" type="file" accept="application/pdf">
+          </label>
+
+          <div class="button-row">
+            <button class="btn btn-secondary" type="button" data-prev-step>
+              <span data-i18n="common.back">رجوع</span>
+            </button>
+            <button class="btn btn-secondary" type="button" data-skip-onboarding>
+              <span data-i18n="onboarding.step3.skip">تخطي</span>
+            </button>
+            <button class="btn btn-primary" type="button" data-finish-onboarding>
+              <span data-i18n="onboarding.step3.start">ابدأ</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main id="main-app" class="main-app hidden">
+      <header class="app-header glass-card">
+        <div class="brand-group">
+          <div class="brand-mark">CV</div>
+          <div>
+            <p class="app-kicker" data-i18n="app.kicker">لوحة تتبع الوظائف</p>
+            <h1>CV Tracker AI</h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span class="user-chip" id="header-user-name">ضيف</span>
+        </div>
+      </header>
+
+      <nav class="tab-nav glass-card" aria-label="Main navigation">
+        <button class="tab-button active" type="button" data-tab="today">
+          <span class="tab-icon">01</span>
+          <span data-i18n="tabs.today">اليوم</span>
+        </button>
+        <button class="tab-button" type="button" data-tab="profile">
+          <span class="tab-icon">02</span>
+          <span data-i18n="tabs.profile">الملف</span>
+        </button>
+        <button class="tab-button" type="button" data-tab="jobs">
+          <span class="tab-icon">03</span>
+          <span data-i18n="tabs.jobs">الوظائف</span>
+        </button>
+        <button class="tab-button" type="button" data-tab="stats">
+          <span class="tab-icon">04</span>
+          <span data-i18n="tabs.stats">الإحصائيات</span>
+        </button>
+        <button class="tab-button" type="button" data-tab="interviews">
+          <span class="tab-icon">05</span>
+          <span data-i18n="tabs.interviews">المقابلات</span>
+        </button>
+        <button class="tab-button" type="button" data-tab="analyzer">
+          <span class="tab-icon">06</span>
+          <span data-i18n="tabs.analyzer">المحلل</span>
+        </button>
+        <button class="tab-button" type="button" data-tab="settings">
+          <span class="tab-icon">07</span>
+          <span data-i18n="tabs.settings">الإعدادات</span>
+        </button>
+      </nav>
+
+      <section class="content-area">
+        <div class="tab-panel active" id="tab-today"></div>
+        <div class="tab-panel" id="tab-profile"></div>
+        <div class="tab-panel" id="tab-jobs">
+          <section class="jobs-workspace">
+            <div class="jobs-header glass-card">
+              <div>
+                <p class="eyebrow" data-i18n="jobs.kicker">إدارة الفرص</p>
+                <h2 data-i18n="jobs.title">الوظائف</h2>
+              </div>
+              <button class="btn btn-primary" type="button" data-open-job-modal>
+                <span class="btn-plus">+</span>
+                <span data-i18n="jobs.addJob">إضافة وظيفة</span>
+              </button>
+            </div>
+
+            <div class="jobs-toolbar glass-card">
+              <label class="field search-field">
+                <span data-i18n="jobs.searchLabel">بحث</span>
+                <input id="job-search" type="search" placeholder="ابحث بعنوان الوظيفة أو الشركة أو الموقع" data-i18n-placeholder="jobs.searchPlaceholder">
+              </label>
+
+              <label class="field">
+                <span data-i18n="jobs.filters.status">الحالة</span>
+                <select id="job-filter-status"></select>
+              </label>
+
+              <label class="field">
+                <span data-i18n="jobs.filters.priority">الأولوية</span>
+                <select id="job-filter-priority"></select>
+              </label>
+
+              <label class="field">
+                <span data-i18n="jobs.filters.source">المصدر</span>
+                <select id="job-filter-source"></select>
+              </label>
+
+              <button class="btn btn-secondary reset-filters-btn" type="button" id="reset-job-filters" data-i18n="jobs.filters.reset">إعادة ضبط</button>
+            </div>
+
+            <div class="jobs-grid" id="jobs-grid"></div>
+            <div class="empty-state glass-card hidden" id="jobs-empty-state">
+              <div class="empty-state-inner">
+                <div class="empty-icon">JOB</div>
+                <h2 data-i18n="empty.jobs.title">لا توجد وظائف بعد</h2>
+                <p data-i18n="empty.jobs.body">ابدأ بإضافة أول فرصة، وبعدها ستظهر هنا كروت منظمة قابلة للبحث والفلترة.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="tab-panel" id="tab-stats"></div>
+        <div class="tab-panel" id="tab-interviews"></div>
+        <div class="tab-panel" id="tab-analyzer"></div>
+        <div class="tab-panel" id="tab-settings"></div>
+      </section>
+
+      <button class="fab-add-job hidden" type="button" data-open-job-modal aria-label="Add job">+</button>
+    </main>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <div class="modal-overlay hidden" id="modal-overlay" aria-hidden="true">
+    <div class="modal-box job-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="job-modal-title">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow" data-i18n="jobs.modal.kicker">تفاصيل الفرصة</p>
+          <h2 id="job-modal-title" data-i18n="jobs.modal.addTitle">إضافة وظيفة</h2>
+        </div>
+        <button class="icon-btn" type="button" id="close-job-modal" aria-label="Close">×</button>
+      </div>
+
+      <form id="job-form" class="job-form">
+        <input type="hidden" id="job-id">
+
+        <div class="form-grid two-columns">
+          <label class="field">
+            <span data-i18n="jobs.fields.jobTitle">عنوان الوظيفة</span>
+            <input id="job-title" type="text" required placeholder="Frontend Developer" data-i18n-placeholder="jobs.placeholders.jobTitle">
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.company">الشركة</span>
+            <input id="job-company" type="text" required placeholder="Acme" data-i18n-placeholder="jobs.placeholders.company">
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.location">الموقع</span>
+            <input id="job-location" type="text" placeholder="Berlin / Remote" data-i18n-placeholder="jobs.placeholders.location">
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.jobType">نوع العمل</span>
+            <select id="job-type"></select>
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.status">الحالة</span>
+            <select id="job-status"></select>
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.priority">الأولوية</span>
+            <select id="job-priority"></select>
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.source">المصدر</span>
+            <select id="job-source"></select>
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.salary">الراتب</span>
+            <input id="job-salary" type="text" placeholder="€60k - €75k" data-i18n-placeholder="jobs.placeholders.salary">
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.jobUrl">رابط الوظيفة</span>
+            <input id="job-url" type="url" placeholder="https://..." data-i18n-placeholder="jobs.placeholders.jobUrl">
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.contactName">اسم جهة التواصل</span>
+            <input id="job-contact-name" type="text" placeholder="Recruiter name" data-i18n-placeholder="jobs.placeholders.contactName">
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.contactEmail">بريد جهة التواصل</span>
+            <input id="job-contact-email" type="email" placeholder="name@company.com" data-i18n-placeholder="jobs.placeholders.contactEmail">
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.followUpDate">تاريخ المتابعة</span>
+            <input id="job-follow-up-date" type="date">
+          </label>
+
+          <label class="field">
+            <span data-i18n="jobs.fields.appliedDate">تاريخ التقديم</span>
+            <input id="job-applied-date" type="date">
+          </label>
+
+          <label class="field field-wide">
+            <span data-i18n="jobs.fields.notes">ملاحظات</span>
+            <textarea id="job-notes" placeholder="ملاحظات قصيرة عن الفرصة..." data-i18n-placeholder="jobs.placeholders.notes"></textarea>
+          </label>
+        </div>
+
+        <div class="button-row modal-actions">
+          <button class="btn btn-secondary" type="button" id="cancel-job-modal" data-i18n="common.cancel">إلغاء</button>
+          <button class="btn btn-primary" type="submit" data-i18n="common.save">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="translations.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
