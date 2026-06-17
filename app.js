@@ -205,14 +205,35 @@ function uuid() {
   return "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
 }
 
+function toLocalISODate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function todayISO() {
-  return new Date().toISOString().slice(0, 10);
+  return toLocalISODate(new Date());
 }
 
 function addDaysISO(days) {
   const date = new Date();
   date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  return toLocalISODate(date);
+}
+
+function addDaysToISO(isoDate, days) {
+  const date = new Date(`${isoDate}T00:00:00`);
+  date.setDate(date.getDate() + days);
+  return toLocalISODate(date);
+}
+
+function endOfWeekISO() {
+  const today = new Date(`${todayISO()}T00:00:00`);
+  const day = today.getDay();
+  const daysUntilSunday = day === 0 ? 0 : 7 - day;
+  today.setDate(today.getDate() + daysUntilSunday);
+  return toLocalISODate(today);
 }
 
 function formatDate(isoDate) {
@@ -473,8 +494,14 @@ function getFollowUpsDueToday() {
 }
 
 function getInterviewsThisWeek() {
-  return AppState.jobs.filter((job) => {
-    return job.status === "interview" && !job.isArchived;
+  const today = todayISO();
+  const weekEnd = endOfWeekISO();
+
+  return AppState.interviews.filter((interview) => {
+    return interview.interviewDate
+      && interview.interviewDate >= today
+      && interview.interviewDate <= weekEnd
+      && ["scheduled", "rescheduled"].includes(interview.status);
   });
 }
 
@@ -871,8 +898,40 @@ function updateInterviewFormatFields() {
   });
 }
 
+function updateFormatFields() {
+  updateInterviewFormatFields();
+}
+
 function isPastInterview(interview) {
   return Boolean(interview.interviewDate && interview.interviewDate < todayISO());
+}
+
+function calculateCountdown(dateString) {
+  const diff = daysBetweenISO(todayISO(), dateString);
+
+  if (diff === 0) return t("interviews.countdown.today");
+  if (diff > 0) return formatMessage("interviews.countdown.inDays", { count: diff });
+
+  return formatMessage("interviews.countdown.daysAgo", { count: Math.abs(diff) });
+}
+
+function getUpcomingInterviews() {
+  return AppState.interviews
+    .filter((interview) => interview.interviewDate >= todayISO() && ["scheduled", "rescheduled"].includes(interview.status))
+    .sort((first, second) => `${first.interviewDate}T${first.interviewTime || "00:00"}`.localeCompare(`${second.interviewDate}T${second.interviewTime || "00:00"}`));
+}
+
+function getPastInterviews() {
+  return AppState.interviews
+    .filter((interview) => interview.interviewDate && interview.interviewDate < todayISO())
+    .sort((first, second) => `${second.interviewDate}T${second.interviewTime || "00:00"}`.localeCompare(`${first.interviewDate}T${first.interviewTime || "00:00"}`));
+}
+
+function getUpcomingInterviewsForDashboard() {
+  const today = todayISO();
+  const nextWeek = addDaysToISO(today, 7);
+
+  return getUpcomingInterviews().filter((interview) => interview.interviewDate <= nextWeek);
 }
 
 function openAddInterviewModal() {
@@ -951,6 +1010,29 @@ function syncInterviewJobFields() {
   }
 }
 
+function handleInterviewResultChange(interviewId, result) {
+  const interview = AppState.interviews.find((item) => item.id === interviewId);
+  if (!interview || !["passed", "failed"].includes(result)) return;
+
+  const nextStatus = result === "failed" ? "rejected" : "interview";
+  const promptKey = result === "failed"
+    ? "interviews.prompts.updateJobRejected"
+    : "interviews.prompts.updateJobInterview";
+
+  if (!window.confirm(t(promptKey))) return;
+
+  updateJob(interview.jobId, (job) => ({
+    ...job,
+    status: nextStatus,
+    isArchived: nextStatus === "archived",
+    updatedAt: todayISO(),
+    activityLog: [
+      createActivity("status_changed", `${t("interviews.fields.result")}: ${t(`interviewResults.${result}`)}`),
+      ...job.activityLog
+    ]
+  }));
+}
+
 function saveInterview(event) {
   event.preventDefault();
 
@@ -961,6 +1043,10 @@ function saveInterview(event) {
   }
 
   if (editingInterviewId) {
+    const previousInterview = AppState.interviews.find((interview) => interview.id === editingInterviewId);
+    const resultChanged = previousInterview?.result !== formData.result;
+    const savedInterviewId = editingInterviewId;
+
     AppState.interviews = AppState.interviews.map((interview) => {
       if (interview.id !== editingInterviewId) return interview;
       return normalizeInterview({
@@ -970,6 +1056,9 @@ function saveInterview(event) {
       });
     });
     addActivityLog(formData.jobId, "interview_updated", `${formData.jobTitle} · ${formatDate(formData.interviewDate)}`);
+    if (resultChanged) {
+      handleInterviewResultChange(savedInterviewId, formData.result);
+    }
   } else {
     const newInterview = normalizeInterview({
       id: uuid(),
@@ -983,7 +1072,7 @@ function saveInterview(event) {
       status: job.status === "accepted" ? job.status : "interview",
       updatedAt: todayISO(),
       activityLog: [
-        createActivity("interview_scheduled", `${t("interviews.round")} ${newInterview.round} · ${formatDate(newInterview.interviewDate)}`),
+        createActivity("interview_scheduled", `${t(`interviewRoundTypes.${newInterview.roundType}`)} · ${formatDate(newInterview.interviewDate)}`),
         ...job.activityLog
       ]
     }));
@@ -1015,8 +1104,8 @@ function getInterviewGroups() {
   });
 
   return {
-    upcoming: sorted.filter((interview) => !isPastInterview(interview)),
-    past: sorted.filter((interview) => isPastInterview(interview)).reverse(),
+    upcoming: getUpcomingInterviews(),
+    past: getPastInterviews(),
     all: sorted
   };
 }
@@ -1028,6 +1117,8 @@ function setInterviewView(view) {
 
 function renderInterviewCard(interview) {
   const isPast = isPastInterview(interview);
+  const isToday = interview.interviewDate === todayISO();
+  const countdown = calculateCountdown(interview.interviewDate);
   const details = [
     interview.interviewTime ? `${t("interviews.fields.interviewTime")}: ${interview.interviewTime}` : "",
     interview.duration ? `${t("interviews.fields.duration")}: ${interview.duration}` : "",
@@ -1036,22 +1127,24 @@ function renderInterviewCard(interview) {
   ].filter(Boolean);
 
   return `
-    <article class="interview-card glass-card${isPast ? " past-interview" : ""}">
+    <article class="interview-card glass-card${isPast ? " past-interview" : ""}${isToday ? " today-interview" : ""}">
       <div class="interview-card-top">
         <div>
-          <p class="eyebrow">${escapeHTML(t("interviews.round"))} ${escapeHTML(interview.round)} · ${escapeHTML(t(`interviewRoundTypes.${interview.roundType}`))}</p>
+          <p class="eyebrow">${escapeHTML(t("interviews.round"))} ${escapeHTML(interview.round)}</p>
           <h3>${escapeHTML(interview.jobTitle)}</h3>
           <p>${escapeHTML(interview.company)}</p>
         </div>
         <div class="interview-date-chip">
           <strong>${escapeHTML(formatDate(interview.interviewDate))}</strong>
           ${interview.interviewTime ? `<span>${escapeHTML(interview.interviewTime)}</span>` : ""}
+          <small>${escapeHTML(countdown)}</small>
         </div>
       </div>
 
       <div class="job-badge-row">
-        <span class="badge badge-status">${escapeHTML(t(`interviewStatuses.${interview.status}`))}</span>
-        <span class="badge">${escapeHTML(t(`interviewFormats.${interview.format}`))}</span>
+        <span class="badge badge-round-type">${escapeHTML(t(`interviewRoundTypes.${interview.roundType}`))}</span>
+        <span class="badge badge-interview-status-${escapeHTML(interview.status)}">${escapeHTML(t(`interviewStatuses.${interview.status}`))}</span>
+        <span class="badge badge-format-${escapeHTML(interview.format)}">${escapeHTML(t(`interviewFormats.${interview.format}`))}</span>
         ${interview.result ? `<span class="badge badge-result-${escapeHTML(interview.result)}">${escapeHTML(t(`interviewResults.${interview.result}`))}</span>` : ""}
       </div>
 
@@ -1069,18 +1162,19 @@ function renderInterviewCard(interview) {
       <div class="job-actions">
         <button class="btn btn-small btn-secondary" type="button" data-interview-action="edit" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.edit"))}</button>
         <button class="btn btn-small btn-danger" type="button" data-interview-action="delete" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.delete"))}</button>
-        ${interview.meetingUrl ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.openMeeting"))}</a>` : ""}
-        ${interview.googleMapsUrl ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.googleMapsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.openMap"))}</a>` : ""}
+        ${interview.format === "video" && interview.meetingUrl ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.joinMeeting"))}</a>` : ""}
+        ${interview.format === "in_person" && interview.googleMapsUrl ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.googleMapsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.openMap"))}</a>` : ""}
       </div>
     </article>
   `;
 }
 
-function renderInterviews() {
+function renderInterviews(filter) {
   const grid = document.getElementById("interviews-grid");
   const empty = document.getElementById("interviews-empty-state");
   if (!grid || !empty) return;
 
+  if (filter) currentInterviewView = ["upcoming", "past", "all"].includes(filter) ? filter : "upcoming";
   const groups = getInterviewGroups();
   const interviews = groups[currentInterviewView] || groups.upcoming;
 
@@ -1223,6 +1317,45 @@ function renderTodaySection(titleKey, jobs, emptyKey, variant) {
   `;
 }
 
+function renderTodayMiniInterviewCard(interview) {
+  const linkButton = interview.format === "video" && interview.meetingUrl
+    ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.joinMeeting"))}</a>`
+    : interview.format === "in_person" && interview.googleMapsUrl
+      ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.googleMapsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.openMap"))}</a>`
+      : "";
+
+  return `
+    <article class="today-mini-card glass-card${interview.interviewDate === todayISO() ? " today-mini-highlight" : ""}">
+      <div class="today-mini-main">
+        <div>
+          <h3>${escapeHTML(interview.jobTitle)}</h3>
+          <p>${escapeHTML(interview.company)}</p>
+        </div>
+        <span class="today-mini-date">${escapeHTML(formatDate(interview.interviewDate))}${interview.interviewTime ? ` · ${escapeHTML(interview.interviewTime)}` : ""}</span>
+      </div>
+      <div class="job-badge-row">
+        <span class="badge badge-round-type">${escapeHTML(t(`interviewRoundTypes.${interview.roundType}`))}</span>
+        <span class="badge badge-interview-status-${escapeHTML(interview.status)}">${escapeHTML(calculateCountdown(interview.interviewDate))}</span>
+      </div>
+      ${linkButton ? `<div class="today-mini-actions">${linkButton}</div>` : ""}
+    </article>
+  `;
+}
+
+function renderTodayInterviewsSection(interviews) {
+  return `
+    <section class="today-section glass-card">
+      <div class="today-section-header">
+        <h2>${escapeHTML(t("todayDashboard.upcomingInterviewsTitle"))}</h2>
+        <span>${escapeHTML(interviews.length)}</span>
+      </div>
+      ${interviews.length
+        ? `<div class="today-mini-grid">${interviews.map(renderTodayMiniInterviewCard).join("")}</div>`
+        : `<div class="today-positive-state">${escapeHTML(t("todayDashboard.noUpcomingInterviews"))}</div>`}
+    </section>
+  `;
+}
+
 function renderRecentActivities(activities) {
   return `
     <section class="today-section today-activity-section glass-card">
@@ -1255,6 +1388,7 @@ function renderTodayDashboard() {
   const summary = getTodaySummary();
   const followUpsDue = getFollowUpsDueToday();
   const attentionJobs = getHighPriorityNeedsAttention();
+  const upcomingInterviews = getUpcomingInterviewsForDashboard();
   const recentActivities = getRecentActivities(5);
   const greetingKey = new Date().getHours() < 12 ? "todayDashboard.goodMorning" : "todayDashboard.goodEvening";
   const summaryCards = [
@@ -1293,6 +1427,7 @@ function renderTodayDashboard() {
       <div class="today-sections-grid">
         ${renderTodaySection("todayDashboard.followUpsTitle", followUpsDue, "todayDashboard.noFollowUps", "follow-up")}
         ${renderTodaySection("todayDashboard.attentionTitle", attentionJobs, "todayDashboard.noAttention", "attention")}
+        ${renderTodayInterviewsSection(upcomingInterviews)}
         ${renderRecentActivities(recentActivities)}
       </div>
     </section>
@@ -1677,7 +1812,7 @@ function bindInterviewsEvents() {
   }
 
   if (formatSelect) {
-    formatSelect.addEventListener("change", updateInterviewFormatFields);
+    formatSelect.addEventListener("change", updateFormatFields);
   }
 
   if (jobSelect) {

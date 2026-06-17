@@ -956,6 +956,12 @@ textarea:focus {
   background: linear-gradient(180deg, var(--surface-mid), var(--text-muted));
 }
 
+.interview-card.today-interview {
+  border-color: rgba(34, 211, 238, 0.56);
+  box-shadow: 0 24px 90px rgba(34, 211, 238, 0.16), 0 0 0 1px rgba(34, 211, 238, 0.14);
+  animation: interviewPulse 1.8s ease-in-out infinite;
+}
+
 .interview-card-top {
   display: flex;
   align-items: flex-start;
@@ -992,6 +998,13 @@ textarea:focus {
 .interview-date-chip span {
   color: var(--cyan);
   font-family: var(--font-mono);
+  font-weight: 900;
+}
+
+.interview-date-chip small {
+  color: rgba(249, 250, 251, 0.66);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   font-weight: 900;
 }
 
@@ -1143,6 +1156,46 @@ textarea:focus {
   border-color: rgba(16, 185, 129, 0.34);
 }
 
+.badge-round-type,
+.badge-format-video,
+.badge-format-phone,
+.badge-format-in_person,
+.badge-format-async_video {
+  color: #ddd6fe;
+  background: rgba(139, 92, 246, 0.14);
+  border-color: rgba(139, 92, 246, 0.32);
+}
+
+.badge-interview-status-scheduled {
+  color: #a5f3fc;
+  background: rgba(34, 211, 238, 0.14);
+  border-color: rgba(34, 211, 238, 0.38);
+}
+
+.badge-interview-status-completed {
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.34);
+}
+
+.badge-interview-status-cancelled {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.34);
+}
+
+.badge-interview-status-rescheduled {
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.34);
+}
+
+.badge-interview-status-no_show {
+  color: rgba(249, 250, 251, 0.56);
+  background: rgba(107, 114, 128, 0.13);
+  border-color: rgba(107, 114, 128, 0.32);
+}
+
 .badge-result-passed {
   color: #a7f3d0;
   background: rgba(16, 185, 129, 0.14);
@@ -1160,6 +1213,17 @@ textarea:focus {
   color: #fde68a;
   background: rgba(245, 158, 11, 0.14);
   border-color: rgba(245, 158, 11, 0.34);
+}
+
+.badge-result-waiting {
+  color: #ddd6fe;
+  background: rgba(139, 92, 246, 0.14);
+  border-color: rgba(139, 92, 246, 0.34);
+}
+
+.today-mini-highlight {
+  border-color: rgba(34, 211, 238, 0.42);
+  box-shadow: 0 18px 52px rgba(34, 211, 238, 0.14);
 }
 
 .job-meta {
@@ -1403,6 +1467,16 @@ textarea:focus {
   }
   50% {
     transform: translateY(-3px);
+  }
+}
+
+@keyframes interviewPulse {
+  0%,
+  100% {
+    box-shadow: 0 24px 90px rgba(34, 211, 238, 0.12), 0 0 0 rgba(34, 211, 238, 0);
+  }
+  50% {
+    box-shadow: 0 24px 90px rgba(34, 211, 238, 0.18), 0 0 34px rgba(34, 211, 238, 0.22);
   }
 }
 

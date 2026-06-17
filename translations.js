@@ -186,8 +186,10 @@ const TRANSLATIONS = {
       followUpsTitle: "المتابعات المستحقة",
       attentionTitle: "تحتاج اهتمام",
       recentActivityTitle: "النشاط الأخير",
+      upcomingInterviewsTitle: "المقابلات القادمة",
       noFollowUps: "كل شيء على ما يرام! لا توجد متابعات مستحقة اليوم.",
       noAttention: "رائع. لا توجد وظائف عالية الأولوية بدون نشاط حديث.",
+      noUpcomingInterviews: "لا توجد مقابلات خلال الأيام القادمة.",
       noRecentActivity: "لا يوجد نشاط حديث بعد.",
       viewJob: "عرض الوظيفة",
       lastActivity: "آخر نشاط",
@@ -291,6 +293,7 @@ const TRANSLATIONS = {
       addInterview: "إضافة مقابلة",
       round: "الجولة",
       openMeeting: "فتح الاجتماع",
+      joinMeeting: "دخول الاجتماع",
       openMap: "فتح الخريطة",
       modal: {
         kicker: "تفاصيل المقابلة",
@@ -347,6 +350,15 @@ const TRANSLATIONS = {
         pastBody: "بعد انتهاء المقابلات، ستظهر هنا لتوثيق النتائج والملاحظات.",
         allTitle: "لا توجد مقابلات بعد",
         allBody: "أضف مقابلة مرتبطة بوظيفة لتبدأ بتتبع الجولات."
+      },
+      countdown: {
+        today: "اليوم!",
+        inDays: "بعد {count} أيام",
+        daysAgo: "منذ {count} أيام"
+      },
+      prompts: {
+        updateJobInterview: "هل تريد تحديث حالة الوظيفة إلى مقابلة؟",
+        updateJobRejected: "هل تريد تحديث حالة الوظيفة إلى مرفوض؟"
       }
     },
     modal: {
@@ -541,8 +553,10 @@ const TRANSLATIONS = {
       followUpsTitle: "Follow-ups Due",
       attentionTitle: "Needs Attention",
       recentActivityTitle: "Recent Activity",
+      upcomingInterviewsTitle: "Upcoming Interviews",
       noFollowUps: "Everything is under control! No follow-ups due today.",
       noAttention: "Nice. No high-priority jobs are sitting without recent activity.",
+      noUpcomingInterviews: "No interviews scheduled in the next few days.",
       noRecentActivity: "No recent activity yet.",
       viewJob: "View Job",
       lastActivity: "Last activity",
@@ -646,6 +660,7 @@ const TRANSLATIONS = {
       addInterview: "Add Interview",
       round: "Round",
       openMeeting: "Open Meeting",
+      joinMeeting: "Join Meeting",
       openMap: "Open Map",
       modal: {
         kicker: "Interview details",
@@ -702,6 +717,15 @@ const TRANSLATIONS = {
         pastBody: "Completed interviews will appear here for results and notes.",
         allTitle: "No interviews yet",
         allBody: "Add an interview linked to a job to start tracking rounds."
+      },
+      countdown: {
+        today: "Today!",
+        inDays: "In {count} days",
+        daysAgo: "{count} days ago"
+      },
+      prompts: {
+        updateJobInterview: "Do you want to update the job status to interview?",
+        updateJobRejected: "Do you want to update the job status to rejected?"
       }
     },
     modal: {
