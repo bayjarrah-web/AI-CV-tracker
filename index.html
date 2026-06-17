@@ -191,7 +191,44 @@
           </section>
         </div>
         <div class="tab-panel" id="tab-stats"></div>
-        <div class="tab-panel" id="tab-interviews"></div>
+        <div class="tab-panel" id="tab-interviews">
+          <section class="interviews-workspace">
+            <div class="interviews-header glass-card">
+              <div>
+                <p class="eyebrow" data-i18n="interviews.kicker">إدارة الجولات</p>
+                <h2 data-i18n="interviews.title">المقابلات</h2>
+              </div>
+              <button class="btn btn-primary" type="button" data-open-interview-modal>
+                <span class="btn-plus">+</span>
+                <span data-i18n="interviews.addInterview">إضافة مقابلة</span>
+              </button>
+            </div>
+
+            <div class="interview-inner-tabs glass-card" role="tablist" aria-label="Interview views">
+              <button class="interview-tab active" type="button" data-interview-view="upcoming">
+                <span data-i18n="interviews.views.upcoming">القادمة</span>
+                <strong id="interview-count-upcoming">0</strong>
+              </button>
+              <button class="interview-tab" type="button" data-interview-view="past">
+                <span data-i18n="interviews.views.past">السابقة</span>
+                <strong id="interview-count-past">0</strong>
+              </button>
+              <button class="interview-tab" type="button" data-interview-view="all">
+                <span data-i18n="interviews.views.all">الكل</span>
+                <strong id="interview-count-all">0</strong>
+              </button>
+            </div>
+
+            <div class="interviews-grid" id="interviews-grid"></div>
+            <div class="empty-state glass-card hidden" id="interviews-empty-state">
+              <div class="empty-state-inner">
+                <div class="empty-icon">INT</div>
+                <h2 data-i18n="interviews.empty.upcomingTitle">لا توجد مقابلات قادمة</h2>
+                <p data-i18n="interviews.empty.upcomingBody">عند جدولة مقابلة جديدة، ستظهر هنا مع كل تفاصيل التحضير.</p>
+              </div>
+            </div>
+          </section>
+        </div>
         <div class="tab-panel" id="tab-analyzer"></div>
         <div class="tab-panel" id="tab-settings"></div>
       </section>
@@ -201,6 +238,147 @@
   </div>
 
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <div class="modal-overlay hidden" id="interview-modal-overlay" aria-hidden="true">
+    <div class="modal-box interview-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="interview-modal-title">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow" data-i18n="interviews.modal.kicker">تفاصيل المقابلة</p>
+          <h2 id="interview-modal-title" data-i18n="interviews.modal.addTitle">إضافة مقابلة</h2>
+        </div>
+        <button class="icon-btn" type="button" id="close-interview-modal" aria-label="Close">×</button>
+      </div>
+
+      <form id="interview-form" class="job-form">
+        <input type="hidden" id="interview-id">
+
+        <section class="form-section">
+          <h3 data-i18n="interviews.sections.job">ربط بالوظيفة</h3>
+          <div class="form-grid two-columns">
+            <label class="field field-wide">
+              <span data-i18n="interviews.fields.jobId">الوظيفة</span>
+              <select id="interview-job-id" required></select>
+            </label>
+
+            <label class="field">
+              <span data-i18n="interviews.fields.round">الجولة</span>
+              <input id="interview-round" type="number" min="1" step="1" value="1">
+            </label>
+
+            <label class="field">
+              <span data-i18n="interviews.fields.roundType">نوع الجولة</span>
+              <select id="interview-round-type"></select>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h3 data-i18n="interviews.sections.schedule">تفاصيل الموعد</h3>
+          <div class="form-grid two-columns">
+            <label class="field">
+              <span data-i18n="interviews.fields.interviewDate">تاريخ المقابلة</span>
+              <input id="interview-date" type="date" required>
+            </label>
+
+            <label class="field">
+              <span data-i18n="interviews.fields.interviewTime">وقت المقابلة</span>
+              <input id="interview-time" type="time">
+            </label>
+
+            <label class="field">
+              <span data-i18n="interviews.fields.duration">المدة</span>
+              <input id="interview-duration" type="text" placeholder="45 دقيقة" data-i18n-placeholder="interviews.placeholders.duration">
+            </label>
+
+            <label class="field">
+              <span data-i18n="interviews.fields.format">الصيغة</span>
+              <select id="interview-format"></select>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h3 data-i18n="interviews.sections.details">تفاصيل إضافية</h3>
+          <div class="form-grid two-columns">
+            <label class="field interview-format-field" data-format-field="meeting">
+              <span data-i18n="interviews.fields.meetingUrl">رابط الاجتماع</span>
+              <input id="interview-meeting-url" type="url" placeholder="https://..." data-i18n-placeholder="interviews.placeholders.meetingUrl">
+            </label>
+
+            <label class="field interview-format-field" data-format-field="platform">
+              <span data-i18n="interviews.fields.platform">المنصة / رقم الهاتف</span>
+              <input id="interview-platform" type="text" placeholder="Zoom / Teams / Phone" data-i18n-placeholder="interviews.placeholders.platform">
+            </label>
+
+            <label class="field interview-format-field" data-format-field="location">
+              <span data-i18n="interviews.fields.location">الموقع</span>
+              <input id="interview-location" type="text" placeholder="Company office" data-i18n-placeholder="interviews.placeholders.location">
+            </label>
+
+            <label class="field interview-format-field" data-format-field="maps">
+              <span data-i18n="interviews.fields.googleMapsUrl">رابط Google Maps</span>
+              <input id="interview-google-maps-url" type="url" placeholder="https://maps.google.com/..." data-i18n-placeholder="interviews.placeholders.googleMapsUrl">
+            </label>
+
+            <label class="field">
+              <span data-i18n="interviews.fields.interviewerName">اسم المقابل</span>
+              <input id="interview-interviewer-name" type="text">
+            </label>
+
+            <label class="field">
+              <span data-i18n="interviews.fields.interviewerTitle">منصب المقابل</span>
+              <input id="interview-interviewer-title" type="text">
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h3 data-i18n="interviews.sections.preparation">التحضير</h3>
+          <div class="form-grid two-columns">
+            <label class="field field-wide">
+              <span data-i18n="interviews.fields.preparationNotes">ملاحظات التحضير</span>
+              <textarea id="interview-preparation-notes" placeholder="نقاط التحضير والأسئلة المتوقعة..." data-i18n-placeholder="interviews.placeholders.preparationNotes"></textarea>
+            </label>
+
+            <label class="field field-wide">
+              <span data-i18n="interviews.fields.notes">ملاحظات</span>
+              <textarea id="interview-notes" placeholder="أي تفاصيل مهمة قبل المقابلة..." data-i18n-placeholder="interviews.placeholders.notes"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section hidden" id="interview-result-section">
+          <h3 data-i18n="interviews.sections.result">ما بعد المقابلة</h3>
+          <div class="form-grid two-columns">
+            <label class="field">
+              <span data-i18n="interviews.fields.status">الحالة</span>
+              <select id="interview-status"></select>
+            </label>
+
+            <label class="field">
+              <span data-i18n="interviews.fields.result">النتيجة</span>
+              <select id="interview-result"></select>
+            </label>
+
+            <label class="field field-wide">
+              <span data-i18n="interviews.fields.postInterviewNotes">ملاحظات بعد المقابلة</span>
+              <textarea id="interview-post-notes"></textarea>
+            </label>
+
+            <label class="field field-wide">
+              <span data-i18n="interviews.fields.questionsAsked">الأسئلة التي طُرحت</span>
+              <textarea id="interview-questions-asked"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <div class="button-row modal-actions">
+          <button class="btn btn-secondary" type="button" id="cancel-interview-modal" data-i18n="common.cancel">إلغاء</button>
+          <button class="btn btn-primary" type="submit" data-i18n="common.save">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <div class="modal-overlay hidden" id="modal-overlay" aria-hidden="true">
     <div class="modal-box job-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="job-modal-title">
