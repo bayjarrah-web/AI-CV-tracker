@@ -81,6 +81,12 @@ const JobFilters = {
   source: "all"
 };
 
+const StatsFilters = {
+  period: "all"
+};
+
+const STATS_PERIOD_OPTIONS = ["week", "month", "quarter", "all"];
+
 const SPECIALTY_OPTIONS = [
   { ar: "تطوير برمجيات", en: "Software Development" },
   { ar: "تطوير واجهات أمامية", en: "Frontend Development" },
@@ -581,17 +587,38 @@ function toPercent(count, total) {
   return Math.round((count / total) * 100);
 }
 
-function getStatsSummary() {
-  const total = AppState.jobs.length;
-  const active = getActiveJobs().length;
+function getStatsPeriodStart(period = StatsFilters.period) {
+  if (period === "week") return addDaysToISO(todayISO(), -6);
+  if (period === "month") return addDaysToISO(todayISO(), -29);
+  if (period === "quarter") return addDaysToISO(todayISO(), -89);
+  return null;
+}
+
+function isDateWithinStatsPeriod(isoDate, period = StatsFilters.period) {
+  if (!isoDate) return period === "all";
+  const startDate = getStatsPeriodStart(period);
+  return !startDate || isoDate >= startDate;
+}
+
+function getStatsJobs() {
+  return AppState.jobs.filter((job) => isDateWithinStatsPeriod(job.appliedDate || job.createdAt));
+}
+
+function getStatsInterviews() {
+  return AppState.interviews.filter((interview) => isDateWithinStatsPeriod(interview.interviewDate || interview.createdAt));
+}
+
+function getStatsSummary(jobs = getStatsJobs()) {
+  const total = jobs.length;
+  const active = jobs.filter((job) => !["archived", "rejected", "withdrawn"].includes(job.status) && !job.isArchived).length;
   const responseStatuses = ["under_review", "interview", "offer", "accepted"];
   const interviewStatuses = ["interview", "offer", "accepted"];
   const offerStatuses = ["offer", "accepted"];
-  const rejected = AppState.jobs.filter((job) => job.status === "rejected").length;
+  const rejected = jobs.filter((job) => job.status === "rejected").length;
 
-  const responses = AppState.jobs.filter((job) => responseStatuses.includes(job.status)).length;
-  const interviews = AppState.jobs.filter((job) => interviewStatuses.includes(job.status)).length;
-  const offers = AppState.jobs.filter((job) => offerStatuses.includes(job.status)).length;
+  const responses = jobs.filter((job) => responseStatuses.includes(job.status)).length;
+  const interviews = jobs.filter((job) => interviewStatuses.includes(job.status)).length;
+  const offers = jobs.filter((job) => offerStatuses.includes(job.status)).length;
 
   return {
     totalApplications: total,
@@ -603,17 +630,17 @@ function getStatsSummary() {
   };
 }
 
-function getStatusDistribution() {
+function getStatusDistribution(jobs = getStatsJobs()) {
   return JOB_STATUS_OPTIONS
     .map((status) => ({
       status,
       label: t(`statuses.${status}`),
-      count: AppState.jobs.filter((job) => job.status === status).length
+      count: jobs.filter((job) => job.status === status).length
     }))
     .filter((item) => item.count > 0);
 }
 
-function getWeeklyApplicationActivity() {
+function getWeeklyApplicationActivity(jobs = getStatsJobs()) {
   const today = todayISO();
   const days = Array.from({ length: 7 }, (_, index) => addDaysToISO(today, index - 6));
 
@@ -623,15 +650,15 @@ function getWeeklyApplicationActivity() {
       weekday: "short",
       day: "numeric"
     }).format(new Date(`${date}T00:00:00`)),
-    count: AppState.jobs.filter((job) => job.appliedDate === date).length
+    count: jobs.filter((job) => job.appliedDate === date).length
   }));
 }
 
-function getSourceAnalytics() {
-  const total = AppState.jobs.length;
+function getSourceAnalytics(jobs = getStatsJobs()) {
+  const total = jobs.length;
   return JOB_SOURCE_OPTIONS
     .map((source) => {
-      const count = AppState.jobs.filter((job) => job.source === source).length;
+      const count = jobs.filter((job) => job.source === source).length;
       return {
         source,
         label: t(`sources.${source}`),
@@ -643,8 +670,33 @@ function getSourceAnalytics() {
     .sort((first, second) => second.count - first.count);
 }
 
-function getInterviewSuccessStats() {
-  const decisive = AppState.interviews.filter((interview) => ["passed", "failed"].includes(interview.result));
+function getInterviewPerformance(interviews = getStatsInterviews()) {
+  const passed = interviews.filter((interview) => interview.result === "passed").length;
+  const failed = interviews.filter((interview) => interview.result === "failed").length;
+  const pending = interviews.filter((interview) => ["", "pending", "waiting"].includes(interview.result)).length;
+  const decisiveTotal = passed + failed;
+  const roundTypes = INTERVIEW_ROUND_TYPE_OPTIONS
+    .map((roundType) => ({
+      roundType,
+      label: t(`interviewRoundTypes.${roundType}`),
+      count: interviews.filter((interview) => interview.roundType === roundType).length
+    }))
+    .filter((item) => item.count > 0)
+    .sort((first, second) => second.count - first.count);
+
+  return {
+    total: interviews.length,
+    passed,
+    failed,
+    pending,
+    successRate: toPercent(passed, decisiveTotal),
+    roundTypes,
+    mostCommonRoundType: roundTypes[0] || null
+  };
+}
+
+function getInterviewSuccessStats(interviews = getStatsInterviews()) {
+  const decisive = interviews.filter((interview) => ["passed", "failed"].includes(interview.result));
   const passed = decisive.filter((interview) => interview.result === "passed").length;
   const failed = decisive.filter((interview) => interview.result === "failed").length;
 
@@ -656,15 +708,17 @@ function getInterviewSuccessStats() {
   };
 }
 
-function getMonthlyTimeline(limit = 10) {
-  const cutoff = addDaysToISO(todayISO(), -30);
+function collectActivityEvents() {
   const jobActivities = AppState.jobs.flatMap((job) => {
-    const created = {
-      id: `${job.id}-application`,
-      date: job.appliedDate || job.createdAt,
-      title: `${job.jobTitle} · ${job.company}`,
-      action: t("statsDashboard.timelineApplication")
-    };
+    const applicationDate = job.appliedDate || job.createdAt;
+    const application = applicationDate
+      ? [{
+        id: `${job.id}-application`,
+        date: applicationDate,
+        title: `${job.jobTitle} · ${job.company}`,
+        action: t("statsDashboard.timelineApplication")
+      }]
+      : [];
 
     const activities = (job.activityLog || []).map((activity) => ({
       id: activity.id,
@@ -673,7 +727,7 @@ function getMonthlyTimeline(limit = 10) {
       action: t(`activity.${activity.action}`)
     }));
 
-    return [created, ...activities];
+    return [...application, ...activities];
   });
 
   const interviewActivities = AppState.interviews.map((interview) => ({
@@ -683,53 +737,94 @@ function getMonthlyTimeline(limit = 10) {
     action: t("statsDashboard.timelineInterview")
   }));
 
-  return [...jobActivities, ...interviewActivities]
+  return [...jobActivities, ...interviewActivities].filter((item) => item.date);
+}
+
+function getMonthlyTimeline(limit = 10) {
+  const cutoff = addDaysToISO(todayISO(), -30);
+  return collectActivityEvents()
     .filter((item) => item.date && item.date >= cutoff)
     .sort((first, second) => second.date.localeCompare(first.date))
     .slice(0, limit);
 }
 
-function getAchievements() {
-  const summary = getStatsSummary();
-  const weeklyApplications = getWeeklyApplicationActivity().reduce((sum, day) => sum + day.count, 0);
+function getMonthlyActivityHeatmap() {
+  const today = todayISO();
+  const days = Array.from({ length: 30 }, (_, index) => addDaysToISO(today, index - 29));
+  const events = collectActivityEvents();
 
+  return days.map((date) => {
+    const count = events.filter((event) => event.date === date).length;
+    let level = 0;
+    if (count >= 1 && count <= 2) level = 1;
+    if (count >= 3 && count <= 5) level = 2;
+    if (count >= 6) level = 3;
+
+    return {
+      date,
+      count,
+      level,
+      label: `${formatDate(date)} · ${formatMessage("statsDashboard.activityCount", { count })}`
+    };
+  });
+}
+
+function hasThreeDayActivityStreak() {
+  const activeDates = new Set(collectActivityEvents().map((event) => event.date).filter(Boolean));
+  return Array.from(activeDates).some((date) => {
+    return activeDates.has(addDaysToISO(date, 1)) && activeDates.has(addDaysToISO(date, 2));
+  });
+}
+
+function getAchievements() {
   return [
     {
-      key: "firstApplication",
+      key: "firstStep",
+      icon: "🚀",
+      color: "cyan",
       unlocked: AppState.jobs.length >= 1,
       progress: Math.min(AppState.jobs.length, 1),
       target: 1
     },
     {
-      key: "tenApplications",
-      unlocked: AppState.jobs.length >= 10,
-      progress: Math.min(AppState.jobs.length, 10),
-      target: 10
+      key: "onARoll",
+      icon: "🔥",
+      color: "amber",
+      unlocked: AppState.jobs.length >= 5,
+      progress: Math.min(AppState.jobs.length, 5),
+      target: 5
     },
     {
-      key: "firstInterview",
-      unlocked: AppState.interviews.length >= 1,
-      progress: Math.min(AppState.interviews.length, 1),
+      key: "interviewReady",
+      icon: "🎯",
+      color: "violet",
+      unlocked: AppState.jobs.some((job) => ["interview", "offer", "accepted"].includes(job.status)),
+      progress: AppState.jobs.some((job) => ["interview", "offer", "accepted"].includes(job.status)) ? 1 : 0,
       target: 1
     },
     {
-      key: "firstOffer",
+      key: "offerReceived",
+      icon: "⭐",
+      color: "green",
       unlocked: getOffers().length >= 1,
       progress: Math.min(getOffers().length, 1),
       target: 1
     },
     {
-      key: "consistentWeek",
-      unlocked: weeklyApplications >= 5,
-      progress: Math.min(weeklyApplications, 5),
-      target: 5
+      key: "consistentTracker",
+      icon: "📅",
+      color: "purple",
+      unlocked: hasThreeDayActivityStreak(),
+      progress: hasThreeDayActivityStreak() ? 3 : 0,
+      target: 3
     },
     {
-      key: "highResponse",
-      unlocked: AppState.jobs.length >= 5 && summary.responseRate >= 50,
-      progress: AppState.jobs.length >= 5 ? Math.min(summary.responseRate, 50) : 0,
-      target: 50,
-      suffix: "%"
+      key: "networkPro",
+      icon: "🤝",
+      color: "primary",
+      unlocked: AppState.jobs.some((job) => ["referral", "recruiter"].includes(job.source)),
+      progress: AppState.jobs.some((job) => ["referral", "recruiter"].includes(job.source)) ? 1 : 0,
+      target: 1
     }
   ];
 }
@@ -1708,12 +1803,15 @@ function renderStatsDashboard() {
   const panel = document.getElementById("tab-stats");
   if (!panel) return;
 
-  const summary = getStatsSummary();
-  const statusDistribution = getStatusDistribution();
-  const weeklyActivity = getWeeklyApplicationActivity();
-  const sources = getSourceAnalytics();
-  const success = getInterviewSuccessStats();
+  const statsJobs = getStatsJobs();
+  const statsInterviews = getStatsInterviews();
+  const summary = getStatsSummary(statsJobs);
+  const statusDistribution = getStatusDistribution(statsJobs);
+  const weeklyActivity = getWeeklyApplicationActivity(statsJobs);
+  const sources = getSourceAnalytics(statsJobs);
+  const performance = getInterviewPerformance(statsInterviews);
   const timeline = getMonthlyTimeline();
+  const heatmap = getMonthlyActivityHeatmap();
   const achievements = getAchievements();
   const kpis = [
     { label: t("statsDashboard.totalApplications"), value: summary.totalApplications, icon: "▣", color: "primary" },
@@ -1733,9 +1831,20 @@ function renderStatsDashboard() {
           <p>${escapeHTML(t("statsDashboard.subtitle"))}</p>
         </div>
         <div class="stats-hero-score">
-          <span>${escapeHTML(t("statsDashboard.last30Days"))}</span>
+          <span>${escapeHTML(t(`statsDashboard.periods.${StatsFilters.period}`))}</span>
           <strong>${escapeHTML(summary.responseRate)}%</strong>
         </div>
+      </div>
+
+      <div class="stats-filter-bar glass-card">
+        <label class="field">
+          <span>${escapeHTML(t("statsDashboard.filterByPeriod"))}</span>
+          <select id="stats-period-filter">
+            ${STATS_PERIOD_OPTIONS.map((period) => `
+              <option value="${escapeHTML(period)}"${StatsFilters.period === period ? " selected" : ""}>${escapeHTML(t(`statsDashboard.periods.${period}`))}</option>
+            `).join("")}
+          </select>
+        </label>
       </div>
 
       <div class="stats-kpi-grid">
@@ -1790,18 +1899,51 @@ function renderStatsDashboard() {
             : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noSources"))}</div>`}
         </section>
 
-        <section class="stats-card success-rate-card glass-card">
+        <section class="stats-card interview-performance-card glass-card">
           <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.interviewSuccessRate"))}</h3>
-            <span>${escapeHTML(success.total)} ${escapeHTML(t("statsDashboard.completedInterviews"))}</span>
+            <h3>${escapeHTML(t("statsDashboard.interviewPerformance"))}</h3>
+            <span>${escapeHTML(performance.total)} ${escapeHTML(t("statsDashboard.interviews"))}</span>
           </div>
-          <div class="success-rate-ring" style="--success-rate: ${escapeHTML(success.rate)}%">
-            <strong>${escapeHTML(success.rate)}%</strong>
+          <div class="success-rate-ring" style="--success-rate: ${escapeHTML(performance.successRate)}%">
+            <strong>${escapeHTML(performance.successRate)}%</strong>
             <span>${escapeHTML(t("statsDashboard.passed"))}</span>
           </div>
-          <div class="success-rate-breakdown">
-            <span>${escapeHTML(t("statsDashboard.passed"))}: <strong>${escapeHTML(success.passed)}</strong></span>
-            <span>${escapeHTML(t("statsDashboard.failed"))}: <strong>${escapeHTML(success.failed)}</strong></span>
+          <div class="interview-performance-grid">
+            <span>${escapeHTML(t("statsDashboard.totalInterviews"))}<strong>${escapeHTML(performance.total)}</strong></span>
+            <span>${escapeHTML(t("statsDashboard.passed"))}<strong>${escapeHTML(performance.passed)}</strong></span>
+            <span>${escapeHTML(t("statsDashboard.failed"))}<strong>${escapeHTML(performance.failed)}</strong></span>
+            <span>${escapeHTML(t("statsDashboard.pending"))}<strong>${escapeHTML(performance.pending)}</strong></span>
+          </div>
+          <div class="round-type-list">
+            ${performance.roundTypes.length
+              ? performance.roundTypes.map((round) => `
+                <span class="round-type-mini-badge">${escapeHTML(round.label)} <strong>${escapeHTML(round.count)}</strong></span>
+              `).join("")
+              : `<span class="round-type-mini-badge">${escapeHTML(t("statsDashboard.noInterviewRounds"))}</span>`}
+          </div>
+          <p class="stats-insight-line">
+            ${escapeHTML(t("statsDashboard.mostCommonRoundType"))}:
+            <strong>${escapeHTML(performance.mostCommonRoundType ? performance.mostCommonRoundType.label : t("statsDashboard.noDataShort"))}</strong>
+          </p>
+        </section>
+
+        <section class="stats-card activity-heatmap-card glass-card">
+          <div class="stats-card-header">
+            <h3>${escapeHTML(t("statsDashboard.monthlyActivity"))}</h3>
+            <span>${escapeHTML(t("statsDashboard.last30Days"))}</span>
+          </div>
+          <div class="activity-heatmap-grid" aria-label="${escapeHTML(t("statsDashboard.monthlyActivity"))}">
+            ${heatmap.map((day) => `
+              <span class="heatmap-cell heatmap-level-${escapeHTML(day.level)}" title="${escapeHTML(day.label)}" aria-label="${escapeHTML(day.label)}"></span>
+            `).join("")}
+          </div>
+          <div class="heatmap-legend">
+            <span>${escapeHTML(t("statsDashboard.lessActivity"))}</span>
+            <i class="heatmap-cell heatmap-level-0"></i>
+            <i class="heatmap-cell heatmap-level-1"></i>
+            <i class="heatmap-cell heatmap-level-2"></i>
+            <i class="heatmap-cell heatmap-level-3"></i>
+            <span>${escapeHTML(t("statsDashboard.moreActivity"))}</span>
           </div>
         </section>
 
@@ -1833,11 +1975,12 @@ function renderStatsDashboard() {
           </div>
           <div class="achievement-grid">
             ${achievements.map((achievement) => `
-              <article class="achievement-badge${achievement.unlocked ? " unlocked" : ""}">
-                <span>${achievement.unlocked ? "✓" : "○"}</span>
+              <article class="achievement-badge achievement-${escapeHTML(achievement.color)}${achievement.unlocked ? " unlocked" : ""}">
+                <span>${escapeHTML(achievement.icon)}</span>
                 <div>
                   <strong>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.title`))}</strong>
                   <p>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.body`))}</p>
+                  ${achievement.unlocked ? "" : `<em>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.hint`))}</em>`}
                   <small>${escapeHTML(achievement.progress)}${escapeHTML(achievement.suffix || "")}/${escapeHTML(achievement.target)}${escapeHTML(achievement.suffix || "")}</small>
                 </div>
               </article>
@@ -2262,6 +2405,17 @@ function bindInterviewsEvents() {
   }
 }
 
+function bindStatsEvents() {
+  const statsPanel = document.getElementById("tab-stats");
+  if (!statsPanel) return;
+
+  statsPanel.addEventListener("change", (event) => {
+    if (event.target.id !== "stats-period-filter") return;
+    StatsFilters.period = STATS_PERIOD_OPTIONS.includes(event.target.value) ? event.target.value : "all";
+    renderStatsDashboard();
+  });
+}
+
 function bindNavigation() {
   document.querySelectorAll("[data-tab]").forEach((button) => {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
@@ -2274,6 +2428,7 @@ function bindNavigation() {
   bindJobsEvents();
   bindInterviewsEvents();
   bindTodayEvents();
+  bindStatsEvents();
 }
 
 function init() {

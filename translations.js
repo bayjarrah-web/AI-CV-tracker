@@ -219,41 +219,65 @@ const TRANSLATIONS = {
       weeklyApplications: "نشاط التقديم الأسبوعي",
       sourceAnalytics: "تحليل مصادر الوظائف",
       interviewSuccessRate: "نسبة نجاح المقابلات",
+      interviewPerformance: "أداء المقابلات",
       monthTimeline: "نشاط الشهر",
+      monthlyActivity: "نشاط الشهر الحالي",
       achievements: "الإنجازات",
       applications: "طلبات",
+      interviews: "مقابلات",
+      totalInterviews: "إجمالي المقابلات",
       completedInterviews: "مقابلات محسومة",
       passed: "ناجحة",
       failed: "غير ناجحة",
+      pending: "بانتظار النتيجة",
+      mostCommonRoundType: "أكثر نوع جولة تكراراً",
+      noInterviewRounds: "لا توجد جولات مقابلة بعد",
+      noDataShort: "لا يوجد بيانات",
+      filterByPeriod: "فلترة حسب الفترة",
+      activityCount: "{count} أنشطة",
+      lessActivity: "أقل",
+      moreActivity: "أكثر",
+      periods: {
+        week: "هذا الأسبوع",
+        month: "هذا الشهر",
+        quarter: "آخر 3 أشهر",
+        all: "كل الوقت"
+      },
       noData: "أضف أول وظيفة لتظهر الرسوم والتحليلات هنا.",
       noSources: "لا توجد مصادر بعد. ستظهر القنوات الأقوى بعد إضافة الوظائف.",
       noTimeline: "لا يوجد نشاط خلال آخر 30 يوم.",
       timelineApplication: "تم تسجيل طلب وظيفة",
       timelineInterview: "تمت جدولة مقابلة",
       achievementsList: {
-        firstApplication: {
-          title: "أول طلب",
-          body: "أضفت أول فرصة إلى المتتبع."
+        firstStep: {
+          title: "First Step",
+          body: "أضفت أول وظيفة إلى المتتبع.",
+          hint: "أضف أول وظيفة لفتح هذا الإنجاز."
         },
-        tenApplications: {
-          title: "10 طلبات",
-          body: "بنيت قاعدة جيدة من الفرص."
+        onARoll: {
+          title: "On a Roll",
+          body: "أضفت 5 وظائف أو أكثر.",
+          hint: "أضف 5 وظائف أو أكثر."
         },
-        firstInterview: {
-          title: "أول مقابلة",
-          body: "وصلت إلى أول جولة مقابلات."
+        interviewReady: {
+          title: "Interview Ready",
+          body: "وصلت إحدى الوظائف إلى مرحلة المقابلة.",
+          hint: "غيّر حالة وظيفة إلى مقابلة أو أبعد."
         },
-        firstOffer: {
-          title: "أول عرض",
-          body: "لديك عرض عمل مسجل."
+        offerReceived: {
+          title: "Offer Received",
+          body: "سجلت عرض عمل في المتتبع.",
+          hint: "غيّر حالة وظيفة إلى عرض."
         },
-        consistentWeek: {
-          title: "أسبوع نشط",
-          body: "قدمت على 5 فرص خلال أسبوع."
+        consistentTracker: {
+          title: "Consistent Tracker",
+          body: "سجلت نشاطاً خلال 3 أيام متتالية.",
+          hint: "سجل نشاطاً في 3 أيام متتالية."
         },
-        highResponse: {
-          title: "ردود قوية",
-          body: "معدل الرد وصل إلى 50% أو أكثر."
+        networkPro: {
+          title: "Network Pro",
+          body: "استخدمت referral أو recruiter كمصدر.",
+          hint: "أضف وظيفة مصدرها referral أو recruiter."
         }
       }
     },
@@ -641,41 +665,65 @@ const TRANSLATIONS = {
       weeklyApplications: "Weekly Application Activity",
       sourceAnalytics: "Source Analytics",
       interviewSuccessRate: "Interview Success Rate",
+      interviewPerformance: "Interview Performance",
       monthTimeline: "Month Timeline",
+      monthlyActivity: "Monthly Activity",
       achievements: "Achievements",
       applications: "applications",
+      interviews: "interviews",
+      totalInterviews: "Total interviews",
       completedInterviews: "decisive interviews",
       passed: "Passed",
       failed: "Failed",
+      pending: "Pending",
+      mostCommonRoundType: "Most common round type",
+      noInterviewRounds: "No interview rounds yet",
+      noDataShort: "No data",
+      filterByPeriod: "Filter by period",
+      activityCount: "{count} activities",
+      lessActivity: "Less",
+      moreActivity: "More",
+      periods: {
+        week: "This Week",
+        month: "This Month",
+        quarter: "Last 3 Months",
+        all: "All Time"
+      },
       noData: "Add your first job to unlock charts and analytics here.",
       noSources: "No sources yet. Your strongest channels will appear after adding jobs.",
       noTimeline: "No activity in the last 30 days yet.",
       timelineApplication: "Application recorded",
       timelineInterview: "Interview scheduled",
       achievementsList: {
-        firstApplication: {
-          title: "First Application",
-          body: "You added your first tracked opportunity."
+        firstStep: {
+          title: "First Step",
+          body: "You added your first tracked job.",
+          hint: "Add your first job to unlock this badge."
         },
-        tenApplications: {
-          title: "10 Applications",
-          body: "You built a useful opportunity base."
+        onARoll: {
+          title: "On a Roll",
+          body: "You added 5 jobs or more.",
+          hint: "Add 5 jobs or more."
         },
-        firstInterview: {
-          title: "First Interview",
-          body: "You reached your first interview round."
+        interviewReady: {
+          title: "Interview Ready",
+          body: "One job reached the interview stage.",
+          hint: "Move a job to interview or beyond."
         },
-        firstOffer: {
-          title: "First Offer",
-          body: "You have a recorded job offer."
+        offerReceived: {
+          title: "Offer Received",
+          body: "You recorded a job offer.",
+          hint: "Move a job status to offer."
         },
-        consistentWeek: {
-          title: "Active Week",
-          body: "You applied to 5 roles in one week."
+        consistentTracker: {
+          title: "Consistent Tracker",
+          body: "You tracked activity for 3 consecutive days.",
+          hint: "Record activity on 3 consecutive days."
         },
-        highResponse: {
-          title: "Strong Responses",
-          body: "Your response rate reached 50% or more."
+        networkPro: {
+          title: "Network Pro",
+          body: "You used referral or recruiter as a source.",
+          hint: "Add a job from referral or recruiter."
         }
       }
     },
