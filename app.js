@@ -426,6 +426,48 @@ function escapeHTML(value) {
     .replace(/'/g, "&#039;");
 }
 
+function isLibraryAvailable(name) {
+  const libraries = {
+    Chart: () => Boolean(window.Chart),
+    lucide: () => Boolean(window.lucide),
+    marked: () => Boolean(window.marked),
+    DOMPurify: () => Boolean(window.DOMPurify)
+  };
+
+  return Boolean(libraries[name]?.());
+}
+
+function safeInitIcons() {
+  if (!isLibraryAvailable("lucide")) return;
+  window.lucide.createIcons();
+}
+
+function safeRenderMarkdown(markdown) {
+  const source = String(markdown ?? "");
+
+  if (isLibraryAvailable("marked") && isLibraryAvailable("DOMPurify")) {
+    return window.DOMPurify.sanitize(window.marked.parse(source));
+  }
+
+  return escapeHTML(source).replace(/\n/g, "<br>");
+}
+
+function initExternalLibraries() {
+  safeInitIcons();
+
+  const shouldLogLibraries =
+    window.location.protocol === "file:" ||
+    ["localhost", "127.0.0.1"].includes(window.location.hostname) ||
+    window.location.search.includes("debug=true");
+
+  if (!shouldLogLibraries) return;
+
+  const available = ["Chart", "lucide", "marked", "DOMPurify"]
+    .filter((libraryName) => isLibraryAvailable(libraryName));
+
+  console.info("External libraries ready:", available.join(", ") || "none");
+}
+
 function normalizeJob(job) {
   return {
     id: job?.id || uuid(),
@@ -1535,6 +1577,8 @@ function renderInterviews(filter) {
     if (title) title.textContent = t(`interviews.empty.${currentInterviewView}Title`);
     if (body) body.textContent = t(`interviews.empty.${currentInterviewView}Body`);
   }
+
+  safeInitIcons();
 }
 
 function isFollowUpDue(job) {
@@ -1771,6 +1815,8 @@ function renderTodayDashboard() {
       </div>
     </section>
   `;
+
+  safeInitIcons();
 }
 
 function getCssVariable(name) {
@@ -1828,11 +1874,11 @@ function renderKPICards(data) {
 
 function renderStatusDonut(data) {
   const statusCanvas = document.getElementById("stats-status-chart");
-  if (!statusCanvas || typeof Chart === "undefined") return;
+  if (!statusCanvas || !isLibraryAvailable("Chart")) return;
   if (statusChart) statusChart.destroy();
 
   const palette = getStatsChartPalette();
-  statusChart = new Chart(statusCanvas, {
+  statusChart = new window.Chart(statusCanvas, {
     type: "doughnut",
     data: {
       labels: data.byStatus.map((item) => item.label),
@@ -1864,10 +1910,10 @@ function renderStatusDonut(data) {
 
 function renderWeeklyBar(data) {
   const weeklyCanvas = document.getElementById("stats-weekly-chart");
-  if (!weeklyCanvas || typeof Chart === "undefined") return;
+  if (!weeklyCanvas || !isLibraryAvailable("Chart")) return;
   if (weeklyChart) weeklyChart.destroy();
 
-  weeklyChart = new Chart(weeklyCanvas, {
+  weeklyChart = new window.Chart(weeklyCanvas, {
     type: "bar",
     data: {
       labels: data.byWeek.map((week) => week.label),
@@ -2097,6 +2143,7 @@ function renderStats() {
   destroyStatsCharts();
   renderStatusDonut(data);
   renderWeeklyBar(data);
+  safeInitIcons();
 }
 
 function renderStatsDashboard() {
@@ -2117,6 +2164,7 @@ function renderJobs() {
     const emptyBody = empty.querySelector("p");
     if (emptyTitle) emptyTitle.textContent = AppState.jobs.length ? t("jobs.noFiltersResult") : t("empty.jobs.title");
     if (emptyBody) emptyBody.textContent = AppState.jobs.length ? t("empty.jobs.body") : t("empty.jobs.body");
+    safeInitIcons();
     return;
   }
 
@@ -2174,6 +2222,8 @@ function renderJobs() {
 
     grid.appendChild(card);
   });
+
+  safeInitIcons();
 }
 
 function initOnboarding() {
@@ -2314,6 +2364,7 @@ function showMainApp() {
   renderEmptyStates();
   renderJobs();
   switchTab(AppState.currentTab);
+  safeInitIcons();
 }
 
 function updateHeader() {
@@ -2369,6 +2420,8 @@ function renderEmptyStates() {
       </div>
     `;
   });
+
+  safeInitIcons();
 }
 
 function bindTodayEvents() {
@@ -2547,6 +2600,7 @@ function init() {
   populateJobSelects();
   populateInterviewSelects();
   initOnboarding();
+  initExternalLibraries();
 }
 
 document.addEventListener("DOMContentLoaded", init);

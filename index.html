@@ -114,31 +114,31 @@
 
       <nav class="tab-nav glass-card" aria-label="Main navigation">
         <button class="tab-button active" type="button" data-tab="today">
-          <span class="tab-icon">01</span>
+          <span class="tab-icon"><i data-lucide="home"></i></span>
           <span data-i18n="tabs.today">اليوم</span>
         </button>
         <button class="tab-button" type="button" data-tab="profile">
-          <span class="tab-icon">02</span>
+          <span class="tab-icon"><i data-lucide="user"></i></span>
           <span data-i18n="tabs.profile">الملف</span>
         </button>
         <button class="tab-button" type="button" data-tab="jobs">
-          <span class="tab-icon">03</span>
+          <span class="tab-icon"><i data-lucide="briefcase"></i></span>
           <span data-i18n="tabs.jobs">الوظائف</span>
         </button>
         <button class="tab-button" type="button" data-tab="stats">
-          <span class="tab-icon">04</span>
+          <span class="tab-icon"><i data-lucide="bar-chart-3"></i></span>
           <span data-i18n="tabs.stats">الإحصائيات</span>
         </button>
         <button class="tab-button" type="button" data-tab="interviews">
-          <span class="tab-icon">05</span>
+          <span class="tab-icon"><i data-lucide="calendar"></i></span>
           <span data-i18n="tabs.interviews">المقابلات</span>
         </button>
         <button class="tab-button" type="button" data-tab="analyzer">
-          <span class="tab-icon">06</span>
+          <span class="tab-icon"><i data-lucide="brain"></i></span>
           <span data-i18n="tabs.analyzer">المحلل</span>
         </button>
         <button class="tab-button" type="button" data-tab="settings">
-          <span class="tab-icon">07</span>
+          <span class="tab-icon"><i data-lucide="settings"></i></span>
           <span data-i18n="tabs.settings">الإعدادات</span>
         </button>
       </nav>
@@ -477,7 +477,11 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="translations.js?v=20260617-11"></script>
-  <script src="app.js?v=20260617-11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.min.mjs" type="module"></script>
+  <script src="translations.js?v=20260617-12"></script>
+  <script src="app.js?v=20260617-12"></script>
 </body>
 </html>

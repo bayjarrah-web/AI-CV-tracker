@@ -32,6 +32,9 @@ The app stays a static, no-build Vanilla HTML/CSS/JS project. Current CDN depend
 - Fontshare Satoshi for display typography
 - Google Fonts DM Sans, JetBrains Mono, Noto Kufi Arabic, and Noto Sans Arabic
 - Chart.js for analytics charts
+- Lucide Icons for consistent interface icons
+- Marked.js and DOMPurify for future safe Markdown rendering
+- PDF.js for future PDF analysis foundations
 
 ## Run
 
