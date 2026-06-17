@@ -21,9 +21,17 @@ A bilingual Arabic/English job application tracker built as a lightweight static
 - User: `cv_tracker_user`
 - CV metadata: `cv_tracker_cv`
 - Jobs: `jobtrack_jobs`
-- Interviews: `cv_tracker_interviews`
+- Interviews: `jobtrack_interviews`
 - Analyses: `cv_tracker_analyses`
 - Settings: `cv_tracker_settings`
+
+## External Libraries
+
+The app stays a static, no-build Vanilla HTML/CSS/JS project. Current CDN dependencies:
+
+- Fontshare Satoshi for display typography
+- Google Fonts DM Sans, JetBrains Mono, Noto Kufi Arabic, and Noto Sans Arabic
+- Chart.js for analytics charts
 
 ## Run
 

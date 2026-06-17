@@ -310,8 +310,8 @@ function setLanguage(lang) {
   document.documentElement.lang = AppState.language;
   document.documentElement.dir = AppState.language === "ar" ? "rtl" : "ltr";
   document.body.style.fontFamily = AppState.language === "ar"
-    ? "\"Noto Sans Arabic\", \"Inter\", sans-serif"
-    : "\"Inter\", \"Noto Sans Arabic\", sans-serif";
+    ? "\"Noto Sans Arabic\", \"DM Sans\", sans-serif"
+    : "\"DM Sans\", \"Noto Sans Arabic\", sans-serif";
 
   StorageManager.set(StorageManager.KEYS.SETTINGS, AppState.settings);
   translatePage();
