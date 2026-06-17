@@ -132,7 +132,29 @@ const TRANSLATIONS = {
       next: "التالي",
       all: "الكل",
       other: "أخرى",
-      guest: "ضيف"
+      guest: "ضيف",
+      available: "متوفر",
+      missing: "غير متوفر",
+      comingSoon: "قريباً"
+    },
+    foundation: {
+      libraries: "المكتبات",
+      libraryStatus: "حالة المكتبات",
+      available: "متوفر",
+      missing: "غير متوفر",
+      analyzerReady: "المحلل الذكي جاهز للمرحلة القادمة",
+      markdownReady: "عارض Markdown جاهز",
+      sanitizerReady: "أداة التنظيف جاهزة",
+      pdfReady: "قارئ PDF جاهز",
+      pdfPending: "قارئ PDF قيد التجهيز",
+      unlockAnalytics: "أضف أول وظيفة لفتح الإحصائيات",
+      comingSoon: "قريباً",
+      foundationReady: "الأساس جاهز",
+      appearance: "المظهر",
+      dataExport: "البيانات والتصدير",
+      aiSetupComingSoon: "إعداد الذكاء الاصطناعي قريباً",
+      profileReady: "ملفك الشخصي جاهز للتوسعة",
+      profileBody: "سيتم استخدام بياناتك وسيرتك الذاتية لاحقاً لتجهيز تجربة أذكى."
     },
     specialties: {
       frontend: "تطوير واجهات أمامية",
@@ -586,7 +608,29 @@ const TRANSLATIONS = {
       next: "Next",
       all: "All",
       other: "Other",
-      guest: "Guest"
+      guest: "Guest",
+      available: "Available",
+      missing: "Missing",
+      comingSoon: "Coming soon"
+    },
+    foundation: {
+      libraries: "Libraries",
+      libraryStatus: "Library status",
+      available: "Available",
+      missing: "Missing",
+      analyzerReady: "AI Analyzer is ready for the next phase",
+      markdownReady: "Markdown renderer ready",
+      sanitizerReady: "Sanitizer ready",
+      pdfReady: "PDF reader ready",
+      pdfPending: "PDF reader pending",
+      unlockAnalytics: "Add your first job to unlock analytics",
+      comingSoon: "Coming soon",
+      foundationReady: "Foundation ready",
+      appearance: "Appearance",
+      dataExport: "Data & Export",
+      aiSetupComingSoon: "AI Setup Coming Soon",
+      profileReady: "Your profile is ready to grow",
+      profileBody: "Your details and CV will power a smarter experience in later phases."
     },
     specialties: {
       frontend: "Frontend development",

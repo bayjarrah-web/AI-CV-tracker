@@ -431,7 +431,8 @@ function isLibraryAvailable(name) {
     Chart: () => Boolean(window.Chart),
     lucide: () => Boolean(window.lucide),
     marked: () => Boolean(window.marked),
-    DOMPurify: () => Boolean(window.DOMPurify)
+    DOMPurify: () => Boolean(window.DOMPurify),
+    pdfjsLib: () => Boolean(window.pdfjsLib)
   };
 
   return Boolean(libraries[name]?.());
@@ -462,7 +463,7 @@ function initExternalLibraries() {
 
   if (!shouldLogLibraries) return;
 
-  const available = ["Chart", "lucide", "marked", "DOMPurify"]
+  const available = ["Chart", "lucide", "marked", "DOMPurify", "pdfjsLib"]
     .filter((libraryName) => isLibraryAvailable(libraryName));
 
   console.info("External libraries ready:", available.join(", ") || "none");
@@ -2099,7 +2100,7 @@ function renderStats() {
           </div>
           ${data.byStatus.length
             ? `<div class="chart-wrap"><canvas id="stats-status-chart"></canvas></div>`
-            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noDataYet"))}</div>`}
+            : `<div class="today-positive-state muted-state">${escapeHTML(t("foundation.unlockAnalytics"))}</div>`}
         </section>
 
         <section class="stats-card chart-card glass-card">
@@ -2404,24 +2405,127 @@ function switchTab(tabName) {
 }
 
 function renderEmptyStates() {
-  const tabs = ["profile", "analyzer", "settings"];
+  renderProfileReadiness();
+  renderAnalyzerReadiness();
+  renderSettingsReadiness();
+  safeInitIcons();
+}
 
-  tabs.forEach((tabName, index) => {
-    const panel = document.getElementById(`tab-${tabName}`);
-    if (!panel) return;
+function renderProfileReadiness() {
+  const panel = document.getElementById("tab-profile");
+  if (!panel) return;
 
-    panel.innerHTML = `
-      <div class="empty-state glass-card">
-        <div class="empty-state-inner">
-          <div class="empty-icon">${String(index + 1).padStart(2, "0")}</div>
-          <h2>${t(`empty.${tabName}.title`)}</h2>
-          <p>${t(`empty.${tabName}.body`)}</p>
+  panel.innerHTML = `
+    <section class="foundation-panel">
+      <div class="foundation-hero glass-card">
+        <div class="foundation-icon"><i data-lucide="user"></i></div>
+        <div>
+          <p class="eyebrow">${escapeHTML(t("foundation.foundationReady"))}</p>
+          <h2>${escapeHTML(t("foundation.profileReady"))}</h2>
+          <p>${escapeHTML(t("foundation.profileBody"))}</p>
         </div>
       </div>
-    `;
-  });
+    </section>
+  `;
+}
 
-  safeInitIcons();
+function getLibraryStatusItems() {
+  return [
+    {
+      key: "marked",
+      label: t("foundation.markdownReady"),
+      available: isLibraryAvailable("marked")
+    },
+    {
+      key: "DOMPurify",
+      label: t("foundation.sanitizerReady"),
+      available: isLibraryAvailable("DOMPurify")
+    },
+    {
+      key: "pdfjsLib",
+      label: isLibraryAvailable("pdfjsLib") ? t("foundation.pdfReady") : t("foundation.pdfPending"),
+      available: isLibraryAvailable("pdfjsLib")
+    }
+  ];
+}
+
+function renderLibraryStatus() {
+  return `
+    <div class="library-status-grid">
+      ${getLibraryStatusItems().map((item) => `
+        <article class="library-status-card ${item.available ? "is-ready" : "is-pending"}">
+          <span class="library-dot" aria-hidden="true"></span>
+          <div>
+            <strong>${escapeHTML(item.label)}</strong>
+            <p>${escapeHTML(item.available ? t("foundation.available") : t("foundation.missing"))}</p>
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderAnalyzerReadiness() {
+  const panel = document.getElementById("tab-analyzer");
+  if (!panel) return;
+
+  panel.innerHTML = `
+    <section class="foundation-panel">
+      <div class="foundation-hero glass-card">
+        <div class="foundation-icon"><i data-lucide="brain"></i></div>
+        <div>
+          <p class="eyebrow">${escapeHTML(t("foundation.libraries"))}</p>
+          <h2>${escapeHTML(t("foundation.analyzerReady"))}</h2>
+          <p>${escapeHTML(t("empty.analyzer.body"))}</p>
+        </div>
+      </div>
+
+      <section class="foundation-card glass-card">
+        <div class="g-section-header">
+          <div>
+            <p class="eyebrow">${escapeHTML(t("foundation.foundationReady"))}</p>
+            <h3>${escapeHTML(t("foundation.libraryStatus"))}</h3>
+          </div>
+          <span class="g-chip">${escapeHTML(t("foundation.comingSoon"))}</span>
+        </div>
+        ${renderLibraryStatus()}
+      </section>
+    </section>
+  `;
+}
+
+function renderSettingsReadiness() {
+  const panel = document.getElementById("tab-settings");
+  if (!panel) return;
+
+  const cards = [
+    { icon: "palette", title: t("foundation.appearance"), body: t("foundation.comingSoon") },
+    { icon: "database", title: t("foundation.dataExport"), body: t("foundation.comingSoon") },
+    { icon: "sparkles", title: t("foundation.aiSetupComingSoon"), body: t("foundation.foundationReady") }
+  ];
+
+  panel.innerHTML = `
+    <section class="foundation-panel">
+      <div class="foundation-hero glass-card">
+        <div class="foundation-icon"><i data-lucide="settings"></i></div>
+        <div>
+          <p class="eyebrow">${escapeHTML(t("foundation.foundationReady"))}</p>
+          <h2>${escapeHTML(t("empty.settings.title"))}</h2>
+          <p>${escapeHTML(t("empty.settings.body"))}</p>
+        </div>
+      </div>
+
+      <div class="settings-readiness-grid">
+        ${cards.map((card) => `
+          <article class="foundation-card glass-card">
+            <div class="foundation-card-icon"><i data-lucide="${escapeHTML(card.icon)}"></i></div>
+            <h3>${escapeHTML(card.title)}</h3>
+            <p>${escapeHTML(card.body)}</p>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
 }
 
 function bindTodayEvents() {

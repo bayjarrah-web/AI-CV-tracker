@@ -1924,6 +1924,310 @@ textarea:focus {
   backdrop-filter: blur(12px);
 }
 
+/* gstack foundation utilities and component polish */
+.g-card,
+.glass-card,
+.job-card,
+.interview-card,
+.stats-card,
+.summary-card,
+.today-section,
+.today-mini-card,
+.foundation-card {
+  border-color: var(--border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(26, 26, 26, 0.92), rgba(20, 20, 20, 0.84));
+}
+
+.g-button,
+.btn,
+.tab-button,
+.interview-tab,
+.period-filter-tab,
+.language-option,
+.icon-btn,
+.fab-add-job {
+  min-height: 44px;
+  outline: none;
+}
+
+.g-button-primary,
+.btn-primary,
+.language-option.active,
+.tab-button.active {
+  color: #111111;
+  border-color: var(--amber-border);
+  background: linear-gradient(135deg, var(--amber), var(--amber-text));
+  box-shadow: var(--shadow-amber);
+}
+
+.g-button-secondary,
+.btn-secondary,
+.period-filter-tab,
+.interview-tab,
+.icon-btn {
+  color: var(--text-muted);
+  border-color: var(--border);
+  background: rgba(250, 250, 250, 0.045);
+}
+
+.g-input,
+input,
+select,
+textarea {
+  border-color: var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(12, 12, 12, 0.78);
+}
+
+.g-chip,
+.g-badge,
+.badge,
+.user-chip,
+.job-due-label {
+  border-radius: var(--radius-pill);
+  border-color: rgba(250, 250, 250, 0.1);
+  background: rgba(250, 250, 250, 0.06);
+}
+
+.g-empty-state,
+.empty-state {
+  min-height: clamp(280px, 48vh, 500px);
+  border-radius: var(--radius-lg);
+}
+
+.g-section-header,
+.stats-card-header,
+.today-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.g-muted {
+  color: var(--text-secondary);
+}
+
+.g-mono,
+.summary-card strong,
+.stats-hero-score strong,
+.job-meta,
+.interview-date-chip,
+.activity-feed-item time,
+.stats-timeline-item time {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.btn:focus-visible,
+.tab-button:focus-visible,
+.interview-tab:focus-visible,
+.period-filter-tab:focus-visible,
+.language-option:focus-visible,
+.icon-btn:focus-visible,
+.fab-add-job:focus-visible {
+  outline: 2px solid var(--amber-text);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--amber-soft);
+}
+
+.btn:hover,
+.tab-button:hover,
+.interview-tab:hover,
+.period-filter-tab:hover,
+.icon-btn:hover,
+.fab-add-job:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:hover,
+.period-filter-tab:hover,
+.interview-tab:hover,
+.icon-btn:hover {
+  color: var(--text-primary);
+  background: rgba(250, 250, 250, 0.075);
+}
+
+.period-filter-tab.active,
+.interview-tab.active {
+  color: #111111;
+  border-color: var(--amber-border);
+  background: linear-gradient(135deg, var(--amber), var(--amber-text));
+  box-shadow: var(--shadow-amber);
+}
+
+.interview-tab.active strong {
+  color: #111111;
+  background: rgba(17, 17, 17, 0.12);
+}
+
+.stats-hero::after,
+.today-hero::after {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.13), transparent 66%);
+}
+
+.stats-hero-score,
+.today-motivation-banner,
+.interview-date-chip {
+  border-color: var(--amber-border);
+  background: var(--amber-soft);
+  box-shadow: none;
+}
+
+.stats-hero-score strong,
+.today-date,
+.activity-log-title,
+.stats-insight-line strong,
+.interview-date-chip span,
+.today-section-header span {
+  color: var(--amber-text);
+}
+
+.period-filter-tabs,
+.job-badge-row,
+.job-actions,
+.today-mini-actions {
+  min-width: 0;
+}
+
+.summary-cards-row,
+.stats-kpi-grid,
+.jobs-grid,
+.interviews-grid,
+.stats-grid,
+.today-sections-grid,
+.achievement-grid,
+.settings-readiness-grid,
+.library-status-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+
+.jobs-toolbar {
+  grid-template-columns: minmax(min(100%, 240px), 1.35fr) repeat(3, minmax(min(100%, 150px), 0.85fr)) auto;
+}
+
+.job-card,
+.interview-card,
+.stats-card,
+.today-section,
+.foundation-card,
+.foundation-hero {
+  min-width: 0;
+}
+
+.job-title-group,
+.interview-card-top > div,
+.foundation-hero > div:last-child,
+.foundation-card,
+.stats-card,
+.today-section {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.foundation-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.foundation-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: clamp(18px, 4vw, 26px);
+  border-radius: var(--radius-lg);
+}
+
+.foundation-hero h2 {
+  font-size: clamp(1.45rem, 4vw, 2.35rem);
+}
+
+.foundation-hero p:not(.eyebrow),
+.foundation-card p,
+.library-status-card p {
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.foundation-icon,
+.foundation-card-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--amber-border);
+  border-radius: var(--radius-md);
+  color: var(--amber-text);
+  background: var(--amber-soft);
+}
+
+.foundation-card {
+  display: grid;
+  gap: 14px;
+  padding: clamp(16px, 4vw, 22px);
+}
+
+.settings-readiness-grid,
+.library-status-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.library-status-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: rgba(250, 250, 250, 0.04);
+}
+
+.library-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-pill);
+  background: var(--text-disabled);
+}
+
+.library-status-card.is-ready .library-dot {
+  background: var(--success);
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.28);
+}
+
+.library-status-card.is-pending .library-dot {
+  background: var(--warning);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.22);
+}
+
+.fab-add-job {
+  border-color: var(--amber-border);
+  color: #111111;
+  background: linear-gradient(135deg, var(--amber), var(--amber-text));
+  box-shadow: var(--shadow-amber);
+}
+
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.modal-box {
+  border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, rgba(26, 26, 26, 0.98), rgba(12, 12, 12, 0.96));
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -2216,5 +2520,59 @@ textarea:focus {
   [dir="rtl"] .fab-add-job {
     right: auto;
     left: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    align-items: end;
+    padding: 0;
+  }
+
+  .modal-box,
+  .job-modal,
+  .interview-modal {
+    width: 100%;
+    max-height: 88vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .foundation-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .library-status-card {
+    align-items: flex-start;
+  }
+
+  .period-filter-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-shell {
+    padding-inline: 10px;
+  }
+
+  .language-option {
+    min-width: 62px;
+    padding-inline: 8px;
+  }
+
+  .jobs-header,
+  .jobs-toolbar,
+  .interviews-header,
+  .interview-inner-tabs,
+  .job-card,
+  .interview-card,
+  .stats-card,
+  .summary-card,
+  .today-section,
+  .foundation-card {
+    padding: 14px;
   }
 }

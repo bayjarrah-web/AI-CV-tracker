@@ -27,14 +27,15 @@ A bilingual Arabic/English job application tracker built as a lightweight static
 
 ## External Libraries
 
-The app stays a static, no-build Vanilla HTML/CSS/JS project. Current CDN dependencies:
+The app stays a static, no-build Vanilla HTML/CSS/JS project. Libraries are loaded via CDN, so no npm install or build step is required and the app remains GitHub Pages compatible.
 
 - Fontshare Satoshi for display typography
 - Google Fonts DM Sans, JetBrains Mono, Noto Kufi Arabic, and Noto Sans Arabic
-- Chart.js for analytics charts
-- Lucide Icons for consistent interface icons
-- Marked.js and DOMPurify for future safe Markdown rendering
-- PDF.js for future PDF analysis foundations
+- Chart.js — analytics charts
+- Lucide Icons — icons
+- Marked.js — markdown rendering for future AI responses
+- DOMPurify — sanitizing generated HTML
+- PDF.js — future PDF CV extraction
 
 ## Run
 
