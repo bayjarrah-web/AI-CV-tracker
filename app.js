@@ -310,6 +310,32 @@ function countryFlag(countryCode) {
     .replace(/./g, (letter) => String.fromCodePoint(127397 + letter.charCodeAt(0)));
 }
 
+function getCountryName(countryCode, language = AppState.language) {
+  if (typeof Intl.DisplayNames !== "function") return countryCode;
+
+  const locale = language === "ar" ? "ar" : "en-US";
+  const displayNames = new Intl.DisplayNames([locale], { type: "region" });
+  return displayNames.of(countryCode) || countryCode;
+}
+
+function getLocalizedCountryOptions() {
+  const locale = AppState.language === "ar" ? "ar" : "en-US";
+  const collator = new Intl.Collator(locale, {
+    sensitivity: "base",
+    ignorePunctuation: true,
+    numeric: true
+  });
+
+  return COUNTRY_CODES
+    .map((code) => ({
+      code,
+      flag: countryFlag(code),
+      label: getCountryName(code, AppState.language),
+      alternateLabel: getCountryName(code, AppState.language === "ar" ? "en" : "ar")
+    }))
+    .sort((first, second) => collator.compare(first.label, second.label));
+}
+
 function populateSuggestionLists() {
   const specialtyList = document.getElementById("specialty-options");
   const countryList = document.getElementById("country-options");
@@ -327,19 +353,13 @@ function populateSuggestionLists() {
       });
   }
 
-  if (countryList && typeof Intl.DisplayNames === "function") {
-    const displayNames = new Intl.DisplayNames([AppState.language], { type: "region" });
+  if (countryList) {
     countryList.innerHTML = "";
-    COUNTRY_CODES
-      .map((code) => ({
-        code,
-        label: displayNames.of(code) || code
-      }))
-      .sort((first, second) => collator.compare(first.label, second.label))
+    getLocalizedCountryOptions()
       .forEach((country) => {
         const option = document.createElement("option");
-        option.value = `${countryFlag(country.code)} ${country.label}`;
-        option.label = country.code;
+        option.value = `${country.flag} ${country.label}`;
+        option.label = `${country.alternateLabel} · ${country.code}`;
         countryList.appendChild(option);
       });
   }
