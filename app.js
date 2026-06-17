@@ -1875,7 +1875,11 @@ function renderKPICards(data) {
 
 function renderStatusDonut(data) {
   const statusCanvas = document.getElementById("stats-status-chart");
-  if (!statusCanvas || !isLibraryAvailable("Chart")) return;
+  if (!statusCanvas) return;
+  if (!isLibraryAvailable("Chart")) {
+    showChartFallback(statusCanvas);
+    return;
+  }
   if (statusChart) statusChart.destroy();
 
   const palette = getStatsChartPalette();
@@ -1911,7 +1915,11 @@ function renderStatusDonut(data) {
 
 function renderWeeklyBar(data) {
   const weeklyCanvas = document.getElementById("stats-weekly-chart");
-  if (!weeklyCanvas || !isLibraryAvailable("Chart")) return;
+  if (!weeklyCanvas) return;
+  if (!isLibraryAvailable("Chart")) {
+    showChartFallback(weeklyCanvas);
+    return;
+  }
   if (weeklyChart) weeklyChart.destroy();
 
   weeklyChart = new window.Chart(weeklyCanvas, {
@@ -1946,6 +1954,18 @@ function renderWeeklyBar(data) {
       }
     }
   });
+}
+
+function showChartFallback(canvas) {
+  const wrapper = canvas.closest(".chart-wrap");
+  if (!wrapper) return;
+
+  wrapper.innerHTML = `
+    <div class="chart-fallback muted-state">
+      <strong>${escapeHTML(t("statsDashboard.noDataYet"))}</strong>
+      <p>${escapeHTML(t("foundation.unlockAnalytics"))}</p>
+    </div>
+  `;
 }
 
 function renderSourceAnalytics(data) {
@@ -2432,18 +2452,38 @@ function renderProfileReadiness() {
 function getLibraryStatusItems() {
   return [
     {
+      key: "Chart",
+      name: "Chart.js",
+      label: t("foundation.chartReady"),
+      use: t("foundation.uses.stats"),
+      available: isLibraryAvailable("Chart")
+    },
+    {
+      key: "lucide",
+      name: "Lucide",
+      label: t("foundation.iconsReady"),
+      use: t("foundation.uses.icons"),
+      available: isLibraryAvailable("lucide")
+    },
+    {
       key: "marked",
+      name: "Marked.js",
       label: t("foundation.markdownReady"),
+      use: t("foundation.uses.aiMarkdown"),
       available: isLibraryAvailable("marked")
     },
     {
       key: "DOMPurify",
+      name: "DOMPurify",
       label: t("foundation.sanitizerReady"),
+      use: t("foundation.uses.security"),
       available: isLibraryAvailable("DOMPurify")
     },
     {
       key: "pdfjsLib",
+      name: "PDF.js",
       label: isLibraryAvailable("pdfjsLib") ? t("foundation.pdfReady") : t("foundation.pdfPending"),
+      use: t("foundation.uses.cvReading"),
       available: isLibraryAvailable("pdfjsLib")
     }
   ];
@@ -2451,14 +2491,21 @@ function getLibraryStatusItems() {
 
 function renderLibraryStatus() {
   return `
-    <div class="library-status-grid">
+    <div class="library-status-table" role="table" aria-label="${escapeHTML(t("foundation.libraryStatus"))}">
+      <div class="library-status-head" role="row">
+        <span role="columnheader">${escapeHTML(t("foundation.library"))}</span>
+        <span role="columnheader">${escapeHTML(t("foundation.status"))}</span>
+        <span role="columnheader">${escapeHTML(t("foundation.use"))}</span>
+      </div>
       ${getLibraryStatusItems().map((item) => `
-        <article class="library-status-card ${item.available ? "is-ready" : "is-pending"}">
-          <span class="library-dot" aria-hidden="true"></span>
-          <div>
-            <strong>${escapeHTML(item.label)}</strong>
-            <p>${escapeHTML(item.available ? t("foundation.available") : t("foundation.missing"))}</p>
-          </div>
+        <article class="library-status-row ${item.available ? "is-ready" : "is-pending"}" role="row">
+          <strong role="cell">${escapeHTML(item.name)}</strong>
+          <span class="library-state" role="cell">
+            <span class="library-dot" aria-hidden="true"></span>
+            ${escapeHTML(item.available ? t("foundation.available") : t("foundation.missing"))}
+          </span>
+          <p role="cell">${escapeHTML(item.use)}</p>
+          <small>${escapeHTML(item.label)}</small>
         </article>
       `).join("")}
     </div>
@@ -2524,6 +2571,17 @@ function renderSettingsReadiness() {
           </article>
         `).join("")}
       </div>
+
+      <section class="foundation-card glass-card">
+        <div class="g-section-header">
+          <div>
+            <p class="eyebrow">${escapeHTML(t("foundation.libraries"))}</p>
+            <h3>${escapeHTML(t("foundation.libraryStatus"))}</h3>
+          </div>
+          <span class="g-chip">${escapeHTML(t("foundation.foundationReady"))}</span>
+        </div>
+        ${renderLibraryStatus()}
+      </section>
     </section>
   `;
 }

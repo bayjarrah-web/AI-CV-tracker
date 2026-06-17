@@ -2182,6 +2182,62 @@ textarea:focus-visible,
   gap: 12px;
 }
 
+.library-status-table {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.library-status-head,
+.library-status-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(112px, 0.8fr) minmax(140px, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.library-status-head {
+  padding: 0 14px;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.library-status-row {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: rgba(250, 250, 250, 0.04);
+}
+
+.library-status-row strong,
+.library-status-row p,
+.library-status-row small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.library-status-row p,
+.library-status-row small {
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.library-status-row small {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+}
+
+.library-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-weight: 900;
+}
+
 .library-status-card {
   display: flex;
   align-items: center;
@@ -2206,9 +2262,33 @@ textarea:focus-visible,
   box-shadow: 0 0 18px rgba(34, 197, 94, 0.28);
 }
 
+.library-status-row.is-ready .library-dot {
+  background: var(--success);
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.28);
+}
+
 .library-status-card.is-pending .library-dot {
   background: var(--warning);
   box-shadow: 0 0 18px rgba(245, 158, 11, 0.22);
+}
+
+.library-status-row.is-pending .library-dot {
+  background: var(--warning);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.22);
+}
+
+.chart-fallback {
+  display: grid;
+  min-height: 292px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.chart-fallback p {
+  color: var(--text-secondary);
+  font-weight: 700;
 }
 
 .fab-add-job {
@@ -2545,6 +2625,14 @@ textarea:focus-visible,
 
   .library-status-card {
     align-items: flex-start;
+  }
+
+  .library-status-head {
+    display: none;
+  }
+
+  .library-status-row {
+    grid-template-columns: 1fr;
   }
 
   .period-filter-tabs {
