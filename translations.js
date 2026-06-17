@@ -84,6 +84,44 @@ const TRANSLATIONS = {
       network: "شبكة العلاقات",
       other: "أخرى"
     },
+    interviewRoundTypes: {
+      hr: "موارد بشرية",
+      technical: "تقنية",
+      managerial: "إدارية",
+      cultural_fit: "ملاءمة ثقافية",
+      final: "نهائية",
+      assessment: "اختبار",
+      other: "أخرى"
+    },
+    interviewFormats: {
+      video: "فيديو",
+      phone: "هاتف",
+      in_person: "حضوري",
+      async_video: "فيديو مسجل"
+    },
+    interviewStatuses: {
+      scheduled: "مجدولة",
+      completed: "مكتملة",
+      cancelled: "ملغاة",
+      rescheduled: "معاد جدولتها",
+      no_show: "لم تتم"
+    },
+    interviewResults: {
+      passed: "ناجحة",
+      failed: "غير ناجحة",
+      pending: "قيد الانتظار",
+      waiting: "بانتظار الرد"
+    },
+    activity: {
+      created: "تم إنشاء الوظيفة",
+      updated: "تم تحديث الوظيفة",
+      status_changed: "تم تغيير الحالة",
+      follow_up_done: "تم تسجيل متابعة",
+      archived: "تمت أرشفة الوظيفة",
+      interview_scheduled: "تمت جدولة مقابلة",
+      interview_updated: "تم تحديث مقابلة",
+      interview_deleted: "تم حذف مقابلة"
+    },
     common: {
       save: "حفظ",
       cancel: "إلغاء",
@@ -135,6 +173,34 @@ const TRANSLATIONS = {
         body: "سنضع هنا خيارات التخصيص والتفضيلات عندما تتوسع التجربة."
       }
     },
+    todayDashboard: {
+      kicker: "أولويات اليوم",
+      title: "لوحة اليوم",
+      motivation: "خطوة متابعة واحدة اليوم قد تفتح باباً كاملاً هذا الأسبوع.",
+      goodMorning: "صباح الخير",
+      goodEvening: "مساء الخير",
+      totalActiveJobs: "وظائف نشطة",
+      followUpsDue: "متابعات مستحقة",
+      interviewsThisWeek: "مقابلات هذا الأسبوع",
+      offers: "عروض",
+      followUpsTitle: "المتابعات المستحقة",
+      attentionTitle: "تحتاج اهتمام",
+      recentActivityTitle: "النشاط الأخير",
+      noFollowUps: "كل شيء على ما يرام! لا توجد متابعات مستحقة اليوم.",
+      noAttention: "رائع. لا توجد وظائف عالية الأولوية بدون نشاط حديث.",
+      noRecentActivity: "لا يوجد نشاط حديث بعد.",
+      viewJob: "عرض الوظيفة",
+      lastActivity: "آخر نشاط",
+      noActivity: "لا يوجد نشاط بعد",
+      followUpDate: "تاريخ المتابعة",
+      motivationFollowUps: "لديك {count} متابعات اليوم، هيا نبدأ!",
+      motivationNoJobs: "ابدأ بإضافة أول وظيفة اليوم!",
+      motivationQuiet: "يوم هادئ، فرصة للبحث عن فرص جديدة!",
+      motivationOffer: "مبروك! لديك عرض عمل في الانتظار!",
+      daysAgo: "منذ {count} أيام",
+      relativeToday: "اليوم",
+      yesterday: "أمس"
+    },
     emotional: {
       welcomeBack: "أهلاً بعودتك. خطوة صغيرة اليوم تكفي لتحريك الأمور.",
       saved: "تم الحفظ. جميل، صار لدينا أساس نبني عليه.",
@@ -142,6 +208,8 @@ const TRANSLATIONS = {
       jobDeleted: "تم حذف الوظيفة نهائياً.",
       jobArchived: "تمت أرشفة الوظيفة.",
       followUpDone: "تم تسجيل المتابعة. خطوة ممتازة.",
+      interviewSaved: "تم حفظ المقابلة. الجولة صارت واضحة ومجهزة.",
+      interviewDeleted: "تم حذف المقابلة.",
       noPressure: "لا ضغط. يمكنك البدء بالمعلومات المتاحة الآن فقط.",
       keepGoing: "تقدمك لا يحتاج أن يكون مثالياً، فقط واضحاً وقابلاً للمتابعة."
     },
@@ -149,6 +217,7 @@ const TRANSLATIONS = {
       requiredName: "يرجى إدخال الاسم للمتابعة.",
       requiredJobFields: "يرجى إدخال عنوان الوظيفة واسم الشركة.",
       invalidPdf: "يرجى اختيار ملف PDF فقط.",
+      requiredInterviewFields: "يرجى اختيار وظيفة وتاريخ المقابلة.",
       storageUnavailable: "تعذر الوصول إلى التخزين المحلي في المتصفح.",
       generic: "حدث خطأ غير متوقع. حاول مرة أخرى."
     },
@@ -210,7 +279,74 @@ const TRANSLATIONS = {
         status_changed: "تم تغيير الحالة",
         archived: "تمت أرشفة الوظيفة",
         followUpDone: "تم تسجيل متابعة",
-        follow_up_done: "تم تسجيل متابعة"
+        follow_up_done: "تم تسجيل متابعة",
+        interview_scheduled: "تمت جدولة مقابلة",
+        interview_updated: "تم تحديث مقابلة",
+        interview_deleted: "تم حذف مقابلة"
+      }
+    },
+    interviews: {
+      kicker: "إدارة الجولات",
+      title: "المقابلات",
+      addInterview: "إضافة مقابلة",
+      round: "الجولة",
+      openMeeting: "فتح الاجتماع",
+      openMap: "فتح الخريطة",
+      modal: {
+        kicker: "تفاصيل المقابلة",
+        addTitle: "إضافة مقابلة",
+        editTitle: "تعديل مقابلة"
+      },
+      views: {
+        upcoming: "القادمة",
+        past: "السابقة",
+        all: "الكل"
+      },
+      sections: {
+        job: "ربط بالوظيفة",
+        schedule: "تفاصيل الموعد",
+        details: "تفاصيل إضافية",
+        preparation: "التحضير",
+        result: "ما بعد المقابلة"
+      },
+      fields: {
+        jobId: "الوظيفة",
+        round: "الجولة",
+        roundType: "نوع الجولة",
+        interviewDate: "تاريخ المقابلة",
+        interviewTime: "وقت المقابلة",
+        duration: "المدة",
+        format: "الصيغة",
+        platform: "المنصة / رقم الهاتف",
+        location: "الموقع",
+        meetingUrl: "رابط الاجتماع",
+        googleMapsUrl: "رابط Google Maps",
+        interviewerName: "اسم المقابل",
+        interviewerTitle: "منصب المقابل",
+        status: "الحالة",
+        result: "النتيجة",
+        notes: "ملاحظات",
+        postInterviewNotes: "ملاحظات بعد المقابلة",
+        questionsAsked: "الأسئلة التي طُرحت",
+        preparationNotes: "ملاحظات التحضير"
+      },
+      placeholders: {
+        jobSelect: "اختر وظيفة نشطة",
+        duration: "مثال: 45 دقيقة",
+        platform: "Zoom / Teams / رقم الهاتف",
+        location: "مكتب الشركة",
+        meetingUrl: "https://...",
+        googleMapsUrl: "https://maps.google.com/...",
+        preparationNotes: "نقاط التحضير والأسئلة المتوقعة...",
+        notes: "أي تفاصيل مهمة قبل المقابلة..."
+      },
+      empty: {
+        upcomingTitle: "لا توجد مقابلات قادمة",
+        upcomingBody: "عند جدولة مقابلة جديدة، ستظهر هنا مع كل تفاصيل التحضير.",
+        pastTitle: "لا توجد مقابلات سابقة",
+        pastBody: "بعد انتهاء المقابلات، ستظهر هنا لتوثيق النتائج والملاحظات.",
+        allTitle: "لا توجد مقابلات بعد",
+        allBody: "أضف مقابلة مرتبطة بوظيفة لتبدأ بتتبع الجولات."
       }
     },
     modal: {
@@ -303,6 +439,44 @@ const TRANSLATIONS = {
       network: "Network",
       other: "Other"
     },
+    interviewRoundTypes: {
+      hr: "HR",
+      technical: "Technical",
+      managerial: "Managerial",
+      cultural_fit: "Cultural fit",
+      final: "Final",
+      assessment: "Assessment",
+      other: "Other"
+    },
+    interviewFormats: {
+      video: "Video",
+      phone: "Phone",
+      in_person: "In person",
+      async_video: "Async video"
+    },
+    interviewStatuses: {
+      scheduled: "Scheduled",
+      completed: "Completed",
+      cancelled: "Cancelled",
+      rescheduled: "Rescheduled",
+      no_show: "No-show"
+    },
+    interviewResults: {
+      passed: "Passed",
+      failed: "Failed",
+      pending: "Pending",
+      waiting: "Waiting"
+    },
+    activity: {
+      created: "Job created",
+      updated: "Job updated",
+      status_changed: "Status changed",
+      follow_up_done: "Follow-up recorded",
+      archived: "Job archived",
+      interview_scheduled: "Interview scheduled",
+      interview_updated: "Interview updated",
+      interview_deleted: "Interview deleted"
+    },
     common: {
       save: "Save",
       cancel: "Cancel",
@@ -354,6 +528,34 @@ const TRANSLATIONS = {
         body: "Customization and preferences will live here as the experience grows."
       }
     },
+    todayDashboard: {
+      kicker: "Today's priorities",
+      title: "Today Dashboard",
+      motivation: "One thoughtful follow-up today can open a serious door this week.",
+      goodMorning: "Good morning",
+      goodEvening: "Good evening",
+      totalActiveJobs: "Total Active Jobs",
+      followUpsDue: "Follow-ups Due",
+      interviewsThisWeek: "Interviews This Week",
+      offers: "Offers",
+      followUpsTitle: "Follow-ups Due",
+      attentionTitle: "Needs Attention",
+      recentActivityTitle: "Recent Activity",
+      noFollowUps: "Everything is under control! No follow-ups due today.",
+      noAttention: "Nice. No high-priority jobs are sitting without recent activity.",
+      noRecentActivity: "No recent activity yet.",
+      viewJob: "View Job",
+      lastActivity: "Last activity",
+      noActivity: "No activity yet",
+      followUpDate: "Follow-up date",
+      motivationFollowUps: "You have {count} follow-ups today. Let's start.",
+      motivationNoJobs: "Start by adding your first job today.",
+      motivationQuiet: "A quiet day. Good chance to search for fresh opportunities.",
+      motivationOffer: "Congrats! You have a job offer waiting.",
+      daysAgo: "{count} days ago",
+      relativeToday: "Today",
+      yesterday: "Yesterday"
+    },
     emotional: {
       welcomeBack: "Welcome back. One small step today is enough to move things forward.",
       saved: "Saved. Nice, we have a foundation to build on.",
@@ -361,6 +563,8 @@ const TRANSLATIONS = {
       jobDeleted: "Job permanently deleted.",
       jobArchived: "Job archived.",
       followUpDone: "Follow-up recorded. Excellent move.",
+      interviewSaved: "Interview saved. This round is now clear and prepared.",
+      interviewDeleted: "Interview deleted.",
       noPressure: "No pressure. You can begin with only what you know right now.",
       keepGoing: "Your progress does not need to be perfect, just clear enough to follow."
     },
@@ -368,6 +572,7 @@ const TRANSLATIONS = {
       requiredName: "Please enter your name to continue.",
       requiredJobFields: "Please enter the job title and company name.",
       invalidPdf: "Please choose a PDF file only.",
+      requiredInterviewFields: "Please choose a job and interview date.",
       storageUnavailable: "Could not access browser local storage.",
       generic: "Something unexpected happened. Please try again."
     },
@@ -429,7 +634,74 @@ const TRANSLATIONS = {
         status_changed: "Status changed",
         archived: "Job archived",
         followUpDone: "Follow-up recorded",
-        follow_up_done: "Follow-up recorded"
+        follow_up_done: "Follow-up recorded",
+        interview_scheduled: "Interview scheduled",
+        interview_updated: "Interview updated",
+        interview_deleted: "Interview deleted"
+      }
+    },
+    interviews: {
+      kicker: "Round management",
+      title: "Interviews",
+      addInterview: "Add Interview",
+      round: "Round",
+      openMeeting: "Open Meeting",
+      openMap: "Open Map",
+      modal: {
+        kicker: "Interview details",
+        addTitle: "Add Interview",
+        editTitle: "Edit Interview"
+      },
+      views: {
+        upcoming: "Upcoming",
+        past: "Past",
+        all: "All"
+      },
+      sections: {
+        job: "Linked job",
+        schedule: "Schedule details",
+        details: "Extra details",
+        preparation: "Preparation",
+        result: "After interview"
+      },
+      fields: {
+        jobId: "Job",
+        round: "Round",
+        roundType: "Round type",
+        interviewDate: "Interview date",
+        interviewTime: "Interview time",
+        duration: "Duration",
+        format: "Format",
+        platform: "Platform / Phone number",
+        location: "Location",
+        meetingUrl: "Meeting URL",
+        googleMapsUrl: "Google Maps URL",
+        interviewerName: "Interviewer name",
+        interviewerTitle: "Interviewer title",
+        status: "Status",
+        result: "Result",
+        notes: "Notes",
+        postInterviewNotes: "Post-interview notes",
+        questionsAsked: "Questions asked",
+        preparationNotes: "Preparation notes"
+      },
+      placeholders: {
+        jobSelect: "Choose an active job",
+        duration: "Example: 45 minutes",
+        platform: "Zoom / Teams / Phone",
+        location: "Company office",
+        meetingUrl: "https://...",
+        googleMapsUrl: "https://maps.google.com/...",
+        preparationNotes: "Preparation points and expected questions...",
+        notes: "Any important details before the interview..."
+      },
+      empty: {
+        upcomingTitle: "No upcoming interviews",
+        upcomingBody: "Once you schedule an interview, it will appear here with preparation details.",
+        pastTitle: "No past interviews",
+        pastBody: "Completed interviews will appear here for results and notes.",
+        allTitle: "No interviews yet",
+        allBody: "Add an interview linked to a job to start tracking rounds."
       }
     },
     modal: {
