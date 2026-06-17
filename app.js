@@ -69,10 +69,8 @@ let editingJobId = null;
 let highlightedJobId = null;
 let editingInterviewId = null;
 let currentInterviewView = "upcoming";
-let statsCharts = {
-  statusDistribution: null,
-  weeklyActivity: null
-};
+let statusChart = null;
+let weeklyChart = null;
 
 const JobFilters = {
   search: "",
@@ -298,7 +296,7 @@ function renderTodayIfActive() {
 
 function renderStatsIfActive() {
   if (AppState.currentTab === "stats") {
-    renderStatsDashboard();
+    renderStats();
   }
 }
 
@@ -600,12 +598,12 @@ function isDateWithinStatsPeriod(isoDate, period = StatsFilters.period) {
   return !startDate || isoDate >= startDate;
 }
 
-function getStatsJobs() {
-  return AppState.jobs.filter((job) => isDateWithinStatsPeriod(job.appliedDate || job.createdAt));
+function getStatsJobs(period = StatsFilters.period) {
+  return AppState.jobs.filter((job) => isDateWithinStatsPeriod(job.appliedDate || job.createdAt, period));
 }
 
-function getStatsInterviews() {
-  return AppState.interviews.filter((interview) => isDateWithinStatsPeriod(interview.interviewDate || interview.createdAt));
+function getStatsInterviews(period = StatsFilters.period) {
+  return AppState.interviews.filter((interview) => isDateWithinStatsPeriod(interview.interviewDate || interview.createdAt, period));
 }
 
 function getStatsSummary(jobs = getStatsJobs()) {
@@ -668,6 +666,40 @@ function getSourceAnalytics(jobs = getStatsJobs()) {
     })
     .filter((item) => item.count > 0)
     .sort((first, second) => second.count - first.count);
+}
+
+function getSourceStats(jobs = getStatsJobs()) {
+  return getSourceAnalytics(jobs);
+}
+
+function calculateAvgResponseTime(jobs = getStatsJobs()) {
+  const responseStatuses = ["under_review", "interview", "offer", "accepted"];
+  const responseTimes = jobs
+    .filter((job) => responseStatuses.includes(job.status) && job.appliedDate && job.updatedAt)
+    .map((job) => Math.max(0, daysBetweenISO(job.appliedDate, job.updatedAt)));
+
+  if (!responseTimes.length) return null;
+  return Math.round(responseTimes.reduce((sum, days) => sum + days, 0) / responseTimes.length);
+}
+
+function getApplicationsByWeek(weeks = 4, jobs = getStatsJobs()) {
+  const today = todayISO();
+
+  return Array.from({ length: weeks }, (_, index) => {
+    const weekEnd = addDaysToISO(today, -(weeks - 1 - index) * 7);
+    const weekStart = addDaysToISO(weekEnd, -6);
+    const count = jobs.filter((job) => {
+      const date = job.appliedDate || job.createdAt;
+      return date && date >= weekStart && date <= weekEnd;
+    }).length;
+
+    return {
+      weekStart,
+      weekEnd,
+      label: `${new Intl.DateTimeFormat(AppState.language === "ar" ? "ar" : "en", { month: "short", day: "numeric" }).format(new Date(`${weekStart}T00:00:00`))}`,
+      count
+    };
+  });
 }
 
 function getInterviewPerformance(interviews = getStatsInterviews()) {
@@ -767,6 +799,48 @@ function getMonthlyActivityHeatmap() {
       label: `${formatDate(date)} · ${formatMessage("statsDashboard.activityCount", { count })}`
     };
   });
+}
+
+function getActivityByDay(days = 30) {
+  const today = todayISO();
+  const dates = Array.from({ length: days }, (_, index) => addDaysToISO(today, index - (days - 1)));
+  const events = collectActivityEvents();
+
+  return dates.map((date) => {
+    const count = events.filter((event) => event.date === date).length;
+    let level = 0;
+    if (count >= 1 && count <= 2) level = 1;
+    if (count >= 3 && count <= 5) level = 2;
+    if (count >= 6) level = 3;
+
+    return {
+      date,
+      count,
+      level,
+      label: `${formatDate(date)} · ${formatMessage("statsDashboard.activityCount", { count })}`
+    };
+  });
+}
+
+function getStatsData(period = StatsFilters.period) {
+  const jobs = getStatsJobs(period);
+  const interviews = getStatsInterviews(period);
+  const summary = getStatsSummary(jobs);
+
+  return {
+    total: summary.totalApplications,
+    active: summary.activeApplications,
+    responseRate: summary.responseRate,
+    interviewRate: summary.interviewRate,
+    offerRate: summary.offerRate,
+    avgResponseTime: calculateAvgResponseTime(jobs),
+    byStatus: getStatusDistribution(jobs),
+    bySource: getSourceStats(jobs),
+    byWeek: getApplicationsByWeek(4, jobs),
+    interviewStats: getInterviewPerformance(interviews),
+    activityByDay: getActivityByDay(30),
+    achievements: getAchievements()
+  };
 }
 
 function hasThreeDayActivityStreak() {
@@ -1704,23 +1778,14 @@ function getCssVariable(name) {
 }
 
 function destroyStatsCharts() {
-  Object.values(statsCharts).forEach((chart) => {
-    if (chart && typeof chart.destroy === "function") chart.destroy();
-  });
-
-  statsCharts = {
-    statusDistribution: null,
-    weeklyActivity: null
-  };
+  if (statusChart) statusChart.destroy();
+  if (weeklyChart) weeklyChart.destroy();
+  statusChart = null;
+  weeklyChart = null;
 }
 
-function renderStatsCharts(statusDistribution, weeklyActivity) {
-  destroyStatsCharts();
-  if (typeof Chart === "undefined") return;
-
-  const statusCanvas = document.getElementById("stats-status-chart");
-  const weeklyCanvas = document.getElementById("stats-weekly-chart");
-  const palette = [
+function getStatsChartPalette() {
+  return [
     getCssVariable("--cyan"),
     getCssVariable("--amber"),
     getCssVariable("--violet"),
@@ -1731,96 +1796,229 @@ function renderStatsCharts(statusDistribution, weeklyActivity) {
     getCssVariable("--purple"),
     getCssVariable("--surface-mid")
   ];
-
-  if (statusCanvas) {
-    statsCharts.statusDistribution = new Chart(statusCanvas, {
-      type: "doughnut",
-      data: {
-        labels: statusDistribution.map((item) => item.label),
-        datasets: [{
-          data: statusDistribution.map((item) => item.count),
-          backgroundColor: statusDistribution.map((_, index) => palette[index % palette.length]),
-          borderColor: "rgba(10, 15, 30, 0.82)",
-          borderWidth: 3,
-          hoverOffset: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: "68%",
-        plugins: {
-          legend: {
-            position: "bottom",
-            labels: {
-              color: "rgba(249, 250, 251, 0.72)",
-              boxWidth: 10,
-              usePointStyle: true
-            }
-          }
-        }
-      }
-    });
-  }
-
-  if (weeklyCanvas) {
-    statsCharts.weeklyActivity = new Chart(weeklyCanvas, {
-      type: "bar",
-      data: {
-        labels: weeklyActivity.map((day) => day.label),
-        datasets: [{
-          label: t("statsDashboard.weeklyApplications"),
-          data: weeklyActivity.map((day) => day.count),
-          backgroundColor: "rgba(34, 211, 238, 0.72)",
-          borderColor: getCssVariable("--cyan"),
-          borderWidth: 1,
-          borderRadius: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            ticks: { color: "rgba(249, 250, 251, 0.62)" },
-            grid: { color: "rgba(255, 255, 255, 0.06)" }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: { color: "rgba(249, 250, 251, 0.62)", precision: 0 },
-            grid: { color: "rgba(255, 255, 255, 0.06)" }
-          }
-        },
-        plugins: {
-          legend: { display: false }
-        }
-      }
-    });
-  }
 }
 
-function renderStatsDashboard() {
+function renderKPICards(data) {
+  const average = data.avgResponseTime === null
+    ? t("statsDashboard.notAvailable")
+    : `${data.avgResponseTime} ${t("statsDashboard.days")}`;
+  const kpis = [
+    { label: t("statsDashboard.totalApplications"), value: data.total, icon: "▣", color: "primary" },
+    { label: t("statsDashboard.activeApplications"), value: data.active, icon: "↗", color: "cyan" },
+    { label: t("statsDashboard.responseRate"), value: `${data.responseRate}%`, icon: "%", color: "violet" },
+    { label: t("statsDashboard.interviewRate"), value: `${data.interviewRate}%`, icon: "◎", color: "amber" },
+    { label: t("statsDashboard.offerRate"), value: `${data.offerRate}%`, icon: "★", color: "green" },
+    { label: t("statsDashboard.avgResponseTime"), value: average, icon: "⏱", color: "purple" }
+  ];
+
+  return `
+    <div class="stats-kpi-grid">
+      ${kpis.map((card) => `
+        <article class="summary-card stats-kpi-card glass-card summary-${card.color}">
+          <span class="summary-icon">${escapeHTML(card.icon)}</span>
+          <div>
+            <strong>${escapeHTML(card.value)}</strong>
+            <p>${escapeHTML(card.label)}</p>
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderStatusDonut(data) {
+  const statusCanvas = document.getElementById("stats-status-chart");
+  if (!statusCanvas || typeof Chart === "undefined") return;
+  if (statusChart) statusChart.destroy();
+
+  const palette = getStatsChartPalette();
+  statusChart = new Chart(statusCanvas, {
+    type: "doughnut",
+    data: {
+      labels: data.byStatus.map((item) => item.label),
+      datasets: [{
+        data: data.byStatus.map((item) => item.count),
+        backgroundColor: data.byStatus.map((_, index) => palette[index % palette.length]),
+        borderColor: "rgba(10, 15, 30, 0.82)",
+        borderWidth: 3,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "68%",
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            color: "rgba(249, 250, 251, 0.72)",
+            boxWidth: 10,
+            usePointStyle: true
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderWeeklyBar(data) {
+  const weeklyCanvas = document.getElementById("stats-weekly-chart");
+  if (!weeklyCanvas || typeof Chart === "undefined") return;
+  if (weeklyChart) weeklyChart.destroy();
+
+  weeklyChart = new Chart(weeklyCanvas, {
+    type: "bar",
+    data: {
+      labels: data.byWeek.map((week) => week.label),
+      datasets: [{
+        label: t("statsDashboard.applicationsThisMonth"),
+        data: data.byWeek.map((week) => week.count),
+        backgroundColor: "rgba(34, 211, 238, 0.72)",
+        borderColor: getCssVariable("--cyan"),
+        borderWidth: 1,
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ticks: { color: "rgba(249, 250, 251, 0.62)" },
+          grid: { color: "rgba(255, 255, 255, 0.06)" }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: "rgba(249, 250, 251, 0.62)", precision: 0 },
+          grid: { color: "rgba(255, 255, 255, 0.06)" }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+}
+
+function renderSourceAnalytics(data) {
+  return `
+    <section class="stats-card glass-card">
+      <div class="stats-card-header">
+        <h3>${escapeHTML(t("statsDashboard.topSources"))}</h3>
+        <span>${escapeHTML(data.bySource.length)}</span>
+      </div>
+      ${data.bySource.length
+        ? `<div class="source-analytics-list">
+            ${data.bySource.map((source) => `
+              <div class="source-row">
+                <div>
+                  <strong>${escapeHTML(source.label)}</strong>
+                  <span>${escapeHTML(source.count)} ${escapeHTML(t("statsDashboard.applications"))}</span>
+                </div>
+                <div class="source-meter" aria-hidden="true"><span style="width: ${escapeHTML(source.percentage)}%"></span></div>
+                <em>${escapeHTML(source.percentage)}%</em>
+              </div>
+            `).join("")}
+          </div>`
+        : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noDataYet"))}</div>`}
+    </section>
+  `;
+}
+
+function renderInterviewAnalytics(data) {
+  const performance = data.interviewStats;
+
+  return `
+    <section class="stats-card interview-performance-card glass-card">
+      <div class="stats-card-header">
+        <h3>${escapeHTML(t("statsDashboard.interviewPerformance"))}</h3>
+        <span>${escapeHTML(performance.total)} ${escapeHTML(t("statsDashboard.interviews"))}</span>
+      </div>
+      <div class="success-rate-ring" style="--success-rate: ${escapeHTML(performance.successRate)}%">
+        <strong>${escapeHTML(performance.successRate)}%</strong>
+        <span>${escapeHTML(t("statsDashboard.successRate"))}</span>
+      </div>
+      <div class="interview-performance-grid">
+        <span>${escapeHTML(t("statsDashboard.totalInterviews"))}<strong>${escapeHTML(performance.total)}</strong></span>
+        <span>${escapeHTML(t("statsDashboard.passed"))}<strong>${escapeHTML(performance.passed)}</strong></span>
+        <span>${escapeHTML(t("statsDashboard.failed"))}<strong>${escapeHTML(performance.failed)}</strong></span>
+        <span>${escapeHTML(t("statsDashboard.pending"))}<strong>${escapeHTML(performance.pending)}</strong></span>
+      </div>
+      <div class="round-type-list">
+        ${performance.roundTypes.length
+          ? performance.roundTypes.map((round) => `
+            <span class="round-type-mini-badge">${escapeHTML(round.label)} <strong>${escapeHTML(round.count)}</strong></span>
+          `).join("")
+          : `<span class="round-type-mini-badge">${escapeHTML(t("statsDashboard.noInterviewRounds"))}</span>`}
+      </div>
+      <p class="stats-insight-line">
+        ${escapeHTML(t("statsDashboard.mostCommonRoundType"))}:
+        <strong>${escapeHTML(performance.mostCommonRoundType ? performance.mostCommonRoundType.label : t("statsDashboard.notAvailable"))}</strong>
+      </p>
+    </section>
+  `;
+}
+
+function renderActivityHeatmap(data) {
+  return `
+    <section class="stats-card activity-heatmap-card glass-card">
+      <div class="stats-card-header">
+        <h3>${escapeHTML(t("statsDashboard.monthlyActivity"))}</h3>
+        <span>${escapeHTML(t("statsDashboard.last30Days"))}</span>
+      </div>
+      <div class="activity-heatmap-grid" aria-label="${escapeHTML(t("statsDashboard.monthlyActivity"))}">
+        ${data.activityByDay.map((day) => `
+          <span class="heatmap-cell heatmap-level-${escapeHTML(day.level)}" title="${escapeHTML(day.label)}" aria-label="${escapeHTML(day.label)}"></span>
+        `).join("")}
+      </div>
+      <div class="heatmap-legend">
+        <span>${escapeHTML(t("statsDashboard.lessActivity"))}</span>
+        <i class="heatmap-cell heatmap-level-0"></i>
+        <i class="heatmap-cell heatmap-level-1"></i>
+        <i class="heatmap-cell heatmap-level-2"></i>
+        <i class="heatmap-cell heatmap-level-3"></i>
+        <span>${escapeHTML(t("statsDashboard.moreActivity"))}</span>
+      </div>
+    </section>
+  `;
+}
+
+function renderAchievements(data) {
+  return `
+    <section class="stats-card achievements-card glass-card">
+      <div class="stats-card-header">
+        <h3>${escapeHTML(t("statsDashboard.achievements"))}</h3>
+        <span>${escapeHTML(data.achievements.filter((item) => item.unlocked).length)}/${escapeHTML(data.achievements.length)}</span>
+      </div>
+      <div class="achievement-grid">
+        ${data.achievements.map((achievement) => `
+          <article class="achievement-badge achievement-${escapeHTML(achievement.color)}${achievement.unlocked ? " unlocked" : ""}">
+            <span>${escapeHTML(achievement.icon)}</span>
+            <div>
+              <strong>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.title`))}</strong>
+              <p>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.body`))}</p>
+              ${achievement.unlocked ? "" : `<em>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.hint`))}</em>`}
+              <small>${escapeHTML(achievement.progress)}${escapeHTML(achievement.suffix || "")}/${escapeHTML(achievement.target)}${escapeHTML(achievement.suffix || "")}</small>
+            </div>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function changePeriod(period) {
+  StatsFilters.period = STATS_PERIOD_OPTIONS.includes(period) ? period : "all";
+  renderStats();
+}
+
+function renderStats() {
   const panel = document.getElementById("tab-stats");
   if (!panel) return;
 
-  const statsJobs = getStatsJobs();
-  const statsInterviews = getStatsInterviews();
-  const summary = getStatsSummary(statsJobs);
-  const statusDistribution = getStatusDistribution(statsJobs);
-  const weeklyActivity = getWeeklyApplicationActivity(statsJobs);
-  const sources = getSourceAnalytics(statsJobs);
-  const performance = getInterviewPerformance(statsInterviews);
+  const data = getStatsData(StatsFilters.period);
   const timeline = getMonthlyTimeline();
-  const heatmap = getMonthlyActivityHeatmap();
-  const achievements = getAchievements();
-  const kpis = [
-    { label: t("statsDashboard.totalApplications"), value: summary.totalApplications, icon: "▣", color: "primary" },
-    { label: t("statsDashboard.activeApplications"), value: summary.activeApplications, icon: "↗", color: "cyan" },
-    { label: t("statsDashboard.responseRate"), value: `${summary.responseRate}%`, icon: "%", color: "violet" },
-    { label: t("statsDashboard.interviewRate"), value: `${summary.interviewRate}%`, icon: "◎", color: "amber" },
-    { label: t("statsDashboard.offerRate"), value: `${summary.offerRate}%`, icon: "★", color: "green" },
-    { label: t("statsDashboard.rejectionRate"), value: `${summary.rejectionRate}%`, icon: "×", color: "red" }
-  ];
 
   panel.innerHTML = `
     <section class="stats-dashboard">
@@ -1832,120 +2030,43 @@ function renderStatsDashboard() {
         </div>
         <div class="stats-hero-score">
           <span>${escapeHTML(t(`statsDashboard.periods.${StatsFilters.period}`))}</span>
-          <strong>${escapeHTML(summary.responseRate)}%</strong>
+          <strong>${escapeHTML(data.responseRate)}%</strong>
         </div>
       </div>
 
       <div class="stats-filter-bar glass-card">
-        <label class="field">
-          <span>${escapeHTML(t("statsDashboard.filterByPeriod"))}</span>
-          <select id="stats-period-filter">
-            ${STATS_PERIOD_OPTIONS.map((period) => `
-              <option value="${escapeHTML(period)}"${StatsFilters.period === period ? " selected" : ""}>${escapeHTML(t(`statsDashboard.periods.${period}`))}</option>
-            `).join("")}
-          </select>
-        </label>
+        <span>${escapeHTML(t("statsDashboard.filterByPeriod"))}</span>
+        <div class="period-filter-tabs" role="tablist" aria-label="${escapeHTML(t("statsDashboard.filterByPeriod"))}">
+          ${STATS_PERIOD_OPTIONS.map((period) => `
+            <button class="period-filter-tab${StatsFilters.period === period ? " active" : ""}" type="button" data-stats-period="${escapeHTML(period)}">${escapeHTML(t(`statsDashboard.periods.${period}`))}</button>
+          `).join("")}
+        </div>
       </div>
 
-      <div class="stats-kpi-grid">
-        ${kpis.map((card) => `
-          <article class="summary-card stats-kpi-card glass-card summary-${card.color}">
-            <span class="summary-icon">${escapeHTML(card.icon)}</span>
-            <div>
-              <strong>${escapeHTML(card.value)}</strong>
-              <p>${escapeHTML(card.label)}</p>
-            </div>
-          </article>
-        `).join("")}
-      </div>
+      ${renderKPICards(data)}
 
       <div class="stats-grid">
         <section class="stats-card chart-card glass-card">
           <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.statusDistribution"))}</h3>
-            <span>${escapeHTML(summary.totalApplications)}</span>
+            <h3>${escapeHTML(t("statsDashboard.applicationsByStatus"))}</h3>
+            <span>${escapeHTML(data.total)}</span>
           </div>
-          ${statusDistribution.length
+          ${data.byStatus.length
             ? `<div class="chart-wrap"><canvas id="stats-status-chart"></canvas></div>`
-            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noData"))}</div>`}
+            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noDataYet"))}</div>`}
         </section>
 
         <section class="stats-card chart-card glass-card">
           <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.weeklyApplications"))}</h3>
-            <span>${escapeHTML(t("statsDashboard.last7Days"))}</span>
+            <h3>${escapeHTML(t("statsDashboard.applicationsThisMonth"))}</h3>
+            <span>${escapeHTML(data.byWeek.reduce((sum, week) => sum + week.count, 0))}</span>
           </div>
           <div class="chart-wrap"><canvas id="stats-weekly-chart"></canvas></div>
         </section>
 
-        <section class="stats-card glass-card">
-          <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.sourceAnalytics"))}</h3>
-            <span>${escapeHTML(sources.length)}</span>
-          </div>
-          ${sources.length
-            ? `<div class="source-analytics-list">
-                ${sources.map((source) => `
-                  <div class="source-row">
-                    <div>
-                      <strong>${escapeHTML(source.label)}</strong>
-                      <span>${escapeHTML(source.count)} ${escapeHTML(t("statsDashboard.applications"))}</span>
-                    </div>
-                    <div class="source-meter" aria-hidden="true"><span style="width: ${escapeHTML(source.percentage)}%"></span></div>
-                    <em>${escapeHTML(source.percentage)}%</em>
-                  </div>
-                `).join("")}
-              </div>`
-            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noSources"))}</div>`}
-        </section>
-
-        <section class="stats-card interview-performance-card glass-card">
-          <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.interviewPerformance"))}</h3>
-            <span>${escapeHTML(performance.total)} ${escapeHTML(t("statsDashboard.interviews"))}</span>
-          </div>
-          <div class="success-rate-ring" style="--success-rate: ${escapeHTML(performance.successRate)}%">
-            <strong>${escapeHTML(performance.successRate)}%</strong>
-            <span>${escapeHTML(t("statsDashboard.passed"))}</span>
-          </div>
-          <div class="interview-performance-grid">
-            <span>${escapeHTML(t("statsDashboard.totalInterviews"))}<strong>${escapeHTML(performance.total)}</strong></span>
-            <span>${escapeHTML(t("statsDashboard.passed"))}<strong>${escapeHTML(performance.passed)}</strong></span>
-            <span>${escapeHTML(t("statsDashboard.failed"))}<strong>${escapeHTML(performance.failed)}</strong></span>
-            <span>${escapeHTML(t("statsDashboard.pending"))}<strong>${escapeHTML(performance.pending)}</strong></span>
-          </div>
-          <div class="round-type-list">
-            ${performance.roundTypes.length
-              ? performance.roundTypes.map((round) => `
-                <span class="round-type-mini-badge">${escapeHTML(round.label)} <strong>${escapeHTML(round.count)}</strong></span>
-              `).join("")
-              : `<span class="round-type-mini-badge">${escapeHTML(t("statsDashboard.noInterviewRounds"))}</span>`}
-          </div>
-          <p class="stats-insight-line">
-            ${escapeHTML(t("statsDashboard.mostCommonRoundType"))}:
-            <strong>${escapeHTML(performance.mostCommonRoundType ? performance.mostCommonRoundType.label : t("statsDashboard.noDataShort"))}</strong>
-          </p>
-        </section>
-
-        <section class="stats-card activity-heatmap-card glass-card">
-          <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.monthlyActivity"))}</h3>
-            <span>${escapeHTML(t("statsDashboard.last30Days"))}</span>
-          </div>
-          <div class="activity-heatmap-grid" aria-label="${escapeHTML(t("statsDashboard.monthlyActivity"))}">
-            ${heatmap.map((day) => `
-              <span class="heatmap-cell heatmap-level-${escapeHTML(day.level)}" title="${escapeHTML(day.label)}" aria-label="${escapeHTML(day.label)}"></span>
-            `).join("")}
-          </div>
-          <div class="heatmap-legend">
-            <span>${escapeHTML(t("statsDashboard.lessActivity"))}</span>
-            <i class="heatmap-cell heatmap-level-0"></i>
-            <i class="heatmap-cell heatmap-level-1"></i>
-            <i class="heatmap-cell heatmap-level-2"></i>
-            <i class="heatmap-cell heatmap-level-3"></i>
-            <span>${escapeHTML(t("statsDashboard.moreActivity"))}</span>
-          </div>
-        </section>
+        ${renderSourceAnalytics(data)}
+        ${renderInterviewAnalytics(data)}
+        ${renderActivityHeatmap(data)}
 
         <section class="stats-card stats-timeline-card glass-card">
           <div class="stats-card-header">
@@ -1968,30 +2089,18 @@ function renderStatsDashboard() {
             : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noTimeline"))}</div>`}
         </section>
 
-        <section class="stats-card achievements-card glass-card">
-          <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.achievements"))}</h3>
-            <span>${escapeHTML(achievements.filter((item) => item.unlocked).length)}/${escapeHTML(achievements.length)}</span>
-          </div>
-          <div class="achievement-grid">
-            ${achievements.map((achievement) => `
-              <article class="achievement-badge achievement-${escapeHTML(achievement.color)}${achievement.unlocked ? " unlocked" : ""}">
-                <span>${escapeHTML(achievement.icon)}</span>
-                <div>
-                  <strong>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.title`))}</strong>
-                  <p>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.body`))}</p>
-                  ${achievement.unlocked ? "" : `<em>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.hint`))}</em>`}
-                  <small>${escapeHTML(achievement.progress)}${escapeHTML(achievement.suffix || "")}/${escapeHTML(achievement.target)}${escapeHTML(achievement.suffix || "")}</small>
-                </div>
-              </article>
-            `).join("")}
-          </div>
-        </section>
+        ${renderAchievements(data)}
       </div>
     </section>
   `;
 
-  renderStatsCharts(statusDistribution, weeklyActivity);
+  destroyStatsCharts();
+  renderStatusDonut(data);
+  renderWeeklyBar(data);
+}
+
+function renderStatsDashboard() {
+  renderStats();
 }
 
 function renderJobs() {
@@ -2235,7 +2344,7 @@ function switchTab(tabName) {
   }
 
   if (tabName === "stats") {
-    renderStatsDashboard();
+    renderStats();
   }
 
   if (tabName === "interviews") {
@@ -2409,10 +2518,10 @@ function bindStatsEvents() {
   const statsPanel = document.getElementById("tab-stats");
   if (!statsPanel) return;
 
-  statsPanel.addEventListener("change", (event) => {
-    if (event.target.id !== "stats-period-filter") return;
-    StatsFilters.period = STATS_PERIOD_OPTIONS.includes(event.target.value) ? event.target.value : "all";
-    renderStatsDashboard();
+  statsPanel.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-stats-period]");
+    if (!button) return;
+    changePeriod(button.dataset.statsPeriod);
   });
 }
 

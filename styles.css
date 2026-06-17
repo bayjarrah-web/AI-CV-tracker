@@ -659,6 +659,11 @@ textarea:focus {
   background: var(--red);
 }
 
+.summary-purple::before,
+.summary-purple .summary-icon {
+  background: var(--purple);
+}
+
 .summary-pulse {
   border-color: rgba(245, 158, 11, 0.54);
   animation: dashboardPulse 1.8s ease-in-out infinite;
@@ -873,20 +878,45 @@ textarea:focus {
 
 .stats-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
 .stats-filter-bar {
   display: flex;
-  align-items: end;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   border-radius: 8px;
   padding: 14px;
 }
 
-.stats-filter-bar .field {
-  width: min(100%, 280px);
+.stats-filter-bar > span {
+  color: rgba(249, 250, 251, 0.64);
+  font-weight: 900;
+}
+
+.period-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.period-filter-tab {
+  min-height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: rgba(249, 250, 251, 0.66);
+  background: rgba(255, 255, 255, 0.045);
+  font-weight: 900;
+}
+
+.period-filter-tab.active {
+  border-color: rgba(34, 211, 238, 0.44);
+  color: #cffafe;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(34, 211, 238, 0.12));
+  box-shadow: 0 14px 36px rgba(34, 211, 238, 0.12);
 }
 
 .stats-kpi-card {
@@ -1204,6 +1234,7 @@ textarea:focus {
   box-shadow: 0 18px 54px rgba(34, 211, 238, 0.08);
   filter: none;
   opacity: 1;
+  animation: achievementGlow 2.6s ease-in-out infinite;
 }
 
 .achievement-badge > span {
@@ -1939,6 +1970,16 @@ textarea:focus {
   }
 }
 
+@keyframes achievementGlow {
+  0%,
+  100% {
+    box-shadow: 0 18px 54px rgba(34, 211, 238, 0.08);
+  }
+  50% {
+    box-shadow: 0 18px 54px rgba(34, 211, 238, 0.16), 0 0 24px rgba(34, 211, 238, 0.12);
+  }
+}
+
 @media (max-width: 900px) {
   .tab-nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1956,7 +1997,7 @@ textarea:focus {
 
   .stats-kpi-grid,
   .achievement-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .interview-performance-grid {
@@ -2063,11 +2104,8 @@ textarea:focus {
   }
 
   .stats-filter-bar {
-    justify-content: stretch;
-  }
-
-  .stats-filter-bar .field {
-    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .activity-heatmap-grid {
