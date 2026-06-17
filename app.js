@@ -1088,6 +1088,7 @@ function saveInterview(event) {
 function deleteInterview(interviewId) {
   const interview = AppState.interviews.find((item) => item.id === interviewId);
   if (!interview) return;
+  if (!window.confirm(t("interviews.confirmDelete"))) return;
 
   AppState.interviews = AppState.interviews.filter((item) => item.id !== interviewId);
   saveInterviews();

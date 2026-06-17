@@ -295,6 +295,7 @@ const TRANSLATIONS = {
       openMeeting: "فتح الاجتماع",
       joinMeeting: "دخول الاجتماع",
       openMap: "فتح الخريطة",
+      confirmDelete: "هل تريد حذف هذه المقابلة نهائياً؟",
       modal: {
         kicker: "تفاصيل المقابلة",
         addTitle: "إضافة مقابلة",
@@ -662,6 +663,7 @@ const TRANSLATIONS = {
       openMeeting: "Open Meeting",
       joinMeeting: "Join Meeting",
       openMap: "Open Map",
+      confirmDelete: "Delete this interview permanently?",
       modal: {
         kicker: "Interview details",
         addTitle: "Add Interview",
