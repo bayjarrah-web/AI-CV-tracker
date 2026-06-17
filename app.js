@@ -69,6 +69,10 @@ let editingJobId = null;
 let highlightedJobId = null;
 let editingInterviewId = null;
 let currentInterviewView = "upcoming";
+let statsCharts = {
+  statusDistribution: null,
+  weeklyActivity: null
+};
 
 const JobFilters = {
   search: "",
@@ -286,6 +290,12 @@ function renderTodayIfActive() {
   }
 }
 
+function renderStatsIfActive() {
+  if (AppState.currentTab === "stats") {
+    renderStatsDashboard();
+  }
+}
+
 function setLanguage(lang) {
   AppState.language = lang === "en" ? "en" : "ar";
   AppState.settings = {
@@ -307,6 +317,7 @@ function setLanguage(lang) {
   updateHeader();
   renderEmptyStates();
   renderTodayIfActive();
+  renderStatsIfActive();
   renderJobs();
   if (AppState.currentTab === "interviews") renderInterviews();
 }
@@ -563,6 +574,164 @@ function getMotivationalMessage() {
   if (!AppState.jobs.length) return t("todayDashboard.motivationNoJobs");
 
   return t("todayDashboard.motivationQuiet");
+}
+
+function toPercent(count, total) {
+  if (!total) return 0;
+  return Math.round((count / total) * 100);
+}
+
+function getStatsSummary() {
+  const total = AppState.jobs.length;
+  const active = getActiveJobs().length;
+  const responseStatuses = ["under_review", "interview", "offer", "accepted"];
+  const interviewStatuses = ["interview", "offer", "accepted"];
+  const offerStatuses = ["offer", "accepted"];
+  const rejected = AppState.jobs.filter((job) => job.status === "rejected").length;
+
+  const responses = AppState.jobs.filter((job) => responseStatuses.includes(job.status)).length;
+  const interviews = AppState.jobs.filter((job) => interviewStatuses.includes(job.status)).length;
+  const offers = AppState.jobs.filter((job) => offerStatuses.includes(job.status)).length;
+
+  return {
+    totalApplications: total,
+    activeApplications: active,
+    responseRate: toPercent(responses, total),
+    interviewRate: toPercent(interviews, total),
+    offerRate: toPercent(offers, total),
+    rejectionRate: toPercent(rejected, total)
+  };
+}
+
+function getStatusDistribution() {
+  return JOB_STATUS_OPTIONS
+    .map((status) => ({
+      status,
+      label: t(`statuses.${status}`),
+      count: AppState.jobs.filter((job) => job.status === status).length
+    }))
+    .filter((item) => item.count > 0);
+}
+
+function getWeeklyApplicationActivity() {
+  const today = todayISO();
+  const days = Array.from({ length: 7 }, (_, index) => addDaysToISO(today, index - 6));
+
+  return days.map((date) => ({
+    date,
+    label: new Intl.DateTimeFormat(AppState.language === "ar" ? "ar" : "en", {
+      weekday: "short",
+      day: "numeric"
+    }).format(new Date(`${date}T00:00:00`)),
+    count: AppState.jobs.filter((job) => job.appliedDate === date).length
+  }));
+}
+
+function getSourceAnalytics() {
+  const total = AppState.jobs.length;
+  return JOB_SOURCE_OPTIONS
+    .map((source) => {
+      const count = AppState.jobs.filter((job) => job.source === source).length;
+      return {
+        source,
+        label: t(`sources.${source}`),
+        count,
+        percentage: toPercent(count, total)
+      };
+    })
+    .filter((item) => item.count > 0)
+    .sort((first, second) => second.count - first.count);
+}
+
+function getInterviewSuccessStats() {
+  const decisive = AppState.interviews.filter((interview) => ["passed", "failed"].includes(interview.result));
+  const passed = decisive.filter((interview) => interview.result === "passed").length;
+  const failed = decisive.filter((interview) => interview.result === "failed").length;
+
+  return {
+    total: decisive.length,
+    passed,
+    failed,
+    rate: toPercent(passed, decisive.length)
+  };
+}
+
+function getMonthlyTimeline(limit = 10) {
+  const cutoff = addDaysToISO(todayISO(), -30);
+  const jobActivities = AppState.jobs.flatMap((job) => {
+    const created = {
+      id: `${job.id}-application`,
+      date: job.appliedDate || job.createdAt,
+      title: `${job.jobTitle} · ${job.company}`,
+      action: t("statsDashboard.timelineApplication")
+    };
+
+    const activities = (job.activityLog || []).map((activity) => ({
+      id: activity.id,
+      date: activity.date,
+      title: `${job.jobTitle} · ${job.company}`,
+      action: t(`activity.${activity.action}`)
+    }));
+
+    return [created, ...activities];
+  });
+
+  const interviewActivities = AppState.interviews.map((interview) => ({
+    id: interview.id,
+    date: interview.interviewDate || interview.createdAt,
+    title: `${interview.jobTitle} · ${interview.company}`,
+    action: t("statsDashboard.timelineInterview")
+  }));
+
+  return [...jobActivities, ...interviewActivities]
+    .filter((item) => item.date && item.date >= cutoff)
+    .sort((first, second) => second.date.localeCompare(first.date))
+    .slice(0, limit);
+}
+
+function getAchievements() {
+  const summary = getStatsSummary();
+  const weeklyApplications = getWeeklyApplicationActivity().reduce((sum, day) => sum + day.count, 0);
+
+  return [
+    {
+      key: "firstApplication",
+      unlocked: AppState.jobs.length >= 1,
+      progress: Math.min(AppState.jobs.length, 1),
+      target: 1
+    },
+    {
+      key: "tenApplications",
+      unlocked: AppState.jobs.length >= 10,
+      progress: Math.min(AppState.jobs.length, 10),
+      target: 10
+    },
+    {
+      key: "firstInterview",
+      unlocked: AppState.interviews.length >= 1,
+      progress: Math.min(AppState.interviews.length, 1),
+      target: 1
+    },
+    {
+      key: "firstOffer",
+      unlocked: getOffers().length >= 1,
+      progress: Math.min(getOffers().length, 1),
+      target: 1
+    },
+    {
+      key: "consistentWeek",
+      unlocked: weeklyApplications >= 5,
+      progress: Math.min(weeklyApplications, 5),
+      target: 5
+    },
+    {
+      key: "highResponse",
+      unlocked: AppState.jobs.length >= 5 && summary.responseRate >= 50,
+      progress: AppState.jobs.length >= 5 ? Math.min(summary.responseRate, 50) : 0,
+      target: 50,
+      suffix: "%"
+    }
+  ];
 }
 
 function createActivity(action, note = "") {
@@ -1435,6 +1604,253 @@ function renderTodayDashboard() {
   `;
 }
 
+function getCssVariable(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function destroyStatsCharts() {
+  Object.values(statsCharts).forEach((chart) => {
+    if (chart && typeof chart.destroy === "function") chart.destroy();
+  });
+
+  statsCharts = {
+    statusDistribution: null,
+    weeklyActivity: null
+  };
+}
+
+function renderStatsCharts(statusDistribution, weeklyActivity) {
+  destroyStatsCharts();
+  if (typeof Chart === "undefined") return;
+
+  const statusCanvas = document.getElementById("stats-status-chart");
+  const weeklyCanvas = document.getElementById("stats-weekly-chart");
+  const palette = [
+    getCssVariable("--cyan"),
+    getCssVariable("--amber"),
+    getCssVariable("--violet"),
+    getCssVariable("--green"),
+    getCssVariable("--primary"),
+    getCssVariable("--red"),
+    getCssVariable("--text-muted"),
+    getCssVariable("--purple"),
+    getCssVariable("--surface-mid")
+  ];
+
+  if (statusCanvas) {
+    statsCharts.statusDistribution = new Chart(statusCanvas, {
+      type: "doughnut",
+      data: {
+        labels: statusDistribution.map((item) => item.label),
+        datasets: [{
+          data: statusDistribution.map((item) => item.count),
+          backgroundColor: statusDistribution.map((_, index) => palette[index % palette.length]),
+          borderColor: "rgba(10, 15, 30, 0.82)",
+          borderWidth: 3,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "68%",
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              color: "rgba(249, 250, 251, 0.72)",
+              boxWidth: 10,
+              usePointStyle: true
+            }
+          }
+        }
+      }
+    });
+  }
+
+  if (weeklyCanvas) {
+    statsCharts.weeklyActivity = new Chart(weeklyCanvas, {
+      type: "bar",
+      data: {
+        labels: weeklyActivity.map((day) => day.label),
+        datasets: [{
+          label: t("statsDashboard.weeklyApplications"),
+          data: weeklyActivity.map((day) => day.count),
+          backgroundColor: "rgba(34, 211, 238, 0.72)",
+          borderColor: getCssVariable("--cyan"),
+          borderWidth: 1,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: { color: "rgba(249, 250, 251, 0.62)" },
+            grid: { color: "rgba(255, 255, 255, 0.06)" }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { color: "rgba(249, 250, 251, 0.62)", precision: 0 },
+            grid: { color: "rgba(255, 255, 255, 0.06)" }
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  }
+}
+
+function renderStatsDashboard() {
+  const panel = document.getElementById("tab-stats");
+  if (!panel) return;
+
+  const summary = getStatsSummary();
+  const statusDistribution = getStatusDistribution();
+  const weeklyActivity = getWeeklyApplicationActivity();
+  const sources = getSourceAnalytics();
+  const success = getInterviewSuccessStats();
+  const timeline = getMonthlyTimeline();
+  const achievements = getAchievements();
+  const kpis = [
+    { label: t("statsDashboard.totalApplications"), value: summary.totalApplications, icon: "▣", color: "primary" },
+    { label: t("statsDashboard.activeApplications"), value: summary.activeApplications, icon: "↗", color: "cyan" },
+    { label: t("statsDashboard.responseRate"), value: `${summary.responseRate}%`, icon: "%", color: "violet" },
+    { label: t("statsDashboard.interviewRate"), value: `${summary.interviewRate}%`, icon: "◎", color: "amber" },
+    { label: t("statsDashboard.offerRate"), value: `${summary.offerRate}%`, icon: "★", color: "green" },
+    { label: t("statsDashboard.rejectionRate"), value: `${summary.rejectionRate}%`, icon: "×", color: "red" }
+  ];
+
+  panel.innerHTML = `
+    <section class="stats-dashboard">
+      <div class="stats-hero glass-card">
+        <div>
+          <p class="eyebrow">${escapeHTML(t("statsDashboard.kicker"))}</p>
+          <h2>${escapeHTML(t("statsDashboard.title"))}</h2>
+          <p>${escapeHTML(t("statsDashboard.subtitle"))}</p>
+        </div>
+        <div class="stats-hero-score">
+          <span>${escapeHTML(t("statsDashboard.last30Days"))}</span>
+          <strong>${escapeHTML(summary.responseRate)}%</strong>
+        </div>
+      </div>
+
+      <div class="stats-kpi-grid">
+        ${kpis.map((card) => `
+          <article class="summary-card stats-kpi-card glass-card summary-${card.color}">
+            <span class="summary-icon">${escapeHTML(card.icon)}</span>
+            <div>
+              <strong>${escapeHTML(card.value)}</strong>
+              <p>${escapeHTML(card.label)}</p>
+            </div>
+          </article>
+        `).join("")}
+      </div>
+
+      <div class="stats-grid">
+        <section class="stats-card chart-card glass-card">
+          <div class="stats-card-header">
+            <h3>${escapeHTML(t("statsDashboard.statusDistribution"))}</h3>
+            <span>${escapeHTML(summary.totalApplications)}</span>
+          </div>
+          ${statusDistribution.length
+            ? `<div class="chart-wrap"><canvas id="stats-status-chart"></canvas></div>`
+            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noData"))}</div>`}
+        </section>
+
+        <section class="stats-card chart-card glass-card">
+          <div class="stats-card-header">
+            <h3>${escapeHTML(t("statsDashboard.weeklyApplications"))}</h3>
+            <span>${escapeHTML(t("statsDashboard.last7Days"))}</span>
+          </div>
+          <div class="chart-wrap"><canvas id="stats-weekly-chart"></canvas></div>
+        </section>
+
+        <section class="stats-card glass-card">
+          <div class="stats-card-header">
+            <h3>${escapeHTML(t("statsDashboard.sourceAnalytics"))}</h3>
+            <span>${escapeHTML(sources.length)}</span>
+          </div>
+          ${sources.length
+            ? `<div class="source-analytics-list">
+                ${sources.map((source) => `
+                  <div class="source-row">
+                    <div>
+                      <strong>${escapeHTML(source.label)}</strong>
+                      <span>${escapeHTML(source.count)} ${escapeHTML(t("statsDashboard.applications"))}</span>
+                    </div>
+                    <div class="source-meter" aria-hidden="true"><span style="width: ${escapeHTML(source.percentage)}%"></span></div>
+                    <em>${escapeHTML(source.percentage)}%</em>
+                  </div>
+                `).join("")}
+              </div>`
+            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noSources"))}</div>`}
+        </section>
+
+        <section class="stats-card success-rate-card glass-card">
+          <div class="stats-card-header">
+            <h3>${escapeHTML(t("statsDashboard.interviewSuccessRate"))}</h3>
+            <span>${escapeHTML(success.total)} ${escapeHTML(t("statsDashboard.completedInterviews"))}</span>
+          </div>
+          <div class="success-rate-ring" style="--success-rate: ${escapeHTML(success.rate)}%">
+            <strong>${escapeHTML(success.rate)}%</strong>
+            <span>${escapeHTML(t("statsDashboard.passed"))}</span>
+          </div>
+          <div class="success-rate-breakdown">
+            <span>${escapeHTML(t("statsDashboard.passed"))}: <strong>${escapeHTML(success.passed)}</strong></span>
+            <span>${escapeHTML(t("statsDashboard.failed"))}: <strong>${escapeHTML(success.failed)}</strong></span>
+          </div>
+        </section>
+
+        <section class="stats-card stats-timeline-card glass-card">
+          <div class="stats-card-header">
+            <h3>${escapeHTML(t("statsDashboard.monthTimeline"))}</h3>
+            <span>${escapeHTML(timeline.length)}</span>
+          </div>
+          ${timeline.length
+            ? `<div class="stats-timeline-list">
+                ${timeline.map((item) => `
+                  <article class="stats-timeline-item">
+                    <span class="activity-dot"></span>
+                    <div>
+                      <strong>${escapeHTML(item.title)}</strong>
+                      <p>${escapeHTML(item.action)}</p>
+                    </div>
+                    <time>${escapeHTML(getRelativeDateLabel(item.date))}</time>
+                  </article>
+                `).join("")}
+              </div>`
+            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noTimeline"))}</div>`}
+        </section>
+
+        <section class="stats-card achievements-card glass-card">
+          <div class="stats-card-header">
+            <h3>${escapeHTML(t("statsDashboard.achievements"))}</h3>
+            <span>${escapeHTML(achievements.filter((item) => item.unlocked).length)}/${escapeHTML(achievements.length)}</span>
+          </div>
+          <div class="achievement-grid">
+            ${achievements.map((achievement) => `
+              <article class="achievement-badge${achievement.unlocked ? " unlocked" : ""}">
+                <span>${achievement.unlocked ? "✓" : "○"}</span>
+                <div>
+                  <strong>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.title`))}</strong>
+                  <p>${escapeHTML(t(`statsDashboard.achievementsList.${achievement.key}.body`))}</p>
+                  <small>${escapeHTML(achievement.progress)}${escapeHTML(achievement.suffix || "")}/${escapeHTML(achievement.target)}${escapeHTML(achievement.suffix || "")}</small>
+                </div>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+      </div>
+    </section>
+  `;
+
+  renderStatsCharts(statusDistribution, weeklyActivity);
+}
+
 function renderJobs() {
   const grid = document.getElementById("jobs-grid");
   const empty = document.getElementById("jobs-empty-state");
@@ -1675,13 +2091,17 @@ function switchTab(tabName) {
     renderTodayDashboard();
   }
 
+  if (tabName === "stats") {
+    renderStatsDashboard();
+  }
+
   if (tabName === "interviews") {
     renderInterviews();
   }
 }
 
 function renderEmptyStates() {
-  const tabs = ["profile", "stats", "analyzer", "settings"];
+  const tabs = ["profile", "analyzer", "settings"];
 
   tabs.forEach((tabName, index) => {
     const panel = document.getElementById(`tab-${tabName}`);

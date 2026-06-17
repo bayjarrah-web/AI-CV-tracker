@@ -203,6 +203,60 @@ const TRANSLATIONS = {
       relativeToday: "اليوم",
       yesterday: "أمس"
     },
+    statsDashboard: {
+      kicker: "تحليلات المسار المهني",
+      title: "الإحصائيات والتحليلات",
+      subtitle: "قراءة واضحة لأداء التقديم، مصادر الفرص، ونقاط القوة في رحلة البحث.",
+      last30Days: "آخر 30 يوم",
+      last7Days: "آخر 7 أيام",
+      totalApplications: "إجمالي الطلبات",
+      activeApplications: "طلبات نشطة",
+      responseRate: "معدل الرد",
+      interviewRate: "معدل المقابلات",
+      offerRate: "معدل العروض",
+      rejectionRate: "معدل الرفض",
+      statusDistribution: "توزيع الحالات",
+      weeklyApplications: "نشاط التقديم الأسبوعي",
+      sourceAnalytics: "تحليل مصادر الوظائف",
+      interviewSuccessRate: "نسبة نجاح المقابلات",
+      monthTimeline: "نشاط الشهر",
+      achievements: "الإنجازات",
+      applications: "طلبات",
+      completedInterviews: "مقابلات محسومة",
+      passed: "ناجحة",
+      failed: "غير ناجحة",
+      noData: "أضف أول وظيفة لتظهر الرسوم والتحليلات هنا.",
+      noSources: "لا توجد مصادر بعد. ستظهر القنوات الأقوى بعد إضافة الوظائف.",
+      noTimeline: "لا يوجد نشاط خلال آخر 30 يوم.",
+      timelineApplication: "تم تسجيل طلب وظيفة",
+      timelineInterview: "تمت جدولة مقابلة",
+      achievementsList: {
+        firstApplication: {
+          title: "أول طلب",
+          body: "أضفت أول فرصة إلى المتتبع."
+        },
+        tenApplications: {
+          title: "10 طلبات",
+          body: "بنيت قاعدة جيدة من الفرص."
+        },
+        firstInterview: {
+          title: "أول مقابلة",
+          body: "وصلت إلى أول جولة مقابلات."
+        },
+        firstOffer: {
+          title: "أول عرض",
+          body: "لديك عرض عمل مسجل."
+        },
+        consistentWeek: {
+          title: "أسبوع نشط",
+          body: "قدمت على 5 فرص خلال أسبوع."
+        },
+        highResponse: {
+          title: "ردود قوية",
+          body: "معدل الرد وصل إلى 50% أو أكثر."
+        }
+      }
+    },
     emotional: {
       welcomeBack: "أهلاً بعودتك. خطوة صغيرة اليوم تكفي لتحريك الأمور.",
       saved: "تم الحفظ. جميل، صار لدينا أساس نبني عليه.",
@@ -570,6 +624,60 @@ const TRANSLATIONS = {
       daysAgo: "{count} days ago",
       relativeToday: "Today",
       yesterday: "Yesterday"
+    },
+    statsDashboard: {
+      kicker: "Career analytics",
+      title: "Stats & Analytics",
+      subtitle: "A clear read on application performance, strongest sources, and momentum across your search.",
+      last30Days: "Last 30 days",
+      last7Days: "Last 7 days",
+      totalApplications: "Total Applications",
+      activeApplications: "Active Applications",
+      responseRate: "Response Rate",
+      interviewRate: "Interview Rate",
+      offerRate: "Offer Rate",
+      rejectionRate: "Rejection Rate",
+      statusDistribution: "Status Distribution",
+      weeklyApplications: "Weekly Application Activity",
+      sourceAnalytics: "Source Analytics",
+      interviewSuccessRate: "Interview Success Rate",
+      monthTimeline: "Month Timeline",
+      achievements: "Achievements",
+      applications: "applications",
+      completedInterviews: "decisive interviews",
+      passed: "Passed",
+      failed: "Failed",
+      noData: "Add your first job to unlock charts and analytics here.",
+      noSources: "No sources yet. Your strongest channels will appear after adding jobs.",
+      noTimeline: "No activity in the last 30 days yet.",
+      timelineApplication: "Application recorded",
+      timelineInterview: "Interview scheduled",
+      achievementsList: {
+        firstApplication: {
+          title: "First Application",
+          body: "You added your first tracked opportunity."
+        },
+        tenApplications: {
+          title: "10 Applications",
+          body: "You built a useful opportunity base."
+        },
+        firstInterview: {
+          title: "First Interview",
+          body: "You reached your first interview round."
+        },
+        firstOffer: {
+          title: "First Offer",
+          body: "You have a recorded job offer."
+        },
+        consistentWeek: {
+          title: "Active Week",
+          body: "You applied to 5 roles in one week."
+        },
+        highResponse: {
+          title: "Strong Responses",
+          body: "Your response rate reached 50% or more."
+        }
+      }
     },
     emotional: {
       welcomeBack: "Welcome back. One small step today is enough to move things forward.",
