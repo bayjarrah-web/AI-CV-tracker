@@ -69,6 +69,10 @@ let editingJobId = null;
 let highlightedJobId = null;
 let editingInterviewId = null;
 let currentInterviewView = "upcoming";
+let analyzerMode = "cv_review";
+let analyzerCvText = "";
+let analyzerCvFileName = "";
+let isAnalyzing = false;
 let statusChart = null;
 let weeklyChart = null;
 
@@ -536,6 +540,26 @@ function saveJobs() {
 
 function saveInterviews() {
   StorageManager.set(StorageManager.KEYS.INTERVIEWS, AppState.interviews);
+}
+
+function saveAnalyses() {
+  StorageManager.set(StorageManager.KEYS.ANALYSES, AppState.analyses);
+}
+
+function getGeminiApiKey() {
+  return AppState.settings.geminiApiKey || "";
+}
+
+function setGeminiApiKey(key) {
+  AppState.settings = {
+    ...AppState.settings,
+    geminiApiKey: String(key || "").trim()
+  };
+  StorageManager.set(StorageManager.KEYS.SETTINGS, AppState.settings);
+}
+
+function getStoredCv() {
+  return StorageManager.get(StorageManager.KEYS.CV);
 }
 
 function getActiveJobs() {
@@ -2447,6 +2471,72 @@ function renderProfileReadiness() {
       </div>
     </section>
   `;
+}
+
+async function extractPdfText(file) {
+  if (!isLibraryAvailable("pdfjsLib")) {
+    throw new Error("pdfjs_unavailable");
+  }
+
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = "";
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+    const pageText = content.items.map((item) => item.str).join(" ");
+    fullText += `${pageText}\n`;
+  }
+
+  return fullText.trim();
+}
+
+function buildAnalyzerPrompt(mode, cvText, job) {
+  const lang = AppState.language === "ar" ? "Arabic" : "English";
+  const header = `You are an expert career coach and ATS specialist. Respond ONLY in ${lang}. Use clean Markdown with headings, bullet points, and a final summary. Be specific and actionable.`;
+
+  if (mode === "job_match" && job) {
+    const jobInfo = [
+      `Job Title: ${job.jobTitle}`,
+      `Company: ${job.company}`,
+      `Location: ${job.location}`,
+      `Type: ${job.jobType}`,
+      job.notes ? `Job Notes/Description: ${job.notes}` : ""
+    ].filter(Boolean).join("\n");
+
+    return `${header}\n\nTask: Compare the following CV against this job and give a match score out of 100, matched skills, missing skills, and concrete improvement tips.\n\n--- JOB ---\n${jobInfo}\n\n--- CV ---\n${cvText}`;
+  }
+
+  if (mode === "career") {
+    return `${header}\n\nTask: Provide a full strategic career analysis based on this CV: current positioning, strengths, gaps, suggested next roles, skills to learn, and a 6-12 month growth plan.\n\n--- CV ---\n${cvText}`;
+  }
+
+  return `${header}\n\nTask: Review this CV in detail. Cover: overall impression, strengths, weaknesses, ATS-friendliness, formatting, wording improvements, and a prioritized action list.\n\n--- CV ---\n${cvText}`;
+}
+
+async function callGemini(prompt) {
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) throw new Error("no_api_key");
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }]
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error("api_failed");
+  }
+
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error("api_failed");
+  return text;
 }
 
 function getLibraryStatusItems() {
