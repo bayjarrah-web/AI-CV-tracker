@@ -61,6 +61,10 @@ const AppState = {
       ...(StorageManager.get(StorageManager.KEYS.SETTINGS) || {})
     };
     this.language = this.settings.language || "ar";
+  },
+
+  saveAnalyses() {
+    saveAnalyses();
   }
 };
 
@@ -2606,29 +2610,296 @@ function renderAnalyzerReadiness() {
   const panel = document.getElementById("tab-analyzer");
   if (!panel) return;
 
+  const apiKeySet = Boolean(getGeminiApiKey());
+  const activeJobs = getActiveJobs();
+  const storedCv = getStoredCv();
+
+  if (!analyzerCvText && storedCv?.text) {
+    analyzerCvText = storedCv.text;
+    analyzerCvFileName = storedCv.name || "";
+  }
+
+  const modes = [
+    { id: "cv_review", icon: "file-check", title: t("analyzer.modeCvReview"), desc: t("analyzer.modeCvReviewDesc") },
+    { id: "job_match", icon: "target", title: t("analyzer.modeJobMatch"), desc: t("analyzer.modeJobMatchDesc") },
+    { id: "career", icon: "compass", title: t("analyzer.modeCareer"), desc: t("analyzer.modeCareerDesc") }
+  ];
+
   panel.innerHTML = `
-    <section class="foundation-panel">
-      <div class="foundation-hero glass-card">
+    <section class="analyzer-panel">
+      <div class="analyzer-hero glass-card">
         <div class="foundation-icon"><i data-lucide="brain"></i></div>
         <div>
-          <p class="eyebrow">${escapeHTML(t("foundation.libraries"))}</p>
-          <h2>${escapeHTML(t("foundation.analyzerReady"))}</h2>
-          <p>${escapeHTML(t("empty.analyzer.body"))}</p>
+          <p class="eyebrow">${escapeHTML(t("analyzer.kicker"))}</p>
+          <h2>${escapeHTML(t("analyzer.title"))}</h2>
+          <p>${escapeHTML(t("analyzer.subtitle"))}</p>
         </div>
       </div>
 
-      <section class="foundation-card glass-card">
+      <section class="analyzer-card glass-card">
         <div class="g-section-header">
-          <div>
-            <p class="eyebrow">${escapeHTML(t("foundation.foundationReady"))}</p>
-            <h3>${escapeHTML(t("foundation.libraryStatus"))}</h3>
-          </div>
-          <span class="g-chip">${escapeHTML(t("foundation.comingSoon"))}</span>
+          <h3>${escapeHTML(t("analyzer.apiSectionTitle"))}</h3>
+          <span class="g-chip ${apiKeySet ? "is-ready" : ""}">${escapeHTML(apiKeySet ? t("analyzer.apiKeySet") : t("analyzer.apiKeyNotSet"))}</span>
         </div>
-        ${renderLibraryStatus()}
+        <p class="g-muted">${escapeHTML(t("analyzer.apiHint"))}</p>
+        <div class="analyzer-api-row">
+          <input id="analyzer-api-key" type="password" placeholder="${escapeHTML(t("analyzer.apiPlaceholder"))}" value="${escapeHTML(getGeminiApiKey())}">
+          <button class="btn btn-primary" type="button" id="analyzer-save-key">${escapeHTML(t("analyzer.apiSave"))}</button>
+        </div>
+        <a class="btn btn-link btn-small" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">${escapeHTML(t("analyzer.getApiKey"))}</a>
+      </section>
+
+      <section class="analyzer-card glass-card">
+        <div class="g-section-header"><h3>${escapeHTML(t("analyzer.modesTitle"))}</h3></div>
+        <div class="analyzer-modes-grid">
+          ${modes.map((mode) => `
+            <button class="analyzer-mode-card${analyzerMode === mode.id ? " active" : ""}" type="button" data-analyzer-mode="${escapeHTML(mode.id)}">
+              <span class="analyzer-mode-icon"><i data-lucide="${escapeHTML(mode.icon)}"></i></span>
+              <strong>${escapeHTML(mode.title)}</strong>
+              <p>${escapeHTML(mode.desc)}</p>
+            </button>
+          `).join("")}
+        </div>
+
+        <div class="analyzer-mode-extra${analyzerMode === "job_match" ? "" : " hidden"}" id="analyzer-job-select-wrap">
+          <label class="field">
+            <span>${escapeHTML(t("analyzer.selectJob"))}</span>
+            <select id="analyzer-job-select">
+              <option value="">${escapeHTML(t("analyzer.selectJobPlaceholder"))}</option>
+              ${activeJobs.map((job) => `<option value="${escapeHTML(job.id)}">${escapeHTML(job.jobTitle)} · ${escapeHTML(job.company)}</option>`).join("")}
+            </select>
+          </label>
+          ${activeJobs.length ? "" : `<p class="g-muted">${escapeHTML(t("analyzer.noJobsForMatch"))}</p>`}
+        </div>
+      </section>
+
+      <section class="analyzer-card glass-card">
+        <div class="g-section-header"><h3>${escapeHTML(t("analyzer.cvSource"))}</h3></div>
+        <label class="upload-box" for="analyzer-cv-file">
+          <span class="upload-icon">PDF</span>
+          <strong>${escapeHTML(t("analyzer.uploadCv"))}</strong>
+          <small id="analyzer-cv-name">${escapeHTML(analyzerCvFileName || (storedCv?.name ? `${t("analyzer.usingStoredCv")} · ${storedCv.name}` : t("analyzer.uploadHint")))}</small>
+          <input id="analyzer-cv-file" type="file" accept="application/pdf">
+        </label>
+        <button class="btn btn-primary analyzer-run-btn" type="button" id="analyzer-run">${escapeHTML(t("analyzer.analyzeButton"))}</button>
+      </section>
+
+      <section class="analyzer-card glass-card hidden" id="analyzer-result-card">
+        <div class="g-section-header">
+          <h3>${escapeHTML(t("analyzer.resultTitle"))}</h3>
+          <button class="btn btn-small btn-secondary" type="button" id="analyzer-copy-result">${escapeHTML(t("analyzer.copyResult"))}</button>
+        </div>
+        <div class="analyzer-result markdown-body" id="analyzer-result-body"></div>
+      </section>
+
+      <section class="analyzer-card glass-card">
+        <div class="g-section-header">
+          <h3>${escapeHTML(t("analyzer.savedTitle"))}</h3>
+          <span class="g-chip">${escapeHTML(AppState.analyses.length)}</span>
+        </div>
+        <div id="analyzer-saved-list">${renderSavedAnalysesList()}</div>
       </section>
     </section>
   `;
+
+  safeInitIcons();
+}
+
+function renderSavedAnalysesList() {
+  if (!AppState.analyses.length) {
+    return `<div class="today-positive-state muted-state">${escapeHTML(t("analyzer.savedEmpty"))}</div>`;
+  }
+
+  return `
+    <div class="analyzer-saved-grid">
+      ${AppState.analyses.slice(0, 5).map((analysis) => `
+        <article class="analyzer-saved-item">
+          <div>
+            <span class="badge">${escapeHTML(t(`analyzer.modeLabels.${analysis.mode}`))}</span>
+            <strong>${escapeHTML(analysis.title || t("analyzer.resultTitle"))}</strong>
+            <small>${escapeHTML(formatDate(analysis.date))}</small>
+          </div>
+          <div class="analyzer-saved-actions">
+            <button class="btn btn-small btn-secondary" type="button" data-saved-action="view" data-analysis-id="${escapeHTML(analysis.id)}">${escapeHTML(t("common.view"))}</button>
+            <button class="btn btn-small btn-danger" type="button" data-saved-action="delete" data-analysis-id="${escapeHTML(analysis.id)}">${escapeHTML(t("analyzer.deleteAnalysis"))}</button>
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function setAnalyzerMode(mode) {
+  analyzerMode = ["cv_review", "job_match", "career"].includes(mode) ? mode : "cv_review";
+  renderAnalyzerReadiness();
+}
+
+function showAnalyzerResult(markdown) {
+  const card = document.getElementById("analyzer-result-card");
+  const body = document.getElementById("analyzer-result-body");
+  if (!card || !body) return;
+  body.innerHTML = safeRenderMarkdown(markdown);
+  card.classList.remove("hidden");
+  card.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function handleAnalyzerCvUpload(event) {
+  const file = event.target.files[0];
+  const nameLabel = document.getElementById("analyzer-cv-name");
+  if (!file) return;
+
+  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+    showToast("analyzer.errorInvalidPdf");
+    event.target.value = "";
+    return;
+  }
+
+  try {
+    if (nameLabel) nameLabel.textContent = t("analyzer.loadingReadingPdf");
+    analyzerCvText = await extractPdfText(file);
+    analyzerCvFileName = file.name;
+    if (!analyzerCvText) {
+      showToast("analyzer.noCvText");
+      if (nameLabel) nameLabel.textContent = t("analyzer.uploadHint");
+      return;
+    }
+    StorageManager.set(StorageManager.KEYS.CV, {
+      name: file.name,
+      text: analyzerCvText,
+      updatedAt: todayISO()
+    });
+    if (nameLabel) nameLabel.textContent = file.name;
+  } catch (error) {
+    console.error(error);
+    showToast("analyzer.errorPdfFailed");
+    if (nameLabel) nameLabel.textContent = t("analyzer.uploadHint");
+  }
+}
+
+async function runAnalysis() {
+  if (isAnalyzing) return;
+
+  if (!getGeminiApiKey()) {
+    showToast("analyzer.errorNoApiKey");
+    return;
+  }
+  if (!analyzerCvText) {
+    showToast("analyzer.errorNoCv");
+    return;
+  }
+
+  let job = null;
+  if (analyzerMode === "job_match") {
+    const jobId = document.getElementById("analyzer-job-select")?.value || "";
+    job = AppState.jobs.find((item) => item.id === jobId);
+    if (!job) {
+      showToast("analyzer.errorNoJob");
+      return;
+    }
+  }
+
+  const runButton = document.getElementById("analyzer-run");
+  isAnalyzing = true;
+  if (runButton) {
+    runButton.disabled = true;
+    runButton.textContent = t("analyzer.loadingThinking");
+  }
+
+  try {
+    const prompt = buildAnalyzerPrompt(analyzerMode, analyzerCvText, job);
+    const resultText = await callGemini(prompt);
+
+    const analysis = {
+      id: uuid(),
+      mode: analyzerMode,
+      title: job ? `${job.jobTitle} · ${job.company}` : t(`analyzer.modeLabels.${analyzerMode}`),
+      content: resultText,
+      date: todayISO(),
+      createdAt: todayISO()
+    };
+
+    AppState.analyses = [analysis, ...AppState.analyses].slice(0, 20);
+    AppState.saveAnalyses();
+    showAnalyzerResult(resultText);
+
+    const savedList = document.getElementById("analyzer-saved-list");
+    if (savedList) savedList.innerHTML = renderSavedAnalysesList();
+    safeInitIcons();
+  } catch (error) {
+    console.error(error);
+    showToast("analyzer.errorApiFailed");
+  } finally {
+    isAnalyzing = false;
+    if (runButton) {
+      runButton.disabled = false;
+      runButton.textContent = t("analyzer.analyzeButton");
+    }
+  }
+}
+
+function deleteAnalysis(analysisId) {
+  AppState.analyses = AppState.analyses.filter((item) => item.id !== analysisId);
+  AppState.saveAnalyses();
+  const savedList = document.getElementById("analyzer-saved-list");
+  if (savedList) savedList.innerHTML = renderSavedAnalysesList();
+  safeInitIcons();
+}
+
+function viewSavedAnalysis(analysisId) {
+  const analysis = AppState.analyses.find((item) => item.id === analysisId);
+  if (analysis) showAnalyzerResult(analysis.content);
+}
+
+function bindAnalyzerEvents() {
+  const panel = document.getElementById("tab-analyzer");
+  if (!panel || panel.dataset.analyzerEventsBound === "true") return;
+  panel.dataset.analyzerEventsBound = "true";
+
+  panel.addEventListener("click", (event) => {
+    const modeButton = event.target.closest("[data-analyzer-mode]");
+    if (modeButton) {
+      setAnalyzerMode(modeButton.dataset.analyzerMode);
+      return;
+    }
+
+    const savedButton = event.target.closest("[data-saved-action]");
+    if (savedButton) {
+      const id = savedButton.dataset.analysisId;
+      if (savedButton.dataset.savedAction === "delete") deleteAnalysis(id);
+      if (savedButton.dataset.savedAction === "view") viewSavedAnalysis(id);
+      return;
+    }
+
+    if (event.target.closest("#analyzer-save-key")) {
+      const input = document.getElementById("analyzer-api-key");
+      if (!input || !input.value.trim()) {
+        showToast("analyzer.apiMissing");
+        return;
+      }
+      setGeminiApiKey(input.value);
+      showToast("analyzer.apiSaved");
+      renderAnalyzerReadiness();
+      return;
+    }
+
+    if (event.target.closest("#analyzer-run")) {
+      runAnalysis();
+      return;
+    }
+
+    if (event.target.closest("#analyzer-copy-result")) {
+      const body = document.getElementById("analyzer-result-body");
+      if (body && navigator.clipboard) {
+        navigator.clipboard.writeText(body.innerText).then(() => showToast("analyzer.copied"));
+      }
+    }
+  });
+
+  panel.addEventListener("change", (event) => {
+    if (event.target.id === "analyzer-cv-file") {
+      handleAnalyzerCvUpload(event);
+    }
+  });
 }
 
 function renderSettingsReadiness() {
@@ -2843,6 +3114,7 @@ function bindNavigation() {
   bindInterviewsEvents();
   bindTodayEvents();
   bindStatsEvents();
+  bindAnalyzerEvents();
 }
 
 function init() {
