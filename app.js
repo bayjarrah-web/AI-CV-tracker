@@ -3026,45 +3026,287 @@ function renderSettingsReadiness() {
   const panel = document.getElementById("tab-settings");
   if (!panel) return;
 
-  const cards = [
-    { icon: "palette", title: t("foundation.appearance"), body: t("foundation.comingSoon") },
-    { icon: "database", title: t("foundation.dataExport"), body: t("foundation.comingSoon") },
-    { icon: "sparkles", title: t("foundation.aiSetupComingSoon"), body: t("foundation.foundationReady") }
-  ];
+  const apiKeySet = Boolean(getGeminiApiKey());
+  const compactOn = Boolean(AppState.settings.compactMode);
+  const autoSaveOn = AppState.settings.autoSave !== false;
+  const defaultPeriod = AppState.settings.defaultStatsPeriod || "all";
 
   panel.innerHTML = `
-    <section class="foundation-panel">
-      <div class="foundation-hero glass-card">
+    <section class="settings-panel">
+      <div class="settings-hero glass-card">
         <div class="foundation-icon"><i data-lucide="settings"></i></div>
         <div>
-          <p class="eyebrow">${escapeHTML(t("foundation.foundationReady"))}</p>
-          <h2>${escapeHTML(t("empty.settings.title"))}</h2>
-          <p>${escapeHTML(t("empty.settings.body"))}</p>
+          <p class="eyebrow">${escapeHTML(t("settings.kicker"))}</p>
+          <h2>${escapeHTML(t("settings.title"))}</h2>
+          <p>${escapeHTML(t("settings.subtitle"))}</p>
         </div>
       </div>
 
-      <div class="settings-readiness-grid">
-        ${cards.map((card) => `
-          <article class="foundation-card glass-card">
-            <div class="foundation-card-icon"><i data-lucide="${escapeHTML(card.icon)}"></i></div>
-            <h3>${escapeHTML(card.title)}</h3>
-            <p>${escapeHTML(card.body)}</p>
-          </article>
-        `).join("")}
-      </div>
+      <section class="settings-card glass-card">
+        <div class="g-section-header"><h3>${escapeHTML(t("settings.profileTitle"))}</h3></div>
+        <div class="settings-profile-grid">
+          <div><span class="g-muted">${escapeHTML(t("settings.profileName"))}</span><strong>${escapeHTML(AppState.user?.name || t("common.guest"))}</strong></div>
+          <div><span class="g-muted">${escapeHTML(t("settings.profileSpecialty"))}</span><strong>${escapeHTML(AppState.user?.specialty || "-")}</strong></div>
+          <div><span class="g-muted">${escapeHTML(t("settings.profileCountry"))}</span><strong>${escapeHTML(AppState.user?.country || "-")}</strong></div>
+        </div>
+      </section>
 
-      <section class="foundation-card glass-card">
-        <div class="g-section-header">
-          <div>
-            <p class="eyebrow">${escapeHTML(t("foundation.libraries"))}</p>
-            <h3>${escapeHTML(t("foundation.libraryStatus"))}</h3>
+      <section class="settings-card glass-card">
+        <div class="g-section-header"><h3>${escapeHTML(t("settings.prefsTitle"))}</h3></div>
+        <div class="settings-pref-row">
+          <span>${escapeHTML(t("settings.prefLanguage"))}</span>
+          <div class="settings-segment">
+            <button class="settings-seg-btn${AppState.language === "ar" ? " active" : ""}" type="button" data-set-language="ar">عربي</button>
+            <button class="settings-seg-btn${AppState.language === "en" ? " active" : ""}" type="button" data-set-language="en">English</button>
           </div>
-          <span class="g-chip">${escapeHTML(t("foundation.foundationReady"))}</span>
         </div>
+        <div class="settings-pref-row">
+          <span>${escapeHTML(t("settings.prefDefaultPeriod"))}</span>
+          <select id="settings-default-period">
+            ${STATS_PERIOD_OPTIONS.map((period) => `<option value="${escapeHTML(period)}"${defaultPeriod === period ? " selected" : ""}>${escapeHTML(t(`statsDashboard.periods.${period}`))}</option>`).join("")}
+          </select>
+        </div>
+        <div class="settings-pref-row">
+          <span>${escapeHTML(t("settings.prefAutoSave"))}</span>
+          <button class="settings-toggle${autoSaveOn ? " on" : ""}" type="button" id="settings-toggle-autosave" role="switch" aria-checked="${autoSaveOn}"><span></span></button>
+        </div>
+        <div class="settings-pref-row">
+          <span>${escapeHTML(t("settings.prefCompact"))}</span>
+          <button class="settings-toggle${compactOn ? " on" : ""}" type="button" id="settings-toggle-compact" role="switch" aria-checked="${compactOn}"><span></span></button>
+        </div>
+      </section>
+
+      <section class="settings-card glass-card">
+        <div class="g-section-header">
+          <h3>${escapeHTML(t("settings.apiTitle"))}</h3>
+          <span class="g-chip ${apiKeySet ? "is-ready" : ""}">${escapeHTML(apiKeySet ? t("settings.apiSet") : t("settings.apiNotSet"))}</span>
+        </div>
+        <button class="btn btn-secondary btn-small" type="button" id="settings-clear-api"${apiKeySet ? "" : " disabled"}>${escapeHTML(t("settings.apiClear"))}</button>
+      </section>
+
+      <section class="settings-card glass-card">
+        <div class="g-section-header"><h3>${escapeHTML(t("settings.exportTitle"))}</h3></div>
+        <p class="g-muted">${escapeHTML(t("settings.exportHint"))}</p>
+        <div class="settings-btn-grid">
+          <button class="btn btn-primary" type="button" data-export-scope="all">${escapeHTML(t("settings.exportAll"))}</button>
+          <button class="btn btn-secondary" type="button" data-export-scope="jobs">${escapeHTML(t("settings.exportJobs"))}</button>
+          <button class="btn btn-secondary" type="button" data-export-scope="interviews">${escapeHTML(t("settings.exportInterviews"))}</button>
+          <button class="btn btn-secondary" type="button" data-export-scope="analyses">${escapeHTML(t("settings.exportAnalyses"))}</button>
+          <button class="btn btn-secondary" type="button" data-export-scope="settings">${escapeHTML(t("settings.exportSettings"))}</button>
+        </div>
+      </section>
+
+      <section class="settings-card glass-card">
+        <div class="g-section-header"><h3>${escapeHTML(t("settings.importTitle"))}</h3></div>
+        <p class="g-muted">${escapeHTML(t("settings.importHint"))}</p>
+        <label class="upload-box" for="settings-import-file">
+          <span class="upload-icon">JSON</span>
+          <strong>${escapeHTML(t("settings.importSelect"))}</strong>
+          <input id="settings-import-file" type="file" accept="application/json,.json">
+        </label>
+        <div class="settings-import-preview hidden" id="settings-import-preview">
+          <p id="settings-import-summary"></p>
+          <div class="settings-btn-grid">
+            <button class="btn btn-secondary" type="button" id="settings-import-merge">${escapeHTML(t("settings.importMerge"))}</button>
+            <button class="btn btn-danger" type="button" id="settings-import-replace">${escapeHTML(t("settings.importReplace"))}</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-card glass-card settings-danger">
+        <div class="g-section-header"><h3>${escapeHTML(t("settings.dangerTitle"))}</h3></div>
+        <p class="g-muted">${escapeHTML(t("settings.dangerHint"))}</p>
+        <div class="settings-btn-grid">
+          <button class="btn btn-secondary" type="button" id="settings-delete-analyses">${escapeHTML(t("settings.deleteAnalyses"))}</button>
+          <button class="btn btn-secondary" type="button" id="settings-delete-archived">${escapeHTML(t("settings.deleteArchived"))}</button>
+          <button class="btn btn-secondary" type="button" id="settings-reset-settings">${escapeHTML(t("settings.resetSettings"))}</button>
+        </div>
+        <div class="settings-delete-all">
+          <input id="settings-delete-confirm" type="text" placeholder="${escapeHTML(t("settings.deleteAllConfirm"))}">
+          <button class="btn btn-danger" type="button" id="settings-delete-all">${escapeHTML(t("settings.deleteAll"))}</button>
+        </div>
+      </section>
+
+      <section class="settings-card glass-card">
+        <div class="g-section-header"><h3>${escapeHTML(t("settings.appInfoTitle"))}</h3></div>
+        <div class="settings-profile-grid">
+          <div><span class="g-muted">${escapeHTML(t("settings.appVersion"))}</span><strong>${escapeHTML(APP_VERSION)}</strong></div>
+          <div><span class="g-muted">${escapeHTML(t("settings.appStorage"))}</span><strong>${escapeHTML(t("settings.appStorageLocal"))}</strong></div>
+        </div>
+        <div class="g-section-header settings-library-title"><h3>${escapeHTML(t("settings.libraryStatusTitle"))}</h3></div>
         ${renderLibraryStatus()}
       </section>
     </section>
   `;
+
+  safeInitIcons();
+}
+
+let pendingImport = null;
+
+function persistSettings() {
+  StorageManager.set(StorageManager.KEYS.SETTINGS, AppState.settings);
+}
+
+function applyCompactMode() {
+  document.body.classList.toggle("compact-mode", Boolean(AppState.settings.compactMode));
+}
+
+function handleSettingsImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const raw = JSON.parse(reader.result);
+      const parsed = validateImportPayload(raw);
+      if (!parsed) {
+        showToast("settings.importInvalid");
+        return;
+      }
+      pendingImport = parsed;
+      const preview = document.getElementById("settings-import-preview");
+      const summary = document.getElementById("settings-import-summary");
+      if (summary) {
+        summary.textContent = formatMessage("settings.importSummary", {
+          jobs: parsed.jobs.length,
+          interviews: parsed.interviews.length,
+          analyses: parsed.analyses.length
+        });
+      }
+      if (preview) preview.classList.remove("hidden");
+    } catch (error) {
+      console.error(error);
+      showToast("settings.importInvalid");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function confirmImport(mode) {
+  if (!pendingImport) return;
+  applyImport(pendingImport, mode);
+  pendingImport = null;
+  showToast("settings.importDone");
+  renderSettingsReadiness();
+}
+
+function deleteAnalysesOnly() {
+  if (!window.confirm(t("settings.confirmDeleteAnalyses"))) return;
+  AppState.analyses = [];
+  saveAnalyses();
+  showToast("settings.done");
+  renderSettingsReadiness();
+}
+
+function deleteArchivedJobs() {
+  if (!window.confirm(t("settings.confirmDeleteArchived"))) return;
+  AppState.jobs = AppState.jobs.filter((job) => !job.isArchived && job.status !== "archived");
+  saveJobs();
+  renderJobs();
+  renderTodayIfActive();
+  showToast("settings.done");
+  renderSettingsReadiness();
+}
+
+function resetSettingsOnly() {
+  if (!window.confirm(t("settings.confirmResetSettings"))) return;
+  const language = AppState.language;
+  AppState.settings = { onboardingCompleted: true, language };
+  StatsFilters.period = "all";
+  persistSettings();
+  applyCompactMode();
+  showToast("settings.done");
+  renderSettingsReadiness();
+}
+
+function deleteAllData() {
+  const input = document.getElementById("settings-delete-confirm");
+  if (!input || input.value.trim() !== "DELETE") return;
+
+  Object.values(StorageManager.KEYS).forEach((key) => StorageManager.remove(key));
+  showToast("settings.deleteAllDone");
+  window.setTimeout(() => window.location.reload(), 900);
+}
+
+function bindSettingsEvents() {
+  const panel = document.getElementById("tab-settings");
+  if (!panel || panel.dataset.settingsEventsBound === "true") return;
+  panel.dataset.settingsEventsBound = "true";
+
+  panel.addEventListener("click", (event) => {
+    const exportBtn = event.target.closest("[data-export-scope]");
+    if (exportBtn) {
+      exportData(exportBtn.dataset.exportScope);
+      return;
+    }
+
+    const langBtn = event.target.closest("[data-set-language]");
+    if (langBtn) {
+      setLanguage(langBtn.dataset.setLanguage);
+      renderSettingsReadiness();
+      return;
+    }
+
+    if (event.target.closest("#settings-toggle-compact")) {
+      AppState.settings.compactMode = !AppState.settings.compactMode;
+      persistSettings();
+      applyCompactMode();
+      renderSettingsReadiness();
+      return;
+    }
+
+    if (event.target.closest("#settings-toggle-autosave")) {
+      AppState.settings.autoSave = AppState.settings.autoSave === false;
+      persistSettings();
+      renderSettingsReadiness();
+      return;
+    }
+
+    if (event.target.closest("#settings-clear-api")) {
+      setGeminiApiKey("");
+      showToast("settings.apiCleared");
+      renderSettingsReadiness();
+      return;
+    }
+
+    if (event.target.closest("#settings-import-merge")) {
+      confirmImport("merge");
+      return;
+    }
+    if (event.target.closest("#settings-import-replace")) {
+      confirmImport("replace");
+      return;
+    }
+    if (event.target.closest("#settings-delete-analyses")) {
+      deleteAnalysesOnly();
+      return;
+    }
+    if (event.target.closest("#settings-delete-archived")) {
+      deleteArchivedJobs();
+      return;
+    }
+    if (event.target.closest("#settings-reset-settings")) {
+      resetSettingsOnly();
+      return;
+    }
+    if (event.target.closest("#settings-delete-all")) {
+      deleteAllData();
+    }
+  });
+
+  panel.addEventListener("change", (event) => {
+    if (event.target.id === "settings-default-period") {
+      AppState.settings.defaultStatsPeriod = event.target.value;
+      StatsFilters.period = STATS_PERIOD_OPTIONS.includes(event.target.value) ? event.target.value : "all";
+      persistSettings();
+      return;
+    }
+    if (event.target.id === "settings-import-file") {
+      handleSettingsImportFile(event);
+    }
+  });
 }
 
 function bindTodayEvents() {
@@ -3235,10 +3477,15 @@ function bindNavigation() {
   bindTodayEvents();
   bindStatsEvents();
   bindAnalyzerEvents();
+  bindSettingsEvents();
 }
 
 function init() {
   AppState.load();
+  if (AppState.settings.defaultStatsPeriod && STATS_PERIOD_OPTIONS.includes(AppState.settings.defaultStatsPeriod)) {
+    StatsFilters.period = AppState.settings.defaultStatsPeriod;
+  }
+  applyCompactMode();
   setLanguage(AppState.language);
   bindNavigation();
   populateJobSelects();
