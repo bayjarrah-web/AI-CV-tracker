@@ -89,9 +89,9 @@ body {
 body:has(#onboarding-screen:not(.hidden)) {
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 12% 50%, rgba(47, 107, 255, 0.28), transparent 24%),
-    radial-gradient(circle at 86% 28%, rgba(77, 163, 255, 0.18), transparent 28%),
-    radial-gradient(circle at 50% -12%, rgba(18, 62, 170, 0.34), transparent 38%),
+    radial-gradient(circle at 0% 50%, rgba(47, 107, 255, 0.24), transparent 23%),
+    radial-gradient(circle at 100% 22%, rgba(77, 163, 255, 0.14), transparent 28%),
+    radial-gradient(circle at 52% -18%, rgba(18, 62, 170, 0.32), transparent 38%),
     linear-gradient(135deg, var(--onboarding-bg), var(--onboarding-bg-2) 58%, #02040B);
 }
 
@@ -104,27 +104,30 @@ body:has(#onboarding-screen:not(.hidden))::after {
 }
 
 body:has(#onboarding-screen:not(.hidden))::before {
-  inset: -15% -8%;
+  inset: -18% -14%;
   background:
-    radial-gradient(circle at 4% 60%, rgba(77, 163, 255, 0.3), transparent 18%),
-    radial-gradient(circle at 100% 54%, rgba(47, 107, 255, 0.2), transparent 22%),
-    repeating-radial-gradient(circle at 92% 24%, rgba(77, 163, 255, 0.14) 0 1px, transparent 1px 28px);
-  filter: blur(2px);
+    radial-gradient(ellipse 92% 88% at -14% 64%, transparent 46.5%, rgba(77, 163, 255, 0.08) 46.7%, rgba(77, 163, 255, 0.48) 46.9%, rgba(77, 163, 255, 0.08) 47.18%, transparent 47.45%),
+    radial-gradient(ellipse 88% 82% at -10% 62%, transparent 54.2%, rgba(47, 107, 255, 0.12) 54.35%, rgba(77, 163, 255, 0.34) 54.52%, rgba(47, 107, 255, 0.12) 54.76%, transparent 55.02%),
+    radial-gradient(ellipse 92% 72% at 118% 40%, transparent 57.4%, rgba(47, 107, 255, 0.1) 57.58%, rgba(77, 163, 255, 0.3) 57.78%, transparent 58.1%),
+    repeating-radial-gradient(circle at 88% 28%, rgba(77, 163, 255, 0.16) 0 1px, transparent 1px 28px),
+    radial-gradient(circle at 0% 62%, rgba(77, 163, 255, 0.2), transparent 20%);
+  filter: drop-shadow(0 0 18px rgba(47, 107, 255, 0.42));
   opacity: 0.9;
 }
 
 body:has(#onboarding-screen:not(.hidden))::after {
-  width: 120vw;
-  height: 120vw;
-  left: -34vw;
-  bottom: -72vw;
-  border: 1px solid rgba(77, 163, 255, 0.22);
-  border-top-color: rgba(77, 163, 255, 0.66);
-  border-right-color: transparent;
+  width: 126vw;
+  height: 126vw;
+  left: -40vw;
+  bottom: -78vw;
+  border: 1px solid rgba(47, 107, 255, 0.32);
+  border-top-color: rgba(77, 163, 255, 0.86);
+  border-right-color: rgba(77, 163, 255, 0.08);
   border-radius: 50%;
   box-shadow:
-    0 -18px 42px rgba(47, 107, 255, 0.18),
-    inset 0 1px 0 rgba(77, 163, 255, 0.22);
+    -10px -20px 62px rgba(47, 107, 255, 0.24),
+    -18px -18px 28px rgba(77, 163, 255, 0.18),
+    inset 0 1px 0 rgba(77, 163, 255, 0.4);
   transform: rotate(-18deg);
 }
 
@@ -3848,44 +3851,69 @@ body:has(#onboarding-screen:not(.hidden)) .onboarding-card.glass-card {
   body:has(#onboarding-screen:not(.hidden)) .onboarding-card.glass-card {
     border-radius: 28px;
   }
+
+  body:has(#onboarding-screen:not(.hidden))::before,
+  body:not(:has(#onboarding-screen:not(.hidden)))::before {
+    inset: -10% -44%;
+    background:
+      radial-gradient(ellipse 120% 74% at -14% 54%, transparent 45.8%, rgba(77, 163, 255, 0.1) 46.05%, rgba(77, 163, 255, 0.58) 46.28%, rgba(47, 107, 255, 0.1) 46.56%, transparent 46.88%),
+      radial-gradient(ellipse 110% 72% at -8% 56%, transparent 54.2%, rgba(77, 163, 255, 0.28) 54.48%, transparent 54.82%),
+      radial-gradient(ellipse 112% 68% at 120% 38%, transparent 58%, rgba(77, 163, 255, 0.2) 58.22%, transparent 58.56%),
+      repeating-radial-gradient(circle at 86% 24%, rgba(77, 163, 255, 0.12) 0 1px, transparent 1px 28px),
+      radial-gradient(circle at 0% 58%, rgba(77, 163, 255, 0.18), transparent 24%);
+  }
+
+  body:has(#onboarding-screen:not(.hidden))::after,
+  body:not(:has(#onboarding-screen:not(.hidden)))::after {
+    width: 170vw;
+    height: 170vw;
+    left: -82vw;
+    bottom: -98vw;
+  }
 }
 
 body:not(:has(#onboarding-screen:not(.hidden))) {
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 12% 12%, rgba(47, 107, 255, 0.18), transparent 30%),
-    radial-gradient(circle at 86% 8%, rgba(77, 163, 255, 0.12), transparent 28%),
-    radial-gradient(circle at 8% 84%, rgba(18, 62, 170, 0.22), transparent 30%),
+    radial-gradient(circle at 0% 48%, rgba(47, 107, 255, 0.2), transparent 24%),
+    radial-gradient(circle at 92% 8%, rgba(77, 163, 255, 0.1), transparent 28%),
+    radial-gradient(circle at 8% 84%, rgba(18, 62, 170, 0.2), transparent 30%),
     linear-gradient(135deg, #050816, #070B14 54%, #02040B);
 }
 
 body:not(:has(#onboarding-screen:not(.hidden)))::before {
   position: fixed;
-  inset: 0;
+  inset: -18% -14%;
   z-index: 0;
   pointer-events: none;
   content: "";
   background:
-    repeating-radial-gradient(circle at 92% 16%, rgba(77, 163, 255, 0.09) 0 1px, transparent 1px 28px),
-    linear-gradient(125deg, transparent 0 56%, rgba(47, 107, 255, 0.08) 56.2%, transparent 68%),
-    radial-gradient(circle at 50% -20%, rgba(77, 163, 255, 0.12), transparent 38%);
-  opacity: 0.95;
+    radial-gradient(ellipse 94% 86% at -15% 63%, transparent 46.4%, rgba(77, 163, 255, 0.08) 46.62%, rgba(77, 163, 255, 0.42) 46.82%, rgba(47, 107, 255, 0.12) 47.08%, transparent 47.36%),
+    radial-gradient(ellipse 84% 78% at -7% 61%, transparent 54%, rgba(47, 107, 255, 0.1) 54.22%, rgba(77, 163, 255, 0.28) 54.42%, transparent 54.74%),
+    radial-gradient(ellipse 88% 70% at 118% 36%, transparent 57.2%, rgba(47, 107, 255, 0.09) 57.42%, rgba(77, 163, 255, 0.24) 57.64%, transparent 57.96%),
+    repeating-radial-gradient(circle at 88% 24%, rgba(77, 163, 255, 0.11) 0 1px, transparent 1px 28px),
+    radial-gradient(circle at 0% 60%, rgba(77, 163, 255, 0.16), transparent 22%);
+  filter: drop-shadow(0 0 16px rgba(47, 107, 255, 0.36));
+  opacity: 0.94;
 }
 
 body:not(:has(#onboarding-screen:not(.hidden)))::after {
   position: fixed;
-  right: -42vw;
-  bottom: -70vw;
+  left: -42vw;
+  bottom: -80vw;
   z-index: 0;
-  width: 120vw;
-  height: 120vw;
+  width: 128vw;
+  height: 128vw;
   pointer-events: none;
   content: "";
-  border: 1px solid rgba(77, 163, 255, 0.12);
-  border-top-color: rgba(77, 163, 255, 0.34);
+  border: 1px solid rgba(47, 107, 255, 0.26);
+  border-top-color: rgba(77, 163, 255, 0.62);
+  border-right-color: rgba(77, 163, 255, 0.08);
   border-radius: 50%;
-  box-shadow: 0 -22px 60px rgba(47, 107, 255, 0.1);
-  transform: rotate(14deg);
+  box-shadow:
+    -10px -20px 56px rgba(47, 107, 255, 0.16),
+    inset 0 1px 0 rgba(77, 163, 255, 0.28);
+  transform: rotate(-18deg);
 }
 
 body:not(:has(#onboarding-screen:not(.hidden))) .glass-card,
