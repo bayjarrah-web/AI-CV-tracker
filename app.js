@@ -92,6 +92,8 @@ const StatsFilters = {
 };
 
 const STATS_PERIOD_OPTIONS = ["week", "month", "quarter", "all"];
+const APP_VERSION = "1.0.0";
+const EXPORT_FORMAT = "cv-tracker-export";
 
 const SPECIALTY_OPTIONS = [
   { ar: "تطوير برمجيات", en: "Software Development" },
@@ -564,6 +566,124 @@ function setGeminiApiKey(key) {
 
 function getStoredCv() {
   return StorageManager.get(StorageManager.KEYS.CV);
+}
+
+function buildExportPayload(scope = "all") {
+  const payload = {
+    format: EXPORT_FORMAT,
+    version: APP_VERSION,
+    exportedAt: new Date().toISOString(),
+    scope,
+    data: {}
+  };
+
+  if (scope === "all" || scope === "jobs") payload.data.jobs = AppState.jobs;
+  if (scope === "all" || scope === "interviews") payload.data.interviews = AppState.interviews;
+  if (scope === "all" || scope === "analyses") payload.data.analyses = AppState.analyses;
+  if (scope === "all" || scope === "settings") payload.data.settings = AppState.settings;
+  if (scope === "all") {
+    payload.data.user = AppState.user;
+    payload.data.cv = getStoredCv();
+  }
+
+  return payload;
+}
+
+function downloadJSON(payload, fileNameBase) {
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${fileNameBase}-${todayISO()}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportData(scope = "all") {
+  const payload = buildExportPayload(scope);
+  downloadJSON(payload, `cv-tracker-${scope}`);
+  showToast("settings.exportDone");
+}
+
+function validateImportPayload(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  if (raw.format !== EXPORT_FORMAT) return null;
+  if (!raw.data || typeof raw.data !== "object") return null;
+
+  const data = raw.data;
+  const hasKey = (key) => Object.prototype.hasOwnProperty.call(data, key);
+  const safeArray = (value) => (Array.isArray(value) ? value : []);
+
+  return {
+    hasJobs: hasKey("jobs"),
+    hasInterviews: hasKey("interviews"),
+    hasAnalyses: hasKey("analyses"),
+    hasSettings: hasKey("settings"),
+    hasUser: hasKey("user"),
+    hasCv: hasKey("cv"),
+    jobs: safeArray(data.jobs),
+    interviews: safeArray(data.interviews),
+    analyses: safeArray(data.analyses),
+    settings: data.settings && typeof data.settings === "object" ? data.settings : null,
+    user: data.user && typeof data.user === "object" ? data.user : null,
+    cv: data.cv && typeof data.cv === "object" ? data.cv : null
+  };
+}
+
+function mergeById(existing, incoming) {
+  const map = new Map(existing.map((item) => [item.id, item]));
+  incoming.forEach((item) => {
+    if (item && item.id) map.set(item.id, item);
+  });
+  return Array.from(map.values());
+}
+
+function applyImport(parsed, mode = "merge") {
+  if (!parsed) return false;
+
+  const importedJobs = parsed.jobs.map(normalizeJob);
+  const importedInterviews = parsed.interviews.map(normalizeInterview);
+
+  if (mode === "replace") {
+    if (parsed.hasJobs) AppState.jobs = importedJobs;
+    if (parsed.hasInterviews) AppState.interviews = importedInterviews;
+    if (parsed.hasAnalyses) AppState.analyses = parsed.analyses;
+  } else {
+    if (parsed.hasJobs) AppState.jobs = mergeById(AppState.jobs, importedJobs);
+    if (parsed.hasInterviews) AppState.interviews = mergeById(AppState.interviews, importedInterviews);
+    if (parsed.hasAnalyses) AppState.analyses = mergeById(AppState.analyses, parsed.analyses);
+  }
+
+  if (parsed.settings) {
+    AppState.settings = { ...AppState.settings, ...parsed.settings };
+    AppState.language = AppState.settings.language || AppState.language;
+  }
+  if (parsed.user) {
+    AppState.user = parsed.user;
+    StorageManager.set(StorageManager.KEYS.USER, AppState.user);
+  }
+  if (parsed.cv) {
+    StorageManager.set(StorageManager.KEYS.CV, parsed.cv);
+  }
+
+  saveJobs();
+  saveInterviews();
+  saveAnalyses();
+  StorageManager.set(StorageManager.KEYS.SETTINGS, AppState.settings);
+
+  updateHeader();
+  populateJobSelects();
+  populateInterviewSelects();
+  renderTodayIfActive();
+  if (AppState.currentTab === "jobs") renderJobs();
+  if (AppState.currentTab === "interviews") renderInterviews();
+  if (AppState.currentTab === "stats") renderStats();
+  if (AppState.currentTab === "analyzer") renderAnalyzerReadiness();
+  if (AppState.currentTab === "settings") renderSettingsReadiness();
+
+  return true;
 }
 
 function getActiveJobs() {
