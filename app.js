@@ -568,67 +568,142 @@ function getStoredCv() {
   return StorageManager.get(StorageManager.KEYS.CV);
 }
 
-function buildExportPayload(scope = "all") {
-  const payload = {
-    format: EXPORT_FORMAT,
-    version: APP_VERSION,
-    exportedAt: new Date().toISOString(),
-    scope,
-    data: {}
-  };
-
-  if (scope === "all" || scope === "jobs") payload.data.jobs = AppState.jobs;
-  if (scope === "all" || scope === "interviews") payload.data.interviews = AppState.interviews;
-  if (scope === "all" || scope === "analyses") payload.data.analyses = AppState.analyses;
-  if (scope === "all" || scope === "settings") payload.data.settings = AppState.settings;
-  if (scope === "all") {
-    payload.data.user = AppState.user;
-    payload.data.cv = getStoredCv();
-  }
-
-  return payload;
+function formatDateForFilename(date = new Date()) {
+  return toLocalISODate(date);
 }
 
-function downloadJSON(payload, fileNameBase) {
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+function buildExportPayload(type = "all") {
+  const exportedAt = new Date().toISOString();
+
+  if (type === "all") {
+    return {
+      app: "AI CV Tracker",
+      version: APP_VERSION,
+      exportedAt,
+      data: {
+        user: AppState.user,
+        cv: getStoredCv(),
+        jobs: AppState.jobs,
+        interviews: AppState.interviews,
+        analyses: AppState.analyses,
+        settings: AppState.settings
+      }
+    };
+  }
+
+  const partialData = {
+    jobs: AppState.jobs,
+    interviews: AppState.interviews,
+    analyses: AppState.analyses,
+    settings: AppState.settings
+  };
+
+  return {
+    app: "AI CV Tracker",
+    type,
+    exportedAt,
+    data: partialData[type] ?? {}
+  };
+}
+
+function getExportFileName(type = "all") {
+  const date = formatDateForFilename();
+  const fileNames = {
+    all: `ai-cv-tracker-backup-${date}.json`,
+    jobs: `jobs-export-${date}.json`,
+    interviews: `interviews-export-${date}.json`,
+    analyses: `analyses-export-${date}.json`,
+    settings: `settings-export-${date}.json`
+  };
+
+  return fileNames[type] || fileNames.all;
+}
+
+function downloadJSON(fileName, data) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${fileNameBase}-${todayISO()}.json`;
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
 }
 
-function exportData(scope = "all") {
-  const payload = buildExportPayload(scope);
-  downloadJSON(payload, `cv-tracker-${scope}`);
-  showToast("settings.exportDone");
+function exportData(type = "all") {
+  const payload = buildExportPayload(type);
+  downloadJSON(getExportFileName(type), payload);
+  showSettingsToast("settings.exportCompleted", "success");
+}
+
+function validateImportData(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  if (!raw.data) return null;
+
+  const safeArray = (value) => (Array.isArray(value) ? value : []);
+  const makeParsed = (data, sourceType = "all") => {
+    const hasKey = (key) => Object.prototype.hasOwnProperty.call(data, key);
+    const parsed = {
+      sourceType,
+      hasJobs: hasKey("jobs"),
+      hasInterviews: hasKey("interviews"),
+      hasAnalyses: hasKey("analyses"),
+      hasSettings: hasKey("settings"),
+      hasUser: hasKey("user"),
+      hasCv: hasKey("cv"),
+      jobs: safeArray(data.jobs),
+      interviews: safeArray(data.interviews),
+      analyses: safeArray(data.analyses),
+      settings: data.settings && typeof data.settings === "object" && !Array.isArray(data.settings) ? data.settings : null,
+      user: data.user && typeof data.user === "object" && !Array.isArray(data.user) ? data.user : null,
+      cv: data.cv && typeof data.cv === "object" && !Array.isArray(data.cv) ? data.cv : null
+    };
+
+    const arraysValid = (!parsed.hasJobs || Array.isArray(data.jobs))
+      && (!parsed.hasInterviews || Array.isArray(data.interviews))
+      && (!parsed.hasAnalyses || Array.isArray(data.analyses));
+    const objectsValid = (!parsed.hasSettings || Boolean(parsed.settings))
+      && (!parsed.hasUser || Boolean(parsed.user))
+      && (!parsed.hasCv || Boolean(parsed.cv));
+
+    return arraysValid && objectsValid ? parsed : null;
+  };
+
+  if (raw.app === "AI CV Tracker" && raw.data && typeof raw.data === "object") {
+    if (raw.type) {
+      if (["jobs", "interviews", "analyses"].includes(raw.type)) {
+        if (!Array.isArray(raw.data)) return null;
+        return makeParsed({ [raw.type]: raw.data }, raw.type);
+      }
+      if (raw.type === "settings") {
+        if (!raw.data || typeof raw.data !== "object" || Array.isArray(raw.data)) return null;
+        return makeParsed({ settings: raw.data }, raw.type);
+      }
+      return null;
+    }
+
+    return makeParsed(raw.data, "all");
+  }
+
+  if (raw.format === EXPORT_FORMAT && raw.data && typeof raw.data === "object") {
+    return makeParsed(raw.data, raw.scope || "legacy");
+  }
+
+  return null;
 }
 
 function validateImportPayload(raw) {
-  if (!raw || typeof raw !== "object") return null;
-  if (raw.format !== EXPORT_FORMAT) return null;
-  if (!raw.data || typeof raw.data !== "object") return null;
+  return validateImportData(raw);
+}
 
-  const data = raw.data;
-  const hasKey = (key) => Object.prototype.hasOwnProperty.call(data, key);
-  const safeArray = (value) => (Array.isArray(value) ? value : []);
-
+function getImportSummary(parsed) {
   return {
-    hasJobs: hasKey("jobs"),
-    hasInterviews: hasKey("interviews"),
-    hasAnalyses: hasKey("analyses"),
-    hasSettings: hasKey("settings"),
-    hasUser: hasKey("user"),
-    hasCv: hasKey("cv"),
-    jobs: safeArray(data.jobs),
-    interviews: safeArray(data.interviews),
-    analyses: safeArray(data.analyses),
-    settings: data.settings && typeof data.settings === "object" ? data.settings : null,
-    user: data.user && typeof data.user === "object" ? data.user : null,
-    cv: data.cv && typeof data.cv === "object" ? data.cv : null
+    jobs: parsed?.jobs?.length || 0,
+    interviews: parsed?.interviews?.length || 0,
+    analyses: parsed?.analyses?.length || 0,
+    hasUser: Boolean(parsed?.user),
+    hasSettings: Boolean(parsed?.settings)
   };
 }
 
@@ -640,7 +715,7 @@ function mergeById(existing, incoming) {
   return Array.from(map.values());
 }
 
-function applyImport(parsed, mode = "merge") {
+function importData(parsed, mode = "merge") {
   if (!parsed) return false;
 
   const importedJobs = parsed.jobs.map(normalizeJob);
@@ -673,6 +748,7 @@ function applyImport(parsed, mode = "merge") {
   saveAnalyses();
   StorageManager.set(StorageManager.KEYS.SETTINGS, AppState.settings);
 
+  applyPreferences();
   updateHeader();
   populateJobSelects();
   populateInterviewSelects();
@@ -684,6 +760,48 @@ function applyImport(parsed, mode = "merge") {
   if (AppState.currentTab === "settings") renderSettingsReadiness();
 
   return true;
+}
+
+function applyImport(parsed, mode = "merge") {
+  return importData(parsed, mode);
+}
+
+function createBackup() {
+  exportData("all");
+  saveSettings({ lastBackupAt: new Date().toISOString() });
+  showSettingsToast("settings.backupCreated", "success");
+  if (AppState.currentTab === "settings") renderSettings();
+}
+
+function getSettings() {
+  return AppState.settings || {};
+}
+
+function saveSettings(partialSettings = {}) {
+  AppState.settings = {
+    ...AppState.settings,
+    ...partialSettings
+  };
+  StorageManager.set(StorageManager.KEYS.SETTINGS, AppState.settings);
+  return AppState.settings;
+}
+
+function applyPreferences() {
+  const settings = getSettings();
+  const theme = ["dark", "light", "system"].includes(settings.theme) ? settings.theme : "dark";
+
+  document.documentElement.dataset.theme = theme;
+  document.body.classList.toggle("compact-mode", Boolean(settings.compactMode));
+
+  if (settings.defaultStatsPeriod && STATS_PERIOD_OPTIONS.includes(settings.defaultStatsPeriod)) {
+    StatsFilters.period = settings.defaultStatsPeriod;
+  }
+}
+
+async function readImportFile(file) {
+  if (!file) return null;
+  const text = await file.text();
+  return JSON.parse(text);
 }
 
 function getActiveJobs() {
@@ -2570,6 +2688,10 @@ function switchTab(tabName) {
   if (tabName === "interviews") {
     renderInterviews();
   }
+
+  if (tabName === "settings") {
+    renderSettings();
+  }
 }
 
 function renderEmptyStates() {
@@ -3022,18 +3144,13 @@ function bindAnalyzerEvents() {
   });
 }
 
-function renderSettingsReadiness() {
+function renderSettings() {
   const panel = document.getElementById("tab-settings");
   if (!panel) return;
 
-  const apiKeySet = Boolean(getGeminiApiKey());
-  const compactOn = Boolean(AppState.settings.compactMode);
-  const autoSaveOn = AppState.settings.autoSave !== false;
-  const defaultPeriod = AppState.settings.defaultStatsPeriod || "all";
-
   panel.innerHTML = `
-    <section class="settings-panel">
-      <div class="settings-hero glass-card">
+    <section class="settings-container">
+      <div class="settings-header glass-card">
         <div class="foundation-icon"><i data-lucide="settings"></i></div>
         <div>
           <p class="eyebrow">${escapeHTML(t("settings.kicker"))}</p>
@@ -3042,192 +3159,413 @@ function renderSettingsReadiness() {
         </div>
       </div>
 
-      <section class="settings-card glass-card">
-        <div class="g-section-header"><h3>${escapeHTML(t("settings.profileTitle"))}</h3></div>
-        <div class="settings-profile-grid">
-          <div><span class="g-muted">${escapeHTML(t("settings.profileName"))}</span><strong>${escapeHTML(AppState.user?.name || t("common.guest"))}</strong></div>
-          <div><span class="g-muted">${escapeHTML(t("settings.profileSpecialty"))}</span><strong>${escapeHTML(AppState.user?.specialty || "-")}</strong></div>
-          <div><span class="g-muted">${escapeHTML(t("settings.profileCountry"))}</span><strong>${escapeHTML(AppState.user?.country || "-")}</strong></div>
-        </div>
-      </section>
-
-      <section class="settings-card glass-card">
-        <div class="g-section-header"><h3>${escapeHTML(t("settings.prefsTitle"))}</h3></div>
-        <div class="settings-pref-row">
-          <span>${escapeHTML(t("settings.prefLanguage"))}</span>
-          <div class="settings-segment">
-            <button class="settings-seg-btn${AppState.language === "ar" ? " active" : ""}" type="button" data-set-language="ar">عربي</button>
-            <button class="settings-seg-btn${AppState.language === "en" ? " active" : ""}" type="button" data-set-language="en">English</button>
-          </div>
-        </div>
-        <div class="settings-pref-row">
-          <span>${escapeHTML(t("settings.prefDefaultPeriod"))}</span>
-          <select id="settings-default-period">
-            ${STATS_PERIOD_OPTIONS.map((period) => `<option value="${escapeHTML(period)}"${defaultPeriod === period ? " selected" : ""}>${escapeHTML(t(`statsDashboard.periods.${period}`))}</option>`).join("")}
-          </select>
-        </div>
-        <div class="settings-pref-row">
-          <span>${escapeHTML(t("settings.prefAutoSave"))}</span>
-          <button class="settings-toggle${autoSaveOn ? " on" : ""}" type="button" id="settings-toggle-autosave" role="switch" aria-checked="${autoSaveOn}"><span></span></button>
-        </div>
-        <div class="settings-pref-row">
-          <span>${escapeHTML(t("settings.prefCompact"))}</span>
-          <button class="settings-toggle${compactOn ? " on" : ""}" type="button" id="settings-toggle-compact" role="switch" aria-checked="${compactOn}"><span></span></button>
-        </div>
-      </section>
-
-      <section class="settings-card glass-card">
-        <div class="g-section-header">
-          <h3>${escapeHTML(t("settings.apiTitle"))}</h3>
-          <span class="g-chip ${apiKeySet ? "is-ready" : ""}">${escapeHTML(apiKeySet ? t("settings.apiSet") : t("settings.apiNotSet"))}</span>
-        </div>
-        <button class="btn btn-secondary btn-small" type="button" id="settings-clear-api"${apiKeySet ? "" : " disabled"}>${escapeHTML(t("settings.apiClear"))}</button>
-      </section>
-
-      <section class="settings-card glass-card">
-        <div class="g-section-header"><h3>${escapeHTML(t("settings.exportTitle"))}</h3></div>
-        <p class="g-muted">${escapeHTML(t("settings.exportHint"))}</p>
-        <div class="settings-btn-grid">
-          <button class="btn btn-primary" type="button" data-export-scope="all">${escapeHTML(t("settings.exportAll"))}</button>
-          <button class="btn btn-secondary" type="button" data-export-scope="jobs">${escapeHTML(t("settings.exportJobs"))}</button>
-          <button class="btn btn-secondary" type="button" data-export-scope="interviews">${escapeHTML(t("settings.exportInterviews"))}</button>
-          <button class="btn btn-secondary" type="button" data-export-scope="analyses">${escapeHTML(t("settings.exportAnalyses"))}</button>
-          <button class="btn btn-secondary" type="button" data-export-scope="settings">${escapeHTML(t("settings.exportSettings"))}</button>
-        </div>
-      </section>
-
-      <section class="settings-card glass-card">
-        <div class="g-section-header"><h3>${escapeHTML(t("settings.importTitle"))}</h3></div>
-        <p class="g-muted">${escapeHTML(t("settings.importHint"))}</p>
-        <label class="upload-box" for="settings-import-file">
-          <span class="upload-icon">JSON</span>
-          <strong>${escapeHTML(t("settings.importSelect"))}</strong>
-          <input id="settings-import-file" type="file" accept="application/json,.json">
-        </label>
-        <div class="settings-import-preview hidden" id="settings-import-preview">
-          <p id="settings-import-summary"></p>
-          <div class="settings-btn-grid">
-            <button class="btn btn-secondary" type="button" id="settings-import-merge">${escapeHTML(t("settings.importMerge"))}</button>
-            <button class="btn btn-danger" type="button" id="settings-import-replace">${escapeHTML(t("settings.importReplace"))}</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="settings-card glass-card settings-danger">
-        <div class="g-section-header"><h3>${escapeHTML(t("settings.dangerTitle"))}</h3></div>
-        <p class="g-muted">${escapeHTML(t("settings.dangerHint"))}</p>
-        <div class="settings-btn-grid">
-          <button class="btn btn-secondary" type="button" id="settings-delete-analyses">${escapeHTML(t("settings.deleteAnalyses"))}</button>
-          <button class="btn btn-secondary" type="button" id="settings-delete-archived">${escapeHTML(t("settings.deleteArchived"))}</button>
-          <button class="btn btn-secondary" type="button" id="settings-reset-settings">${escapeHTML(t("settings.resetSettings"))}</button>
-        </div>
-        <div class="settings-delete-all">
-          <input id="settings-delete-confirm" type="text" placeholder="${escapeHTML(t("settings.deleteAllConfirm"))}">
-          <button class="btn btn-danger" type="button" id="settings-delete-all">${escapeHTML(t("settings.deleteAll"))}</button>
-        </div>
-      </section>
-
-      <section class="settings-card glass-card">
-        <div class="g-section-header"><h3>${escapeHTML(t("settings.appInfoTitle"))}</h3></div>
-        <div class="settings-profile-grid">
-          <div><span class="g-muted">${escapeHTML(t("settings.appVersion"))}</span><strong>${escapeHTML(APP_VERSION)}</strong></div>
-          <div><span class="g-muted">${escapeHTML(t("settings.appStorage"))}</span><strong>${escapeHTML(t("settings.appStorageLocal"))}</strong></div>
-        </div>
-        <div class="g-section-header settings-library-title"><h3>${escapeHTML(t("settings.libraryStatusTitle"))}</h3></div>
-        ${renderLibraryStatus()}
-      </section>
+      <div class="settings-grid">
+        ${renderProfileSummarySettings()}
+        ${renderPreferenceSettings()}
+        ${renderGeminiSettings()}
+        ${renderExportSettings()}
+        ${renderImportSettings()}
+        ${renderBackupSettings()}
+        ${renderDangerZone()}
+        ${renderAppInfoSettings()}
+      </div>
+      <div id="settings-toast-region" aria-live="polite"></div>
     </section>
   `;
 
   safeInitIcons();
 }
 
+function renderSettingsReadiness() {
+  renderSettings();
+}
+
+function settingsCard(title, description, body, extraClass = "") {
+  return `
+    <section class="settings-card glass-card ${extraClass}">
+      <div>
+        <h3 class="settings-card-title">${escapeHTML(title)}</h3>
+        ${description ? `<p class="settings-card-description">${escapeHTML(description)}</p>` : ""}
+      </div>
+      ${body}
+    </section>
+  `;
+}
+
+function renderProfileSummarySettings() {
+  const storedCv = getStoredCv();
+  const hasCv = Boolean(storedCv?.name || storedCv?.text);
+  const statusClass = hasCv ? "active" : "missing";
+
+  return settingsCard(t("settings.profileSummary"), "", `
+    <div class="settings-profile-grid">
+      <div><span class="g-muted">${escapeHTML(t("settings.profileName"))}</span><strong>${escapeHTML(AppState.user?.name || t("common.guest"))}</strong></div>
+      <div><span class="g-muted">${escapeHTML(t("settings.profileSpecialty"))}</span><strong>${escapeHTML(AppState.user?.specialty || "-")}</strong></div>
+      <div><span class="g-muted">${escapeHTML(t("settings.profileCountry"))}</span><strong>${escapeHTML(AppState.user?.country || "-")}</strong></div>
+      <div><span class="g-muted">CV</span><strong><span class="settings-status-badge ${statusClass}">${escapeHTML(hasCv ? t("settings.cvUploaded") : t("settings.cvNotUploaded"))}</span></strong></div>
+    </div>
+    <div class="settings-actions">
+      <button class="btn btn-secondary" type="button" id="settings-edit-profile">${escapeHTML(t("settings.editProfile"))}</button>
+      <button class="btn btn-primary" type="button" id="settings-upload-cv">${escapeHTML(t("settings.uploadReplaceCv"))}</button>
+      <input class="settings-file-input" id="settings-cv-file" type="file" accept="application/pdf">
+    </div>
+  `);
+}
+
+function renderPreferenceSettings() {
+  const settings = getSettings();
+  const theme = settings.theme || "dark";
+  const defaultPeriod = settings.defaultStatsPeriod || "all";
+  const autoSaveOn = settings.autoSave !== false;
+  const compactOn = Boolean(settings.compactMode);
+
+  return settingsCard(t("settings.preferences"), "", `
+    <div class="settings-row">
+      <label class="settings-label" for="settings-language">${escapeHTML(t("settings.language"))}</label>
+      <select class="settings-select" id="settings-language">
+        <option value="ar"${AppState.language === "ar" ? " selected" : ""}>عربي</option>
+        <option value="en"${AppState.language === "en" ? " selected" : ""}>English</option>
+      </select>
+    </div>
+    <div class="settings-row">
+      <label class="settings-label" for="settings-theme">${escapeHTML(t("settings.theme"))}</label>
+      <select class="settings-select" id="settings-theme">
+        ${["dark", "light", "system"].map((value) => `<option value="${value}"${theme === value ? " selected" : ""}>${escapeHTML(t(`settings.${value}`))}</option>`).join("")}
+      </select>
+    </div>
+    <div class="settings-row">
+      <label class="settings-label" for="settings-default-period">${escapeHTML(t("settings.defaultStatsPeriod"))}</label>
+      <select class="settings-select" id="settings-default-period">
+        ${STATS_PERIOD_OPTIONS.map((period) => `<option value="${escapeHTML(period)}"${defaultPeriod === period ? " selected" : ""}>${escapeHTML(t(`statsDashboard.periods.${period}`))}</option>`).join("")}
+      </select>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">${escapeHTML(t("settings.autoSave"))}</span>
+      <button class="settings-toggle${autoSaveOn ? " on" : ""}" type="button" id="settings-toggle-autosave" role="switch" aria-checked="${autoSaveOn}"><span></span></button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">${escapeHTML(t("settings.compactMode"))}</span>
+      <button class="settings-toggle${compactOn ? " on" : ""}" type="button" id="settings-toggle-compact" role="switch" aria-checked="${compactOn}"><span></span></button>
+    </div>
+  `);
+}
+
+function renderGeminiSettings() {
+  const apiKeySet = Boolean(getGeminiApiKey());
+
+  return settingsCard(t("settings.geminiApiSettings"), t("settings.apiLocalNote"), `
+    <div class="settings-row">
+      <span class="settings-label">${escapeHTML(t("settings.apiCurrent"))}</span>
+      <span class="settings-status-badge ${apiKeySet ? "active" : "missing"}">${escapeHTML(apiKeySet ? t("settings.apiActive") : t("settings.apiNotSetShort"))}</span>
+    </div>
+    <label class="settings-field">
+      <span class="settings-label">${escapeHTML(t("settings.apiTitle"))}</span>
+      <input class="settings-input" id="settings-api-key-input" type="password" placeholder="${escapeHTML(t("settings.apiInputPlaceholder"))}" value="${escapeHTML(getGeminiApiKey())}">
+    </label>
+    <div class="settings-actions">
+      <button class="btn btn-primary" type="button" id="settings-save-api">${escapeHTML(t("settings.apiSaveKey"))}</button>
+      <button class="btn btn-secondary" type="button" id="settings-clear-api"${apiKeySet ? "" : " disabled"}>${escapeHTML(t("settings.apiClear"))}</button>
+      <a class="btn btn-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">${escapeHTML(t("analyzer.getApiKey"))}</a>
+    </div>
+  `);
+}
+
+function renderExportSettings() {
+  return settingsCard(t("settings.dataExport"), t("settings.exportHint"), `
+    <div class="export-actions-grid">
+      <button class="btn btn-primary" type="button" data-export-scope="all">${escapeHTML(t("settings.exportAllData"))}</button>
+      <button class="btn btn-secondary" type="button" data-export-scope="jobs">${escapeHTML(t("settings.exportJobsOnly"))}</button>
+      <button class="btn btn-secondary" type="button" data-export-scope="interviews">${escapeHTML(t("settings.exportInterviewsOnly"))}</button>
+      <button class="btn btn-secondary" type="button" data-export-scope="analyses">${escapeHTML(t("settings.exportAnalysesOnly"))}</button>
+      <button class="btn btn-secondary" type="button" data-export-scope="settings">${escapeHTML(t("settings.exportSettingsOnly"))}</button>
+    </div>
+  `);
+}
+
+function renderImportSettings() {
+  return settingsCard(t("settings.dataImport"), t("settings.importHint"), `
+    <label class="settings-field">
+      <span class="settings-label">${escapeHTML(t("settings.chooseJsonFile"))}</span>
+      <input class="settings-file-input-visible" id="settings-import-file" type="file" accept="application/json,.json">
+    </label>
+    <button class="btn btn-secondary" type="button" id="settings-read-import">${escapeHTML(t("settings.importData"))}</button>
+    <div class="import-preview hidden" id="settings-import-preview">
+      <h4>${escapeHTML(t("settings.importPreview"))}</h4>
+      <div class="import-preview-grid" id="settings-import-summary"></div>
+      <div class="settings-actions">
+        <button class="btn btn-secondary" type="button" id="settings-import-merge">${escapeHTML(t("settings.mergeExisting"))}</button>
+        <button class="btn btn-danger" type="button" id="settings-import-replace">${escapeHTML(t("settings.replaceExisting"))}</button>
+      </div>
+    </div>
+  `);
+}
+
+function renderBackupSettings() {
+  const lastBackupAt = getSettings().lastBackupAt;
+
+  return settingsCard(t("settings.backupRestore"), "", `
+    <div class="backup-meta">
+      <span>${escapeHTML(t("settings.lastBackup"))}</span>
+      <strong>${escapeHTML(lastBackupAt ? formatDate(lastBackupAt.slice(0, 10)) : t("settings.never"))}</strong>
+    </div>
+    <div class="settings-actions">
+      <button class="btn btn-primary" type="button" id="settings-create-backup">${escapeHTML(t("settings.createBackup"))}</button>
+      <button class="btn btn-secondary" type="button" id="settings-restore-backup">${escapeHTML(t("settings.restoreBackup"))}</button>
+    </div>
+  `, "settings-card-full");
+}
+
+function renderDangerZone() {
+  return settingsCard(t("settings.dangerTitle"), t("settings.dangerHint"), `
+    <div class="danger-zone">
+      <div class="danger-action">
+        <span>${escapeHTML(t("settings.deleteAnalyses"))}</span>
+        <button class="danger-button" type="button" data-danger-action="analyses">${escapeHTML(t("settings.deleteAnalyses"))}</button>
+      </div>
+      <div class="danger-action">
+        <span>${escapeHTML(t("settings.deleteArchived"))}</span>
+        <button class="danger-button" type="button" data-danger-action="archived">${escapeHTML(t("settings.deleteArchived"))}</button>
+      </div>
+      <div class="danger-action">
+        <span>${escapeHTML(t("settings.resetSettings"))}</span>
+        <button class="danger-button" type="button" data-danger-action="reset">${escapeHTML(t("settings.resetSettings"))}</button>
+      </div>
+      <div class="danger-action">
+        <span>${escapeHTML(t("settings.deleteAll"))}</span>
+        <div class="settings-delete-all">
+          <input class="settings-input" id="settings-delete-confirm" type="text" placeholder="${escapeHTML(t("settings.deleteAllConfirm"))}">
+          <button class="danger-button" type="button" data-danger-action="all">${escapeHTML(t("settings.deleteAll"))}</button>
+        </div>
+      </div>
+    </div>
+  `, "settings-card-full danger-zone-card");
+}
+
+function getLibraryStatus() {
+  return [
+    { name: "Chart.js", available: isLibraryAvailable("Chart") },
+    { name: "Lucide Icons", available: isLibraryAvailable("lucide") },
+    { name: "Marked.js", available: isLibraryAvailable("marked") },
+    { name: "DOMPurify", available: isLibraryAvailable("DOMPurify") },
+    { name: "PDF.js", available: isLibraryAvailable("pdfjsLib") }
+  ];
+}
+
+function renderAppInfoSettings() {
+  return settingsCard(t("settings.appInfo"), "", `
+    <div class="settings-profile-grid">
+      <div><span class="g-muted">App name</span><strong>AI CV Tracker</strong></div>
+      <div><span class="g-muted">${escapeHTML(t("settings.appVersion"))}</span><strong>${escapeHTML(APP_VERSION)}</strong></div>
+      <div><span class="g-muted">${escapeHTML(t("settings.appStorage"))}</span><strong>${escapeHTML(t("settings.localBrowserStorage"))}</strong></div>
+      <div><span class="g-muted">${escapeHTML(t("settings.build"))}</span><strong>${escapeHTML(t("settings.staticGithubPages"))}</strong></div>
+    </div>
+    <h4 class="settings-card-title">${escapeHTML(t("settings.libraryStatusTitle"))}</h4>
+    <div class="library-status-list">
+      ${getLibraryStatus().map((item) => `
+        <div class="library-status-item">
+          <span>${escapeHTML(item.name)}</span>
+          <strong class="settings-status-badge ${item.available ? "active" : "missing"}">${escapeHTML(item.available ? t("settings.availableStatus") : t("settings.missingStatus"))}</strong>
+        </div>
+      `).join("")}
+    </div>
+  `, "settings-card-full");
+}
+
 let pendingImport = null;
+let pendingImportRaw = null;
 
 function persistSettings() {
-  StorageManager.set(StorageManager.KEYS.SETTINGS, AppState.settings);
+  saveSettings();
 }
 
 function applyCompactMode() {
-  document.body.classList.toggle("compact-mode", Boolean(AppState.settings.compactMode));
+  applyPreferences();
 }
 
-function handleSettingsImportFile(event) {
+async function handleSettingsImportFile(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const raw = JSON.parse(reader.result);
-      const parsed = validateImportPayload(raw);
-      if (!parsed) {
-        showToast("settings.importInvalid");
-        return;
-      }
-      pendingImport = parsed;
-      const preview = document.getElementById("settings-import-preview");
-      const summary = document.getElementById("settings-import-summary");
-      if (summary) {
-        summary.textContent = formatMessage("settings.importSummary", {
-          jobs: parsed.jobs.length,
-          interviews: parsed.interviews.length,
-          analyses: parsed.analyses.length
-        });
-      }
-      if (preview) preview.classList.remove("hidden");
-    } catch (error) {
-      console.error(error);
-      showToast("settings.importInvalid");
+  try {
+    pendingImportRaw = await readImportFile(file);
+    pendingImport = validateImportData(pendingImportRaw);
+    if (!pendingImport) {
+      showSettingsToast("settings.invalidBackupFile", "error");
+      return;
     }
-  };
-  reader.readAsText(file);
+    showImportPreview(getImportSummary(pendingImport));
+  } catch (error) {
+    console.error(error);
+    pendingImport = null;
+    pendingImportRaw = null;
+    showSettingsToast("settings.invalidBackupFile", "error");
+  }
 }
 
-function confirmImport(mode) {
+function showImportPreview(summary) {
+  const preview = document.getElementById("settings-import-preview");
+  const summaryBox = document.getElementById("settings-import-summary");
+  if (!preview || !summaryBox) return;
+
+  summaryBox.innerHTML = `
+    <div><span>Jobs</span><strong>${escapeHTML(summary.jobs)}</strong></div>
+    <div><span>Interviews</span><strong>${escapeHTML(summary.interviews)}</strong></div>
+    <div><span>Analyses</span><strong>${escapeHTML(summary.analyses)}</strong></div>
+    <div><span>User</span><strong>${escapeHTML(summary.hasUser ? t("settings.present") : t("settings.absent"))}</strong></div>
+    <div><span>Settings</span><strong>${escapeHTML(summary.hasSettings ? t("settings.present") : t("settings.absent"))}</strong></div>
+  `;
+  preview.classList.remove("hidden");
+}
+
+async function confirmImport(mode) {
   if (!pendingImport) return;
-  applyImport(pendingImport, mode);
+  const confirmKey = mode === "replace" ? "settings.confirmImportReplace" : "settings.confirmImportMerge";
+  const confirmed = await confirmDangerAction(confirmKey);
+  if (!confirmed) return;
+
+  importData(pendingImport, mode);
   pendingImport = null;
-  showToast("settings.importDone");
-  renderSettingsReadiness();
+  pendingImportRaw = null;
+  showSettingsToast("settings.importCompleted", "success");
+  renderSettings();
 }
 
-function deleteAnalysesOnly() {
-  if (!window.confirm(t("settings.confirmDeleteAnalyses"))) return;
+async function confirmDangerAction(action) {
+  const message = action.startsWith("settings.") ? t(action) : t(`settings.${action}`);
+  const confirmLabel = action.includes("Import") ? t("common.save") : t("common.delete");
+
+  return new Promise((resolve) => {
+    const existing = document.querySelector(".confirm-modal");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.className = "confirm-modal";
+    overlay.innerHTML = `
+      <div class="confirm-modal-box glass-card" role="dialog" aria-modal="true">
+        <h3>${escapeHTML(t("settings.dangerTitle"))}</h3>
+        <p>${escapeHTML(message)}</p>
+        <div class="settings-actions">
+          <button class="btn btn-secondary" type="button" data-confirm-value="no">${escapeHTML(t("common.cancel"))}</button>
+          <button class="btn btn-danger" type="button" data-confirm-value="yes">${escapeHTML(confirmLabel)}</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-confirm-value]");
+      if (!button && event.target !== overlay) return;
+      const value = button?.dataset.confirmValue === "yes";
+      overlay.remove();
+      resolve(value);
+    });
+  });
+}
+
+async function deleteAnalysesOnly() {
+  if (!await confirmDangerAction("confirmDeleteAnalyses")) return;
   AppState.analyses = [];
   saveAnalyses();
-  showToast("settings.done");
-  renderSettingsReadiness();
+  showSettingsToast("settings.analysesDeleted", "success");
+  renderSettings();
 }
 
-function deleteArchivedJobs() {
-  if (!window.confirm(t("settings.confirmDeleteArchived"))) return;
+async function deleteArchivedJobsOnly() {
+  if (!await confirmDangerAction("confirmDeleteArchived")) return;
   AppState.jobs = AppState.jobs.filter((job) => !job.isArchived && job.status !== "archived");
   saveJobs();
   renderJobs();
   renderTodayIfActive();
-  showToast("settings.done");
-  renderSettingsReadiness();
+  showSettingsToast("settings.archivedJobsDeleted", "success");
+  renderSettings();
+}
+
+function deleteArchivedJobs() {
+  deleteArchivedJobsOnly();
+}
+
+async function resetSettings() {
+  if (!await confirmDangerAction("confirmResetSettings")) return;
+  const language = AppState.language;
+  AppState.settings = {
+    onboardingCompleted: true,
+    language,
+    theme: "dark",
+    defaultStatsPeriod: "all",
+    autoSave: true,
+    compactMode: false
+  };
+  StatsFilters.period = "all";
+  persistSettings();
+  applyPreferences();
+  showSettingsToast("settings.settingsReset", "success");
+  renderSettings();
 }
 
 function resetSettingsOnly() {
-  if (!window.confirm(t("settings.confirmResetSettings"))) return;
-  const language = AppState.language;
-  AppState.settings = { onboardingCompleted: true, language };
-  StatsFilters.period = "all";
-  persistSettings();
-  applyCompactMode();
-  showToast("settings.done");
-  renderSettingsReadiness();
+  resetSettings();
 }
 
-function deleteAllData() {
+async function deleteAllData() {
   const input = document.getElementById("settings-delete-confirm");
-  if (!input || input.value.trim() !== "DELETE") return;
+  if (!input || input.value.trim() !== "DELETE") {
+    showSettingsToast("settings.deleteAllNeedsText", "error");
+    return;
+  }
+  if (!await confirmDangerAction("confirmDeleteAll")) return;
 
   Object.values(StorageManager.KEYS).forEach((key) => StorageManager.remove(key));
-  showToast("settings.deleteAllDone");
+  showSettingsToast("settings.allDataDeleted", "success");
   window.setTimeout(() => window.location.reload(), 900);
+}
+
+async function handleSettingsCvUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+    showSettingsToast("analyzer.errorInvalidPdf", "error");
+    event.target.value = "";
+    return;
+  }
+
+  try {
+    let cvText = "";
+    if (isLibraryAvailable("pdfjsLib")) {
+      cvText = await extractPdfText(file);
+    }
+    StorageManager.set(StorageManager.KEYS.CV, {
+      name: file.name,
+      text: cvText,
+      updatedAt: todayISO()
+    });
+    analyzerCvText = cvText;
+    analyzerCvFileName = file.name;
+    showSettingsToast("settings.cvSaved", "success");
+    renderSettings();
+  } catch (error) {
+    console.error(error);
+    showSettingsToast("analyzer.errorPdfFailed", "error");
+  }
+}
+
+function showSettingsToast(message, type = "success") {
+  const region = document.getElementById("settings-toast-region");
+  if (!region) {
+    showToast(message);
+    return;
+  }
+
+  const toast = document.createElement("div");
+  toast.className = `settings-toast ${type}`;
+  toast.textContent = t(message);
+  region.appendChild(toast);
+
+  window.setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(10px)";
+    window.setTimeout(() => toast.remove(), 260);
+  }, 2400);
 }
 
 function bindSettingsEvents() {
@@ -3242,10 +3580,22 @@ function bindSettingsEvents() {
       return;
     }
 
-    const langBtn = event.target.closest("[data-set-language]");
-    if (langBtn) {
-      setLanguage(langBtn.dataset.setLanguage);
-      renderSettingsReadiness();
+    if (event.target.closest("#settings-edit-profile")) {
+      switchTab("profile");
+      return;
+    }
+
+    if (event.target.closest("#settings-upload-cv") || event.target.closest("#settings-restore-backup")) {
+      const targetId = event.target.closest("#settings-restore-backup") ? "settings-import-file" : "settings-cv-file";
+      document.getElementById(targetId)?.click();
+      return;
+    }
+
+    if (event.target.closest("#settings-save-api")) {
+      const input = document.getElementById("settings-api-key-input");
+      setGeminiApiKey(input?.value || "");
+      showSettingsToast("analyzer.apiSaved", "success");
+      renderSettings();
       return;
     }
 
@@ -3253,21 +3603,36 @@ function bindSettingsEvents() {
       AppState.settings.compactMode = !AppState.settings.compactMode;
       persistSettings();
       applyCompactMode();
-      renderSettingsReadiness();
+      renderSettings();
       return;
     }
 
     if (event.target.closest("#settings-toggle-autosave")) {
       AppState.settings.autoSave = AppState.settings.autoSave === false;
       persistSettings();
-      renderSettingsReadiness();
+      renderSettings();
       return;
     }
 
     if (event.target.closest("#settings-clear-api")) {
       setGeminiApiKey("");
-      showToast("settings.apiCleared");
-      renderSettingsReadiness();
+      showSettingsToast("settings.apiCleared", "success");
+      renderSettings();
+      return;
+    }
+
+    if (event.target.closest("#settings-create-backup")) {
+      createBackup();
+      return;
+    }
+
+    if (event.target.closest("#settings-read-import")) {
+      const input = document.getElementById("settings-import-file");
+      if (!input?.files?.[0]) {
+        showSettingsToast("settings.invalidBackupFile", "error");
+        return;
+      }
+      handleSettingsImportFile({ target: input });
       return;
     }
 
@@ -3277,6 +3642,15 @@ function bindSettingsEvents() {
     }
     if (event.target.closest("#settings-import-replace")) {
       confirmImport("replace");
+      return;
+    }
+    const dangerButton = event.target.closest("[data-danger-action]");
+    if (dangerButton) {
+      const action = dangerButton.dataset.dangerAction;
+      if (action === "analyses") deleteAnalysesOnly();
+      if (action === "archived") deleteArchivedJobsOnly();
+      if (action === "reset") resetSettings();
+      if (action === "all") deleteAllData();
       return;
     }
     if (event.target.closest("#settings-delete-analyses")) {
@@ -3297,14 +3671,28 @@ function bindSettingsEvents() {
   });
 
   panel.addEventListener("change", (event) => {
+    if (event.target.id === "settings-language") {
+      setLanguage(event.target.value);
+      renderSettings();
+      return;
+    }
+    if (event.target.id === "settings-theme") {
+      saveSettings({ theme: event.target.value });
+      applyPreferences();
+      renderSettings();
+      return;
+    }
     if (event.target.id === "settings-default-period") {
-      AppState.settings.defaultStatsPeriod = event.target.value;
+      saveSettings({ defaultStatsPeriod: event.target.value });
       StatsFilters.period = STATS_PERIOD_OPTIONS.includes(event.target.value) ? event.target.value : "all";
-      persistSettings();
       return;
     }
     if (event.target.id === "settings-import-file") {
       handleSettingsImportFile(event);
+      return;
+    }
+    if (event.target.id === "settings-cv-file") {
+      handleSettingsCvUpload(event);
     }
   });
 }
