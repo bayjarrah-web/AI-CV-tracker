@@ -3534,7 +3534,7 @@ async function deleteAllData() {
   JobFilters.status = "all";
   JobFilters.priority = "all";
   JobFilters.source = "all";
-  InterviewFilters.active = "upcoming";
+  currentInterviewView = "upcoming";
   StatsFilters.period = "all";
   analyzerMode = "cv_review";
   analyzerCvText = "";
