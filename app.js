@@ -2716,18 +2716,20 @@ function saveUserFromOnboarding() {
   const specialtyInput = document.getElementById("user-specialty");
   const countryInput = document.getElementById("user-country");
   const name = nameInput.value.trim();
+  const specialty = specialtyInput.value.trim();
+  const country = countryInput.value.trim();
 
-  if (!name) {
-    showToast("errors.requiredName");
-    nameInput.focus();
+  if (!name || !specialty || !country) {
+    showToast("errors.requiredProfileInfo");
+    (nameInput.value.trim() ? specialtyInput.value.trim() ? countryInput : specialtyInput : nameInput).focus();
     return false;
   }
 
   AppState.user = {
     id: AppState.user?.id || uuid(),
     name,
-    specialty: specialtyInput.value.trim(),
-    country: countryInput.value.trim(),
+    specialty,
+    country,
     createdAt: AppState.user?.createdAt || todayISO()
   };
 
@@ -2765,7 +2767,7 @@ function handleCvFileChange(event) {
 }
 
 function finishOnboarding() {
-  if (!AppState.user && !saveUserFromOnboarding()) {
+  if (!saveUserFromOnboarding()) {
     showStep(2);
     return;
   }

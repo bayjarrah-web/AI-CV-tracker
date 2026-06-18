@@ -504,6 +504,7 @@ const TRANSLATIONS = {
     },
     errors: {
       requiredName: "يرجى إدخال الاسم للمتابعة.",
+      requiredProfileInfo: "يرجى إدخال معلوماتك الأساسية للمتابعة.",
       requiredJobFields: "يرجى إدخال عنوان الوظيفة واسم الشركة.",
       invalidPdf: "يرجى اختيار ملف PDF فقط.",
       requiredInterviewFields: "يرجى اختيار وظيفة وتاريخ المقابلة.",
@@ -1159,6 +1160,7 @@ const TRANSLATIONS = {
     },
     errors: {
       requiredName: "Please enter your name to continue.",
+      requiredProfileInfo: "Please enter your basic information to continue.",
       requiredJobFields: "Please enter the job title and company name.",
       invalidPdf: "Please choose a PDF file only.",
       requiredInterviewFields: "Please choose a job and interview date.",

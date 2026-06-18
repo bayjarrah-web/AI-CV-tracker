@@ -3884,6 +3884,10 @@ body:not(:has(#onboarding-screen:not(.hidden))) {
     linear-gradient(135deg, #020617 0%, #06111F 54%, #02040B 100%);
 }
 
+body:not(:has(#onboarding-screen:not(.hidden))) .app-shell {
+  padding-top: 74px;
+}
+
 body:not(:has(#onboarding-screen:not(.hidden)))::before {
   position: fixed;
   inset: 0;
@@ -3944,6 +3948,42 @@ body:not(:has(#onboarding-screen:not(.hidden))) .analyzer-card {
 body:not(:has(#onboarding-screen:not(.hidden))) .app-header,
 body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
   border-color: rgba(77, 163, 255, 0.16);
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .global-language-switch {
+  top: 12px;
+  left: 12px;
+  gap: 4px;
+  padding: 4px;
+  border-color: rgba(96, 165, 250, 0.14);
+  background: rgba(2, 6, 23, 0.66);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(59, 130, 246, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+[dir="ltr"] body:not(:has(#onboarding-screen:not(.hidden))) .global-language-switch {
+  left: 12px;
+  right: auto;
+}
+
+[dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .global-language-switch {
+  right: 12px;
+  left: auto;
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .language-option {
+  min-width: 52px;
+  min-height: 28px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 640px) {
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-shell {
+    padding-top: 86px;
+  }
 }
 
 .btn,
