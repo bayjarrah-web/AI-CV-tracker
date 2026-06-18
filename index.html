@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,14 +8,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://api.fontshare.com">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260618-21">
+  <link rel="stylesheet" href="styles.css?v=20260618-22">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
-    <button class="language-option active" type="button" data-language-option="ar">عربي</button>
-    <button class="language-option" type="button" data-language-option="en">English</button>
+    <button class="language-option" type="button" data-language-option="ar">عربي</button>
+    <button class="language-option active" type="button" data-language-option="en">English</button>
   </div>
 
   <div class="app-shell">
@@ -28,12 +28,15 @@
         </div>
 
         <div class="onboarding-step active" data-step="1">
-          <div class="brand-mark brand-mark-large">CV</div>
-          <p class="eyebrow" data-i18n="onboarding.step1.eyebrow">رفيقك الذكي للبحث عن عمل</p>
-          <h1 data-i18n="onboarding.step1.title">مرحباً بك في CV Tracker AI</h1>
-          <p class="onboarding-copy" data-i18n="onboarding.step1.subtitle">نظم طلباتك، تابع مقابلاتك، وافهم تقدمك من مكان واحد.</p>
+          <div class="brand-mark brand-mark-large" aria-hidden="true"></div>
+          <h1 class="onboarding-premium-title">
+            <span>Welcome to</span>
+            <span><strong>AI</strong> CV tracker</span>
+          </h1>
+          <p class="onboarding-copy onboarding-premium-copy">understand and analyse your applications from one place</p>
           <button class="btn btn-primary" type="button" data-next-step>
-            <span data-i18n="onboarding.step1.cta">هيا نبدأ</span>
+            <span>Get Started</span>
+            <span class="btn-arrow" aria-hidden="true">→</span>
           </button>
         </div>
 
@@ -488,7 +491,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260618-21"></script>
-  <script src="app.js?v=20260618-21"></script>
+  <script src="translations.js?v=20260618-22"></script>
+  <script src="app.js?v=20260618-22"></script>
 </body>
 </html>

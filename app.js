@@ -41,14 +41,14 @@ const StorageManager = {
 
 const AppState = {
   currentTab: "today",
-  language: "ar",
+  language: "en",
   user: null,
   jobs: [],
   interviews: [],
   analyses: [],
   settings: {
     onboardingCompleted: false,
-    language: "ar"
+    language: "en"
   },
 
   load() {
@@ -60,7 +60,7 @@ const AppState = {
       ...this.settings,
       ...(StorageManager.get(StorageManager.KEYS.SETTINGS) || {})
     };
-    this.language = this.settings.language || "ar";
+    this.language = this.settings.language || "en";
   },
 
   saveAnalyses() {
