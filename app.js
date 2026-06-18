@@ -382,6 +382,143 @@ function getLocalizedCountryOptions() {
     .sort((first, second) => collator.compare(first.label, second.label));
 }
 
+function normalizeCountrySearch(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getCountryInputValue(country) {
+  return `${country.flag} ${country.label}`;
+}
+
+function getFilteredCountryOptions(query = "", limit = 12) {
+  const normalizedQuery = normalizeCountrySearch(query);
+  const countries = getLocalizedCountryOptions();
+
+  if (!normalizedQuery) return countries.slice(0, limit);
+
+  return countries
+    .map((country) => {
+      const label = normalizeCountrySearch(country.label);
+      const alternateLabel = normalizeCountrySearch(country.alternateLabel);
+      const code = normalizeCountrySearch(country.code);
+      const searchText = [label, alternateLabel, code].join(" ");
+      let rank = 4;
+
+      if (label.startsWith(normalizedQuery)) rank = 0;
+      else if (alternateLabel.startsWith(normalizedQuery)) rank = 1;
+      else if (code.startsWith(normalizedQuery)) rank = 2;
+      else if (searchText.includes(normalizedQuery)) rank = 3;
+
+      return { country, rank };
+    })
+    .filter((item) => item.rank < 4)
+    .sort((first, second) => first.rank - second.rank)
+    .map((item) => item.country)
+    .slice(0, limit);
+}
+
+function ensureCountrySuggestions(input) {
+  const field = input.closest(".field") || input.parentElement;
+  if (!field) return null;
+
+  let suggestions = field.querySelector(".country-suggestions");
+  if (!suggestions) {
+    suggestions = document.createElement("div");
+    suggestions.className = "country-suggestions hidden";
+    suggestions.setAttribute("role", "listbox");
+    suggestions.id = `${input.id || "country"}-suggestions`;
+    input.setAttribute("aria-controls", suggestions.id);
+    field.appendChild(suggestions);
+  }
+
+  return suggestions;
+}
+
+function renderCountrySuggestions(input) {
+  const suggestions = ensureCountrySuggestions(input);
+  if (!suggestions) return;
+
+  const options = getFilteredCountryOptions(input.value);
+  suggestions.innerHTML = "";
+
+  options.forEach((country) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "country-option";
+    button.dataset.countryCode = country.code;
+    button.setAttribute("role", "option");
+    button.innerHTML = `
+      <span class="country-option-flag">${escapeHTML(country.flag)}</span>
+      <span class="country-option-main">${escapeHTML(country.label)}</span>
+      <span class="country-option-alt">${escapeHTML(country.alternateLabel)} · ${escapeHTML(country.code)}</span>
+    `;
+    suggestions.appendChild(button);
+  });
+
+  suggestions.classList.toggle("hidden", options.length === 0);
+}
+
+function hideCountrySuggestions(input) {
+  const suggestions = input
+    ? input.closest(".field")?.querySelector(".country-suggestions")
+    : document.querySelector(".country-suggestions:not(.hidden)");
+  if (suggestions) suggestions.classList.add("hidden");
+}
+
+function selectCountryOption(input, countryCode) {
+  const country = getLocalizedCountryOptions().find((item) => item.code === countryCode);
+  if (!country) return;
+
+  input.value = getCountryInputValue(country);
+  hideCountrySuggestions(input);
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function bindCountryFieldEvents() {
+  if (document.body.dataset.countryEventsBound === "true") return;
+  document.body.dataset.countryEventsBound = "true";
+
+  document.addEventListener("input", (event) => {
+    if (event.target.matches("[data-country-input]")) {
+      renderCountrySuggestions(event.target);
+    }
+  });
+
+  document.addEventListener("focusin", (event) => {
+    if (event.target.matches("[data-country-input]")) {
+      renderCountrySuggestions(event.target);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && event.target.matches("[data-country-input]")) {
+      hideCountrySuggestions(event.target);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    const option = event.target.closest(".country-option");
+    if (option) {
+      const field = option.closest(".field");
+      const input = field?.querySelector("[data-country-input]");
+      if (input) selectCountryOption(input, option.dataset.countryCode);
+      return;
+    }
+
+    if (!event.target.closest(".country-suggestions") && !event.target.matches("[data-country-input]")) {
+      document.querySelectorAll(".country-suggestions").forEach((suggestions) => {
+        suggestions.classList.add("hidden");
+      });
+    }
+  });
+}
+
 function populateSuggestionLists() {
   const specialtyList = document.getElementById("specialty-options");
   const countryList = document.getElementById("country-options");
@@ -3906,6 +4043,7 @@ function init() {
   applyCompactMode();
   setLanguage(AppState.language);
   bindNavigation();
+  bindCountryFieldEvents();
   populateJobSelects();
   populateInterviewSelects();
   initOnboarding();

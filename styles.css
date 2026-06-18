@@ -258,6 +258,7 @@ p {
 .field {
   display: grid;
   gap: 8px;
+  position: relative;
   color: rgba(249, 250, 251, 0.82);
   font-weight: 700;
 }
@@ -3379,6 +3380,64 @@ textarea:focus-visible,
   border-color: rgba(239, 68, 68, 0.42);
 }
 
+.country-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 80;
+  display: grid;
+  max-height: min(320px, 48vh);
+  gap: 4px;
+  overflow-y: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  background: color-mix(in srgb, var(--surface-elevated) 94%, transparent);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(12px);
+}
+
+.country-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  color: var(--text-main);
+  background: transparent;
+  text-align: start;
+}
+
+.country-option:hover,
+.country-option:focus-visible {
+  background: var(--amber-soft);
+  outline: none;
+}
+
+.country-option-flag {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.country-option-main {
+  overflow: hidden;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.country-option-alt {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
 .compact-mode .settings-card,
 .compact-mode .settings-header {
   padding: 14px;
@@ -3414,6 +3473,15 @@ select:disabled {
   .export-actions-grid .btn,
   .danger-button {
     width: 100%;
+  }
+
+  .country-option {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .country-option-alt {
+    grid-column: 2;
+    white-space: normal;
   }
 
   .confirm-modal {
