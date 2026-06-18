@@ -3516,7 +3516,37 @@ async function deleteAllData() {
 
   Object.values(StorageManager.KEYS).forEach((key) => StorageManager.remove(key));
   showSettingsToast("settings.allDataDeleted", "success");
-  window.setTimeout(() => window.location.reload(), 900);
+
+  AppState.user = null;
+  AppState.jobs = [];
+  AppState.interviews = [];
+  AppState.analyses = [];
+  AppState.settings = {
+    onboardingCompleted: false,
+    language: AppState.language,
+    theme: "dark",
+    defaultStatsPeriod: "all",
+    autoSave: true,
+    compactMode: false
+  };
+  AppState.currentTab = "today";
+  JobFilters.search = "";
+  JobFilters.status = "all";
+  JobFilters.priority = "all";
+  JobFilters.source = "all";
+  InterviewFilters.active = "upcoming";
+  StatsFilters.period = "all";
+  analyzerMode = "cv_review";
+  analyzerCvText = "";
+  analyzerCvFileName = "";
+  pendingImport = null;
+  pendingImportRaw = null;
+
+  applyPreferences();
+  document.getElementById("main-app")?.classList.add("hidden");
+  onboardingStep = 1;
+  populateSuggestionLists();
+  showOnboarding();
 }
 
 async function handleSettingsCvUpload(event) {
