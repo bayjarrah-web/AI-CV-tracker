@@ -10,7 +10,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260619-02">
+  <link rel="stylesheet" href="styles.css?v=20260619-03">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
@@ -144,14 +144,26 @@
           <section class="jobs-workspace">
             <div class="jobs-header glass-card">
               <div>
-                <p class="eyebrow" data-i18n="jobs.kicker">إدارة الفرص</p>
-                <h2 data-i18n="jobs.title">الوظائف</h2>
+                <p class="eyebrow" data-i18n="applicationsDashboard.kicker">Applications Dashboard</p>
+                <h2 data-i18n="tabs.applications">Applications</h2>
               </div>
               <button class="btn btn-primary" type="button" data-open-job-modal>
                 <span class="btn-plus">+</span>
                 <span data-i18n="jobs.addJob">إضافة وظيفة</span>
               </button>
             </div>
+
+            <section class="applications-dashboard-shell glass-card" aria-labelledby="applications-dashboard-title">
+              <div class="applications-dashboard-header">
+                <div>
+                  <p class="eyebrow" data-i18n="applicationsDashboard.kicker">Applications Dashboard</p>
+                  <h2 id="applications-dashboard-title" data-i18n="applicationsDashboard.title">Track the hiring cycle</h2>
+                </div>
+                <p data-i18n="applicationsDashboard.subtitle">See where every application stands, then filter the list with one tap.</p>
+              </div>
+
+              <div class="applications-status-grid" id="applications-status-grid" aria-label="Application status summary"></div>
+            </section>
 
             <div class="jobs-toolbar glass-card">
               <label class="field search-field">
@@ -482,7 +494,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260619-02"></script>
-  <script src="app.js?v=20260619-02"></script>
+  <script src="translations.js?v=20260619-03"></script>
+  <script src="app.js?v=20260619-03"></script>
 </body>
 </html>

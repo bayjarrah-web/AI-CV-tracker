@@ -415,6 +415,29 @@ const TRANSLATIONS = {
       relativeToday: "اليوم",
       yesterday: "أمس"
     },
+    applicationsDashboard: {
+      kicker: "لوحة الطلبات",
+      title: "تابع دورة التوظيف",
+      subtitle: "اعرف أين يقف كل طلب، واضغط على أي حالة لتصفية القائمة فوراً.",
+      cards: {
+        sent: {
+          label: "تم الإرسال",
+          hint: "طلبات أرسلتها وتنتظر أول رد."
+        },
+        interview: {
+          label: "تم تحديد مقابلة",
+          hint: "طلبات وصلت إلى مرحلة مقابلة."
+        },
+        under_review: {
+          label: "تحت الدراسة",
+          hint: "طلبات قيد المراجعة من الشركة."
+        },
+        rejected: {
+          label: "رفض",
+          hint: "طلبات تم رفضها أو إغلاقها."
+        }
+      }
+    },
     statsDashboard: {
       kicker: "تحليلات المسار المهني",
       title: "الإحصائيات والتحليلات",
@@ -1082,6 +1105,29 @@ const TRANSLATIONS = {
       daysAgo: "{count} days ago",
       relativeToday: "Today",
       yesterday: "Yesterday"
+    },
+    applicationsDashboard: {
+      kicker: "Applications Dashboard",
+      title: "Track the hiring cycle",
+      subtitle: "See where every application stands, then filter the list with one tap.",
+      cards: {
+        sent: {
+          label: "Sent",
+          hint: "Applications sent and waiting for a first reply."
+        },
+        interview: {
+          label: "Interview Scheduled",
+          hint: "Applications that reached the interview stage."
+        },
+        under_review: {
+          label: "Under Review",
+          hint: "Applications currently being reviewed."
+        },
+        rejected: {
+          label: "Rejected",
+          hint: "Applications that were declined or closed."
+        }
+      }
     },
     statsDashboard: {
       kicker: "Career analytics",

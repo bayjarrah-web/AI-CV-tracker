@@ -2009,6 +2009,49 @@ function isFollowUpDue(job) {
   return Boolean(job.followUpDate && job.followUpDate <= todayISO() && !job.isArchived);
 }
 
+const APPLICATION_STATUS_CARDS = [
+  { status: "sent", icon: "send" },
+  { status: "interview", icon: "calendar-check" },
+  { status: "under_review", icon: "scan-search" },
+  { status: "rejected", icon: "x-circle" }
+];
+
+function getApplicationStatusCounts() {
+  return APPLICATION_STATUS_CARDS.reduce((counts, item) => {
+    counts[item.status] = AppState.jobs.filter((job) => job.status === item.status && !job.isArchived).length;
+    return counts;
+  }, {});
+}
+
+function renderApplicationsDashboardShell() {
+  const grid = document.getElementById("applications-status-grid");
+  if (!grid) return;
+
+  const counts = getApplicationStatusCounts();
+  grid.innerHTML = APPLICATION_STATUS_CARDS.map((item) => {
+    const isActive = JobFilters.status === item.status;
+    return `
+      <button class="application-status-card ${isActive ? "active" : ""}" type="button" data-application-status="${escapeHTML(item.status)}" aria-pressed="${isActive}">
+        <span class="application-status-icon badge-status-${escapeHTML(item.status)}"><i data-lucide="${escapeHTML(item.icon)}"></i></span>
+        <span class="application-status-content">
+          <strong>${escapeHTML(counts[item.status] || 0)}</strong>
+          <span>${escapeHTML(t(`applicationsDashboard.cards.${item.status}.label`))}</span>
+          <small>${escapeHTML(t(`applicationsDashboard.cards.${item.status}.hint`))}</small>
+        </span>
+      </button>
+    `;
+  }).join("");
+}
+
+function setApplicationStatusFilter(status) {
+  if (!APPLICATION_STATUS_CARDS.some((item) => item.status === status)) return;
+
+  JobFilters.status = status;
+  const statusFilter = document.getElementById("job-filter-status");
+  if (statusFilter) statusFilter.value = status;
+  renderJobs();
+}
+
 function getFilteredJobs() {
   const search = JobFilters.search.trim().toLowerCase();
 
@@ -2598,6 +2641,8 @@ function renderJobs() {
   const grid = document.getElementById("jobs-grid");
   const empty = document.getElementById("jobs-empty-state");
   if (!grid || !empty) return;
+
+  renderApplicationsDashboardShell();
 
   const jobs = getFilteredJobs();
   grid.innerHTML = "";
@@ -3963,6 +4008,7 @@ function bindJobsEvents() {
   const priorityFilter = document.getElementById("job-filter-priority");
   const sourceFilter = document.getElementById("job-filter-source");
   const resetFilters = document.getElementById("reset-job-filters");
+  const jobsWorkspace = document.querySelector(".jobs-workspace");
 
   if (jobForm) {
     jobForm.addEventListener("submit", saveJob);
@@ -3990,6 +4036,14 @@ function bindJobsEvents() {
       if (action === "followUp") markFollowUpDone(jobId);
       if (action === "archive") archiveJob(jobId);
       if (action === "delete") deleteJob(jobId);
+    });
+  }
+
+  if (jobsWorkspace) {
+    jobsWorkspace.addEventListener("click", (event) => {
+      const statusCard = event.target.closest("[data-application-status]");
+      if (!statusCard) return;
+      setApplicationStatusFilter(statusCard.dataset.applicationStatus);
     });
   }
 
