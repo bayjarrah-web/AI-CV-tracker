@@ -40,7 +40,7 @@ const StorageManager = {
 };
 
 const AppState = {
-  currentTab: "today",
+  currentTab: "jobs",
   language: "en",
   user: null,
   jobs: [],
@@ -2820,35 +2820,41 @@ function updateHeader() {
   }
 }
 
+function normalizeVisibleTab(tabName) {
+  if (["today", "profile"].includes(tabName)) return "jobs";
+  return tabName;
+}
+
 function switchTab(tabName) {
-  AppState.currentTab = tabName;
+  const nextTab = normalizeVisibleTab(tabName);
+  AppState.currentTab = nextTab;
 
   document.querySelectorAll(".tab-button").forEach((button) => {
-    button.classList.toggle("active", button.dataset.tab === tabName);
+    button.classList.toggle("active", button.dataset.tab === nextTab);
   });
 
   document.querySelectorAll(".tab-panel").forEach((panel) => {
-    panel.classList.toggle("active", panel.id === `tab-${tabName}`);
+    panel.classList.toggle("active", panel.id === `tab-${nextTab}`);
   });
 
   const fab = document.querySelector(".fab-add-job");
   if (fab) {
-    fab.classList.toggle("hidden", tabName !== "jobs");
+    fab.classList.toggle("hidden", nextTab !== "jobs");
   }
 
-  if (tabName === "today") {
+  if (nextTab === "today") {
     renderTodayDashboard();
   }
 
-  if (tabName === "stats") {
+  if (nextTab === "stats") {
     renderStats();
   }
 
-  if (tabName === "interviews") {
+  if (nextTab === "interviews") {
     renderInterviews();
   }
 
-  if (tabName === "settings") {
+  if (nextTab === "settings") {
     renderSettings();
   }
 }
@@ -3721,7 +3727,7 @@ async function deleteAllData() {
     autoSave: true,
     compactMode: false
   };
-  AppState.currentTab = "today";
+  AppState.currentTab = "jobs";
   JobFilters.search = "";
   JobFilters.status = "all";
   JobFilters.priority = "all";
@@ -4084,6 +4090,11 @@ function bindNavigation() {
   document.querySelectorAll("[data-tab]").forEach((button) => {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
   });
+
+  const settingsButton = document.getElementById("header-settings-button");
+  if (settingsButton) {
+    settingsButton.addEventListener("click", () => switchTab("settings"));
+  }
 
   document.querySelectorAll("[data-language-option]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.languageOption));

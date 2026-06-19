@@ -10,7 +10,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260619-01">
+  <link rel="stylesheet" href="styles.css?v=20260619-02">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
@@ -112,37 +112,28 @@
         </div>
         <div class="header-actions">
           <span class="user-chip" id="header-user-name">ضيف</span>
+          <button class="header-icon-button" type="button" id="header-settings-button" aria-label="Settings">
+            <i data-lucide="settings"></i>
+          </button>
         </div>
       </header>
 
       <nav class="tab-nav glass-card" aria-label="Main navigation">
-        <button class="tab-button active" type="button" data-tab="today">
-          <span class="tab-icon"><i data-lucide="home"></i></span>
-          <span data-i18n="tabs.today">اليوم</span>
-        </button>
-        <button class="tab-button" type="button" data-tab="profile">
-          <span class="tab-icon"><i data-lucide="user"></i></span>
-          <span data-i18n="tabs.profile">الملف</span>
-        </button>
-        <button class="tab-button" type="button" data-tab="jobs">
+        <button class="tab-button active" type="button" data-tab="jobs">
           <span class="tab-icon"><i data-lucide="briefcase"></i></span>
-          <span data-i18n="tabs.jobs">الوظائف</span>
-        </button>
-        <button class="tab-button" type="button" data-tab="stats">
-          <span class="tab-icon"><i data-lucide="bar-chart-3"></i></span>
-          <span data-i18n="tabs.stats">الإحصائيات</span>
+          <span data-i18n="tabs.applications">Applications</span>
         </button>
         <button class="tab-button" type="button" data-tab="interviews">
           <span class="tab-icon"><i data-lucide="calendar"></i></span>
           <span data-i18n="tabs.interviews">المقابلات</span>
         </button>
+        <button class="tab-button" type="button" data-tab="stats">
+          <span class="tab-icon"><i data-lucide="bar-chart-3"></i></span>
+          <span data-i18n="tabs.stats">الإحصائيات</span>
+        </button>
         <button class="tab-button" type="button" data-tab="analyzer">
           <span class="tab-icon"><i data-lucide="brain"></i></span>
           <span data-i18n="tabs.analyzer">المحلل</span>
-        </button>
-        <button class="tab-button" type="button" data-tab="settings">
-          <span class="tab-icon"><i data-lucide="settings"></i></span>
-          <span data-i18n="tabs.settings">الإعدادات</span>
         </button>
       </nav>
 
@@ -491,7 +482,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260619-01"></script>
-  <script src="app.js?v=20260619-01"></script>
+  <script src="translations.js?v=20260619-02"></script>
+  <script src="app.js?v=20260619-02"></script>
 </body>
 </html>

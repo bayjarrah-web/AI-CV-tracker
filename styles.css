@@ -706,9 +706,47 @@ textarea:focus {
   font-weight: 700;
 }
 
+.header-icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 14px;
+  color: rgba(248, 250, 252, 0.82);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+    rgba(8, 18, 32, 0.64);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.header-icon-button:hover {
+  color: #ffffff;
+  border-color: rgba(56, 189, 248, 0.42);
+  background: rgba(47, 107, 255, 0.14);
+  box-shadow:
+    0 16px 42px rgba(59, 130, 246, 0.22),
+    0 0 24px rgba(56, 189, 248, 0.14);
+  transform: translateY(-1px);
+}
+
+.header-icon-button:focus-visible {
+  outline: 2px solid rgba(56, 189, 248, 0.8);
+  outline-offset: 3px;
+}
+
+.header-icon-button svg {
+  width: 1.08rem;
+  height: 1.08rem;
+  stroke-width: 2.2;
+}
+
 .tab-nav {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   padding: 10px;
   border-radius: var(--radius-lg);

@@ -37,6 +37,7 @@ const TRANSLATIONS = {
       }
     },
     tabs: {
+      applications: "الطلبات",
       today: "اليوم",
       profile: "الملف",
       jobs: "الوظائف",
@@ -704,6 +705,7 @@ const TRANSLATIONS = {
       }
     },
     tabs: {
+      applications: "Applications",
       today: "Today",
       profile: "Profile",
       jobs: "Jobs",
