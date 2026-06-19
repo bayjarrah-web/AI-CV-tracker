@@ -13,7 +13,7 @@ const StorageManager = {
       const value = localStorage.getItem(key);
       return value ? JSON.parse(value) : null;
     } catch (error) {
-      console.error(TRANSLATIONS.ar.errors.storageUnavailable, error);
+      console.error("Storage error:", error);
       return null;
     }
   },
@@ -23,7 +23,7 @@ const StorageManager = {
       localStorage.setItem(key, JSON.stringify(value));
       return true;
     } catch (error) {
-      console.error(TRANSLATIONS.ar.errors.storageUnavailable, error);
+      console.error("Storage error:", error);
       return false;
     }
   },
@@ -33,7 +33,7 @@ const StorageManager = {
       localStorage.removeItem(key);
       return true;
     } catch (error) {
-      console.error(TRANSLATIONS.ar.errors.storageUnavailable, error);
+      console.error("Storage error:", error);
       return false;
     }
   }
@@ -77,8 +77,13 @@ let analyzerMode = "cv_review";
 let analyzerCvText = "";
 let analyzerCvFileName = "";
 let isAnalyzing = false;
+let lastAnalysisTime = 0;
 let statusChart = null;
 let weeklyChart = null;
+
+const MAX_PDF_SIZE_BYTES = 5 * 1024 * 1024;
+const MAX_CV_TEXT_CHARS = 15000;
+const ANALYSIS_COOLDOWN_MS = 5000;
 
 const JobFilters = {
   search: "",
@@ -598,6 +603,17 @@ function safeRenderMarkdown(markdown) {
   }
 
   return escapeHTML(source).replace(/\n/g, "<br>");
+}
+
+function isSafeUrl(url) {
+  if (!url) return false;
+
+  try {
+    const parsed = new URL(url);
+    return ["http:", "https:"].includes(parsed.protocol);
+  } catch {
+    return false;
+  }
 }
 
 function initExternalLibraries() {
@@ -1586,7 +1602,9 @@ function addActivityLog(jobId, action, note = "") {
   renderTodayIfActive();
 }
 
-function archiveJob(jobId) {
+async function archiveJob(jobId) {
+  if (!await confirmDangerAction("confirmArchiveJob")) return;
+
   updateJob(jobId, (job) => ({
     ...job,
     status: "archived",
@@ -1597,7 +1615,9 @@ function archiveJob(jobId) {
   showToast("emotional.jobArchived");
 }
 
-function deleteJob(jobId) {
+async function deleteJob(jobId) {
+  if (!await confirmDangerAction("confirmDeleteJob")) return;
+
   AppState.jobs = AppState.jobs.filter((job) => job.id !== jobId);
   saveJobs();
   renderTodayIfActive();
@@ -1947,8 +1967,8 @@ function renderInterviewCard(interview) {
       <div class="job-actions">
         <button class="btn btn-small btn-secondary" type="button" data-interview-action="edit" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.edit"))}</button>
         <button class="btn btn-small btn-danger" type="button" data-interview-action="delete" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.delete"))}</button>
-        ${interview.format === "video" && interview.meetingUrl ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.joinMeeting"))}</a>` : ""}
-        ${interview.format === "in_person" && interview.googleMapsUrl ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.googleMapsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.openMap"))}</a>` : ""}
+        ${interview.format === "video" && isSafeUrl(interview.meetingUrl) ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.joinMeeting"))}</a>` : ""}
+        ${interview.format === "in_person" && isSafeUrl(interview.googleMapsUrl) ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.googleMapsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.openMap"))}</a>` : ""}
       </div>
     </article>
   `;
@@ -2105,9 +2125,9 @@ function renderTodaySection(titleKey, jobs, emptyKey, variant) {
 }
 
 function renderTodayMiniInterviewCard(interview) {
-  const linkButton = interview.format === "video" && interview.meetingUrl
+  const linkButton = interview.format === "video" && isSafeUrl(interview.meetingUrl)
     ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.joinMeeting"))}</a>`
-    : interview.format === "in_person" && interview.googleMapsUrl
+    : interview.format === "in_person" && isSafeUrl(interview.googleMapsUrl)
       ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.googleMapsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.openMap"))}</a>`
       : "";
 
@@ -2587,7 +2607,7 @@ function renderJobs() {
     const emptyTitle = empty.querySelector("h2");
     const emptyBody = empty.querySelector("p");
     if (emptyTitle) emptyTitle.textContent = AppState.jobs.length ? t("jobs.noFiltersResult") : t("empty.jobs.title");
-    if (emptyBody) emptyBody.textContent = AppState.jobs.length ? t("empty.jobs.body") : t("empty.jobs.body");
+    if (emptyBody) emptyBody.textContent = AppState.jobs.length ? t("jobs.noFiltersResultBody") : t("empty.jobs.body");
     safeInitIcons();
     return;
   }
@@ -2633,7 +2653,7 @@ function renderJobs() {
         <button class="btn btn-small btn-secondary" type="button" data-job-action="followUp" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("jobs.followUpDone"))}</button>
         <button class="btn btn-small btn-secondary" type="button" data-job-action="archive" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("common.archive"))}</button>
         <button class="btn btn-small btn-danger" type="button" data-job-action="delete" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("common.delete"))}</button>
-        ${job.jobUrl ? `<a class="btn btn-small btn-link" href="${escapeHTML(job.jobUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("jobs.openLink"))}</a>` : ""}
+        ${isSafeUrl(job.jobUrl) ? `<a class="btn btn-small btn-link" href="${escapeHTML(job.jobUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("jobs.openLink"))}</a>` : ""}
       </div>
 
       ${activityItems ? `
@@ -2877,6 +2897,14 @@ async function extractPdfText(file) {
   return fullText.trim();
 }
 
+function limitCvText(text) {
+  const source = String(text || "").trim();
+  if (source.length <= MAX_CV_TEXT_CHARS) return source;
+
+  showToast("analyzer.cvTruncated");
+  return source.slice(0, MAX_CV_TEXT_CHARS);
+}
+
 function buildAnalyzerPrompt(mode, cvText, job) {
   const lang = AppState.language === "ar" ? "Arabic" : "English";
   const header = `You are an expert career coach and ATS specialist. Respond ONLY in ${lang}. Use clean Markdown with headings, bullet points, and a final summary. Be specific and actionable.`;
@@ -2915,6 +2943,8 @@ async function callGemini(prompt) {
   });
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) throw new Error("invalid_api_key");
+    if (response.status === 429) throw new Error("quota_exceeded");
     throw new Error("api_failed");
   }
 
@@ -3135,9 +3165,15 @@ async function handleAnalyzerCvUpload(event) {
     return;
   }
 
+  if (file.size > MAX_PDF_SIZE_BYTES) {
+    showToast("analyzer.errorFileTooLarge");
+    event.target.value = "";
+    return;
+  }
+
   try {
     if (nameLabel) nameLabel.textContent = t("analyzer.loadingReadingPdf");
-    analyzerCvText = await extractPdfText(file);
+    analyzerCvText = limitCvText(await extractPdfText(file));
     analyzerCvFileName = file.name;
     if (!analyzerCvText) {
       showToast("analyzer.noCvText");
@@ -3160,6 +3196,12 @@ async function handleAnalyzerCvUpload(event) {
 async function runAnalysis() {
   if (isAnalyzing) return;
 
+  const now = Date.now();
+  if (now - lastAnalysisTime < ANALYSIS_COOLDOWN_MS) {
+    showToast("analyzer.pleaseWait");
+    return;
+  }
+
   if (!getGeminiApiKey()) {
     showToast("analyzer.errorNoApiKey");
     return;
@@ -3181,6 +3223,7 @@ async function runAnalysis() {
 
   const runButton = document.getElementById("analyzer-run");
   isAnalyzing = true;
+  lastAnalysisTime = now;
   if (runButton) {
     runButton.disabled = true;
     runButton.textContent = t("analyzer.loadingThinking");
@@ -3208,7 +3251,13 @@ async function runAnalysis() {
     safeInitIcons();
   } catch (error) {
     console.error(error);
-    showToast("analyzer.errorApiFailed");
+    const errorMessages = {
+      invalid_api_key: "analyzer.errorInvalidKey",
+      quota_exceeded: "analyzer.errorQuotaExceeded",
+      no_api_key: "analyzer.errorNoApiKey",
+      api_failed: "analyzer.errorApiFailed"
+    };
+    showToast(errorMessages[error.message] || "analyzer.errorApiFailed");
   } finally {
     isAnalyzing = false;
     if (runButton) {
@@ -3571,7 +3620,11 @@ async function confirmImport(mode) {
 
 async function confirmDangerAction(action) {
   const message = action.startsWith("settings.") ? t(action) : t(`settings.${action}`);
-  const confirmLabel = action.includes("Import") ? t("common.save") : t("common.delete");
+  const confirmLabel = action.includes("Import")
+    ? t("common.save")
+    : action.includes("Archive")
+      ? t("common.archive")
+      : t("common.delete");
 
   return new Promise((resolve) => {
     const existing = document.querySelector(".confirm-modal");
@@ -3698,10 +3751,16 @@ async function handleSettingsCvUpload(event) {
     return;
   }
 
+  if (file.size > MAX_PDF_SIZE_BYTES) {
+    showSettingsToast("analyzer.errorFileTooLarge", "error");
+    event.target.value = "";
+    return;
+  }
+
   try {
     let cvText = "";
     if (isLibraryAvailable("pdfjsLib")) {
-      cvText = await extractPdfText(file);
+      cvText = limitCvText(await extractPdfText(file));
     }
     StorageManager.set(StorageManager.KEYS.CV, {
       name: file.name,
@@ -3777,7 +3836,8 @@ function bindSettingsEvents() {
     }
 
     if (event.target.closest("#settings-toggle-autosave")) {
-      AppState.settings.autoSave = AppState.settings.autoSave === false;
+      const currentAutoSave = AppState.settings.autoSave !== false;
+      AppState.settings.autoSave = !currentAutoSave;
       persistSettings();
       renderSettings();
       return;

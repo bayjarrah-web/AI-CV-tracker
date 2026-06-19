@@ -5,10 +5,13 @@ const TRANSLATIONS = {
     },
     onboarding: {
       step1: {
+        welcome: "مرحباً بك في",
+        ai: "AI",
+        product: "CV tracker",
         eyebrow: "رفيقك الذكي للبحث عن عمل",
         title: "مرحباً بك في CV Tracker AI",
-        subtitle: "نظم طلباتك، تابع مقابلاتك، وافهم تقدمك من مكان واحد.",
-        cta: "هيا نبدأ"
+        subtitle: "افهم وحلّل طلباتك من مكان واحد",
+        cta: "ابدأ الآن"
       },
       step2: {
         eyebrow: "إعداد الملف الشخصي",
@@ -212,8 +215,13 @@ const TRANSLATIONS = {
       errorNoCv: "الرجاء رفع سيرة ذاتية (PDF) أولاً.",
       errorNoJob: "الرجاء اختيار وظيفة للمطابقة.",
       errorApiFailed: "فشل الاتصال بـ Gemini. تحقق من المفتاح والاتصال.",
+      errorInvalidKey: "مفتاح Gemini غير صالح أو لا يملك صلاحية الوصول.",
+      errorQuotaExceeded: "تم تجاوز حد استخدام Gemini حالياً. جرّب لاحقاً.",
       errorPdfFailed: "تعذّرت قراءة ملف الـ PDF.",
       errorInvalidPdf: "الملف يجب أن يكون بصيغة PDF.",
+      errorFileTooLarge: "حجم ملف PDF كبير جداً. الحد الأقصى 5MB.",
+      cvTruncated: "تم اختصار نص السيرة الذاتية للحفاظ على سرعة التحليل.",
+      pleaseWait: "انتظر بضع ثوانٍ قبل تشغيل تحليل جديد.",
       modeLabels: {
         cv_review: "مراجعة السيرة",
         job_match: "مطابقة وظيفة",
@@ -267,6 +275,8 @@ const TRANSLATIONS = {
       deleteAllDone: "تم حذف كل البيانات",
       confirmDeleteAnalyses: "هل أنت متأكد من حذف كل التحليلات؟",
       confirmDeleteArchived: "هل أنت متأكد من حذف الوظائف المؤرشفة؟",
+      confirmDeleteJob: "هل تريد حذف هذه الوظيفة نهائياً؟",
+      confirmArchiveJob: "هل تريد أرشفة هذه الوظيفة؟",
       confirmResetSettings: "إعادة ضبط الإعدادات إلى الوضع الافتراضي؟",
       done: "تم بنجاح",
       appInfoTitle: "معلومات التطبيق",
@@ -518,6 +528,7 @@ const TRANSLATIONS = {
       searchLabel: "بحث",
       searchPlaceholder: "ابحث بعنوان الوظيفة أو الشركة أو الموقع",
       noFiltersResult: "لا توجد وظائف مطابقة للفلاتر الحالية.",
+      noFiltersResultBody: "جرّب تعديل البحث أو إعادة ضبط الفلاتر لعرض المزيد من الوظائف.",
       followUpDue: "المتابعة مستحقة",
       openLink: "فتح الرابط",
       followUpDone: "تمت المتابعة",
@@ -661,10 +672,13 @@ const TRANSLATIONS = {
     },
     onboarding: {
       step1: {
+        welcome: "Welcome to",
+        ai: "AI",
+        product: "CV tracker",
         eyebrow: "Your focused job-search companion",
         title: "Welcome to CV Tracker AI",
-        subtitle: "Organize applications, follow interviews, and understand your progress from one place.",
-        cta: "Let's start"
+        subtitle: "understand and analyse your applications from one place",
+        cta: "Get Started"
       },
       step2: {
         eyebrow: "Profile setup",
@@ -868,8 +882,13 @@ const TRANSLATIONS = {
       errorNoCv: "Please upload a CV (PDF) first.",
       errorNoJob: "Please select a job to match.",
       errorApiFailed: "Failed to reach Gemini. Check your key and connection.",
+      errorInvalidKey: "Your Gemini key is invalid or does not have access.",
+      errorQuotaExceeded: "Gemini quota is currently exceeded. Try again later.",
       errorPdfFailed: "Failed to read the PDF file.",
       errorInvalidPdf: "The file must be a PDF.",
+      errorFileTooLarge: "The PDF file is too large. Maximum size is 5MB.",
+      cvTruncated: "Resume text was shortened to keep analysis fast.",
+      pleaseWait: "Please wait a few seconds before starting another analysis.",
       modeLabels: {
         cv_review: "CV Review",
         job_match: "Job Match",
@@ -923,6 +942,8 @@ const TRANSLATIONS = {
       deleteAllDone: "All data deleted",
       confirmDeleteAnalyses: "Delete all analyses?",
       confirmDeleteArchived: "Delete all archived jobs?",
+      confirmDeleteJob: "Delete this job permanently?",
+      confirmArchiveJob: "Archive this job?",
       confirmResetSettings: "Reset settings to default?",
       done: "Done successfully",
       appInfoTitle: "App Info",
@@ -1174,6 +1195,7 @@ const TRANSLATIONS = {
       searchLabel: "Search",
       searchPlaceholder: "Search by job title, company, or location",
       noFiltersResult: "No jobs match the current filters.",
+      noFiltersResultBody: "Try changing the search terms or resetting filters to see more jobs.",
       followUpDue: "Follow-up due",
       openLink: "Open Link",
       followUpDone: "Mark Follow-up Done",

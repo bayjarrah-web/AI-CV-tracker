@@ -10,7 +10,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260618-27">
+  <link rel="stylesheet" href="styles.css?v=20260619-01">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
@@ -30,12 +30,12 @@
         <div class="onboarding-step active" data-step="1">
           <div class="brand-mark brand-mark-large" aria-hidden="true"></div>
           <h1 class="onboarding-premium-title">
-            <span>Welcome to</span>
-            <span><strong>AI</strong> CV tracker</span>
+            <span data-i18n="onboarding.step1.welcome">Welcome to</span>
+            <span><strong data-i18n="onboarding.step1.ai">AI</strong> <span data-i18n="onboarding.step1.product">CV tracker</span></span>
           </h1>
-          <p class="onboarding-copy onboarding-premium-copy">understand and analyse your applications from one place</p>
+          <p class="onboarding-copy onboarding-premium-copy" data-i18n="onboarding.step1.subtitle">understand and analyse your applications from one place</p>
           <button class="btn btn-primary" type="button" data-next-step>
-            <span>Get Started</span>
+            <span data-i18n="onboarding.step1.cta">Get Started</span>
             <span class="btn-arrow" aria-hidden="true">→</span>
           </button>
         </div>
@@ -479,9 +479,9 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
@@ -491,7 +491,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260618-27"></script>
-  <script src="app.js?v=20260618-27"></script>
+  <script src="translations.js?v=20260619-01"></script>
+  <script src="app.js?v=20260619-01"></script>
 </body>
 </html>
