@@ -448,6 +448,7 @@ const TRANSLATIONS = {
       kicker: "تحليلات المسار المهني",
       title: "الإحصائيات والتحليلات",
       subtitle: "قراءة واضحة لأداء التقديم، مصادر الفرص، ونقاط القوة في رحلة البحث.",
+      simpleSubtitle: "أرقام قليلة وواضحة تكشف أين تقف طلباتك الآن.",
       last30Days: "آخر 30 يوم",
       last7Days: "آخر 7 أيام",
       totalApplications: "إجمالي الطلبات",
@@ -458,8 +459,10 @@ const TRANSLATIONS = {
       avgResponseTime: "متوسط وقت الرد",
       rejectionRate: "معدل الرفض",
       applicationsByStatus: "الطلبات حسب الحالة",
+      statusSnapshot: "ملخص الحالات",
       applicationsThisMonth: "طلبات هذا الشهر",
       topSources: "أفضل المصادر",
+      sourcePerformance: "أداء المصادر",
       statusDistribution: "توزيع الحالات",
       weeklyApplications: "نشاط التقديم الأسبوعي",
       sourceAnalytics: "تحليل مصادر الوظائف",
@@ -486,6 +489,15 @@ const TRANSLATIONS = {
       days: "أيام",
       notAvailable: "غير متاح",
       noDataYet: "لا توجد بيانات بعد",
+      chartView: "طريقة عرض الرسم",
+      chartTypes: {
+        bar: "أعمدة",
+        donut: "دائرة"
+      },
+      sourceGroups: {
+        direct: "موقع الشركة",
+        network: "شبكة العلاقات"
+      },
       periods: {
         week: "هذا الأسبوع",
         month: "هذا الشهر",
@@ -1158,6 +1170,7 @@ const TRANSLATIONS = {
       kicker: "Career analytics",
       title: "Stats & Analytics",
       subtitle: "A clear read on application performance, strongest sources, and momentum across your search.",
+      simpleSubtitle: "A small set of numbers that shows where your applications stand now.",
       last30Days: "Last 30 days",
       last7Days: "Last 7 days",
       totalApplications: "Total Applications",
@@ -1168,8 +1181,10 @@ const TRANSLATIONS = {
       avgResponseTime: "Avg Response Time",
       rejectionRate: "Rejection Rate",
       applicationsByStatus: "Applications by Status",
+      statusSnapshot: "Status Snapshot",
       applicationsThisMonth: "Applications This Month",
       topSources: "Top Sources",
+      sourcePerformance: "Source Performance",
       statusDistribution: "Status Distribution",
       weeklyApplications: "Weekly Application Activity",
       sourceAnalytics: "Source Analytics",
@@ -1196,6 +1211,15 @@ const TRANSLATIONS = {
       days: "days",
       notAvailable: "N/A",
       noDataYet: "No data yet",
+      chartView: "Chart view",
+      chartTypes: {
+        bar: "Bar",
+        donut: "Donut"
+      },
+      sourceGroups: {
+        direct: "Company Site",
+        network: "Network"
+      },
       periods: {
         week: "This Week",
         month: "This Month",

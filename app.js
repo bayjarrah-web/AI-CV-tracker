@@ -81,6 +81,7 @@ let isAnalyzing = false;
 let lastAnalysisTime = 0;
 let statusChart = null;
 let weeklyChart = null;
+let statsChartType = "bar";
 
 const MAX_PDF_SIZE_BYTES = 5 * 1024 * 1024;
 const MAX_CV_TEXT_CHARS = 15000;
@@ -1297,6 +1298,8 @@ function getStatsData(period = StatsFilters.period) {
     active: summary.activeApplications,
     responseRate: summary.responseRate,
     interviewRate: summary.interviewRate,
+    rejectionRate: summary.rejectionRate,
+    underReview: jobs.filter((job) => job.status === "under_review").length,
     offerRate: summary.offerRate,
     avgResponseTime: calculateAvgResponseTime(jobs),
     byStatus: getStatusDistribution(jobs),
@@ -2689,24 +2692,174 @@ function changePeriod(period) {
   renderStats();
 }
 
+function getSimplifiedStatsKpis(data) {
+  return [
+    { key: "total", label: t("statsDashboard.totalApplications"), value: data.total, icon: "briefcase", color: "primary" },
+    { key: "interviewRate", label: t("statsDashboard.interviewRate"), value: `${data.interviewRate}%`, icon: "users", color: "cyan" },
+    { key: "rejectionRate", label: t("statsDashboard.rejectionRate"), value: `${data.rejectionRate}%`, icon: "x-circle", color: "red" },
+    { key: "underReview", label: t("statuses.under_review"), value: data.underReview, icon: "scan-search", color: "violet" }
+  ];
+}
+
+function getSimplifiedStatusData(data) {
+  const statusMap = new Map(data.byStatus.map((item) => [item.status, item.count]));
+  return SIMPLE_APPLICATION_STATUS_OPTIONS.map((status) => ({
+    status,
+    label: t(`statuses.${status}`),
+    count: statusMap.get(status) || 0
+  }));
+}
+
+function renderSimplifiedStatsKpis(data) {
+  return `
+    <div class="stats-simple-kpi-grid">
+      ${getSimplifiedStatsKpis(data).map((card) => `
+        <article class="stats-simple-kpi glass-card summary-${card.color}">
+          <span class="summary-icon"><i data-lucide="${escapeHTML(card.icon)}"></i></span>
+          <div>
+            <strong>${escapeHTML(card.value)}</strong>
+            <p>${escapeHTML(card.label)}</p>
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderStatsChartTypeToggle() {
+  return `
+    <div class="stats-chart-toggle" role="tablist" aria-label="${escapeHTML(t("statsDashboard.chartView"))}">
+      ${["bar", "donut"].map((type) => `
+        <button class="period-filter-tab${statsChartType === type ? " active" : ""}" type="button" data-stats-chart="${escapeHTML(type)}">
+          ${escapeHTML(t(`statsDashboard.chartTypes.${type}`))}
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderSimplifiedStatsChart(data) {
+  const canvas = document.getElementById("stats-simple-chart");
+  if (!canvas) return;
+  if (statusChart) statusChart.destroy();
+  statusChart = null;
+
+  if (!isLibraryAvailable("Chart") || !data.total) {
+    showChartFallback(canvas);
+    return;
+  }
+
+  const statusData = getSimplifiedStatusData(data);
+  const colors = ["#38BDF8", "#2563EB", "#8B5CF6", "#EF4444"];
+  const isDonut = statsChartType === "donut";
+
+  statusChart = new window.Chart(canvas, {
+    type: isDonut ? "doughnut" : "bar",
+    data: {
+      labels: statusData.map((item) => item.label),
+      datasets: [{
+        data: statusData.map((item) => item.count),
+        backgroundColor: colors.map((color) => isDonut ? color : `${color}CC`),
+        borderColor: colors,
+        borderWidth: isDonut ? 2 : 1,
+        borderRadius: isDonut ? 0 : 10,
+        hoverOffset: isDonut ? 8 : 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: isDonut ? "68%" : undefined,
+      scales: isDonut ? {} : {
+        x: {
+          ticks: { color: "rgba(248, 250, 252, 0.72)" },
+          grid: { display: false }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: "rgba(248, 250, 252, 0.62)", precision: 0 },
+          grid: { color: "rgba(96, 165, 250, 0.08)" }
+        }
+      },
+      plugins: {
+        legend: {
+          display: isDonut,
+          position: "bottom",
+          labels: {
+            color: "rgba(248, 250, 252, 0.72)",
+            boxWidth: 10,
+            usePointStyle: true
+          }
+        }
+      }
+    }
+  });
+}
+
+function getSimplifiedSourcePerformance(jobs = getStatsJobs()) {
+  const groups = [
+    { key: "linkedin", label: t("sources.linkedin"), sources: ["linkedin"] },
+    { key: "direct", label: t("statsDashboard.sourceGroups.direct"), sources: ["company_site"] },
+    { key: "network", label: t("statsDashboard.sourceGroups.network"), sources: ["referral", "recruiter"] },
+    { key: "other", label: t("sources.other"), sources: ["indeed", "bayt", "glassdoor", "whatsapp", "other"] }
+  ];
+
+  return groups.map((group) => {
+    const groupJobs = jobs.filter((job) => group.sources.includes(job.source));
+    const interviews = groupJobs.filter((job) => ["interview", "offer", "accepted"].includes(job.status)).length;
+    return {
+      ...group,
+      count: groupJobs.length,
+      interviewRate: toPercent(interviews, groupJobs.length)
+    };
+  }).filter((group) => group.count > 0).sort((first, second) => second.interviewRate - first.interviewRate || second.count - first.count);
+}
+
+function renderSimplifiedSourcePerformance(data) {
+  const sources = getSimplifiedSourcePerformance(getStatsJobs(StatsFilters.period));
+  const best = sources[0] || null;
+
+  return `
+    <section class="stats-simple-card stats-source-card glass-card">
+      <div class="stats-card-header">
+        <h3>${escapeHTML(t("statsDashboard.sourcePerformance"))}</h3>
+        <span>${escapeHTML(best ? best.label : t("statsDashboard.noDataShort"))}</span>
+      </div>
+      ${sources.length
+        ? `<div class="source-analytics-list">
+            ${sources.map((source) => `
+              <div class="source-row">
+                <div>
+                  <strong>${escapeHTML(source.label)}</strong>
+                  <span>${escapeHTML(source.count)} ${escapeHTML(t("statsDashboard.applications"))}</span>
+                </div>
+                <div class="source-meter" aria-hidden="true"><span style="width: ${escapeHTML(source.interviewRate)}%"></span></div>
+                <em>${escapeHTML(source.interviewRate)}%</em>
+              </div>
+            `).join("")}
+          </div>`
+        : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noSources"))}</div>`}
+    </section>
+  `;
+}
+
 function renderStats() {
   const panel = document.getElementById("tab-stats");
   if (!panel) return;
 
   const data = getStatsData(StatsFilters.period);
-  const timeline = getMonthlyTimeline();
 
   panel.innerHTML = `
-    <section class="stats-dashboard">
+    <section class="stats-dashboard stats-simple-dashboard">
       <div class="stats-hero glass-card">
         <div>
           <p class="eyebrow">${escapeHTML(t("statsDashboard.kicker"))}</p>
           <h2>${escapeHTML(t("statsDashboard.title"))}</h2>
-          <p>${escapeHTML(t("statsDashboard.subtitle"))}</p>
+          <p>${escapeHTML(t("statsDashboard.simpleSubtitle"))}</p>
         </div>
         <div class="stats-hero-score">
           <span>${escapeHTML(t(`statsDashboard.periods.${StatsFilters.period}`))}</span>
-          <strong>${escapeHTML(data.responseRate)}%</strong>
+          <strong>${escapeHTML(data.interviewRate)}%</strong>
         </div>
       </div>
 
@@ -2719,60 +2872,26 @@ function renderStats() {
         </div>
       </div>
 
-      ${renderKPICards(data)}
+      ${renderSimplifiedStatsKpis(data)}
 
-      <div class="stats-grid">
-        <section class="stats-card chart-card glass-card">
+      <div class="stats-simple-grid">
+        <section class="stats-simple-card chart-card glass-card">
           <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.applicationsByStatus"))}</h3>
+            <h3>${escapeHTML(t("statsDashboard.statusSnapshot"))}</h3>
             <span>${escapeHTML(data.total)}</span>
           </div>
-          ${data.byStatus.length
-            ? `<div class="chart-wrap"><canvas id="stats-status-chart"></canvas></div>`
+          ${data.total
+            ? `${renderStatsChartTypeToggle()}<div class="chart-wrap"><canvas id="stats-simple-chart"></canvas></div>`
             : `<div class="today-positive-state muted-state">${escapeHTML(t("foundation.unlockAnalytics"))}</div>`}
         </section>
 
-        <section class="stats-card chart-card glass-card">
-          <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.applicationsThisMonth"))}</h3>
-            <span>${escapeHTML(data.byWeek.reduce((sum, week) => sum + week.count, 0))}</span>
-          </div>
-          <div class="chart-wrap"><canvas id="stats-weekly-chart"></canvas></div>
-        </section>
-
-        ${renderSourceAnalytics(data)}
-        ${renderInterviewAnalytics(data)}
-        ${renderActivityHeatmap(data)}
-
-        <section class="stats-card stats-timeline-card glass-card">
-          <div class="stats-card-header">
-            <h3>${escapeHTML(t("statsDashboard.monthTimeline"))}</h3>
-            <span>${escapeHTML(timeline.length)}</span>
-          </div>
-          ${timeline.length
-            ? `<div class="stats-timeline-list">
-                ${timeline.map((item) => `
-                  <article class="stats-timeline-item">
-                    <span class="activity-dot"></span>
-                    <div>
-                      <strong>${escapeHTML(item.title)}</strong>
-                      <p>${escapeHTML(item.action)}</p>
-                    </div>
-                    <time>${escapeHTML(getRelativeDateLabel(item.date))}</time>
-                  </article>
-                `).join("")}
-              </div>`
-            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.noTimeline"))}</div>`}
-        </section>
-
-        ${renderAchievements(data)}
+        ${renderSimplifiedSourcePerformance(data)}
       </div>
     </section>
   `;
 
   destroyStatsCharts();
-  renderStatusDonut(data);
-  renderWeeklyBar(data);
+  renderSimplifiedStatsChart(data);
   safeInitIcons();
 }
 
@@ -4310,9 +4429,17 @@ function bindStatsEvents() {
   if (!statsPanel) return;
 
   statsPanel.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-stats-period]");
-    if (!button) return;
-    changePeriod(button.dataset.statsPeriod);
+    const periodButton = event.target.closest("[data-stats-period]");
+    if (periodButton) {
+      changePeriod(periodButton.dataset.statsPeriod);
+      return;
+    }
+
+    const chartButton = event.target.closest("[data-stats-chart]");
+    if (chartButton) {
+      statsChartType = ["bar", "donut"].includes(chartButton.dataset.statsChart) ? chartButton.dataset.statsChart : "bar";
+      renderStats();
+    }
   });
 }
 
