@@ -570,7 +570,9 @@ const TRANSLATIONS = {
       modal: {
         kicker: "تفاصيل الفرصة",
         addTitle: "إضافة وظيفة",
-        editTitle: "تعديل وظيفة"
+        editTitle: "تعديل وظيفة",
+        advancedTitle: "تفاصيل متقدمة",
+        advancedHint: "حقول اختيارية للتتبع العميق"
       },
       filters: {
         status: "الحالة",
@@ -1267,7 +1269,9 @@ const TRANSLATIONS = {
       modal: {
         kicker: "Opportunity details",
         addTitle: "Add Job",
-        editTitle: "Edit Job"
+        editTitle: "Edit Job",
+        advancedTitle: "Advanced details",
+        advancedHint: "Optional fields for deeper tracking"
       },
       filters: {
         status: "Status",

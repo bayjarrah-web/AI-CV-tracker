@@ -10,7 +10,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260619-04">
+  <link rel="stylesheet" href="styles.css?v=20260619-05">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
@@ -417,13 +417,8 @@
           </label>
 
           <label class="field">
-            <span data-i18n="jobs.fields.location">الموقع</span>
-            <input id="job-location" type="text" autocomplete="off" placeholder="Berlin / Remote" data-i18n-placeholder="jobs.placeholders.location" data-country-input aria-autocomplete="list">
-          </label>
-
-          <label class="field">
-            <span data-i18n="jobs.fields.jobType">نوع العمل</span>
-            <select id="job-type"></select>
+            <span data-i18n="jobs.fields.appliedDate">تاريخ التقديم</span>
+            <input id="job-applied-date" type="date">
           </label>
 
           <label class="field">
@@ -432,8 +427,8 @@
           </label>
 
           <label class="field">
-            <span data-i18n="jobs.fields.priority">الأولوية</span>
-            <select id="job-priority"></select>
+            <span data-i18n="jobs.fields.location">الموقع</span>
+            <input id="job-location" type="text" autocomplete="off" placeholder="Berlin / Remote" data-i18n-placeholder="jobs.placeholders.location" data-country-input aria-autocomplete="list">
           </label>
 
           <label class="field">
@@ -442,33 +437,8 @@
           </label>
 
           <label class="field">
-            <span data-i18n="jobs.fields.salary">الراتب</span>
-            <input id="job-salary" type="text" placeholder="€60k - €75k" data-i18n-placeholder="jobs.placeholders.salary">
-          </label>
-
-          <label class="field">
             <span data-i18n="jobs.fields.jobUrl">رابط الوظيفة</span>
             <input id="job-url" type="url" placeholder="https://..." data-i18n-placeholder="jobs.placeholders.jobUrl">
-          </label>
-
-          <label class="field">
-            <span data-i18n="jobs.fields.contactName">اسم جهة التواصل</span>
-            <input id="job-contact-name" type="text" placeholder="Recruiter name" data-i18n-placeholder="jobs.placeholders.contactName">
-          </label>
-
-          <label class="field">
-            <span data-i18n="jobs.fields.contactEmail">بريد جهة التواصل</span>
-            <input id="job-contact-email" type="email" placeholder="name@company.com" data-i18n-placeholder="jobs.placeholders.contactEmail">
-          </label>
-
-          <label class="field">
-            <span data-i18n="jobs.fields.followUpDate">تاريخ المتابعة</span>
-            <input id="job-follow-up-date" type="date">
-          </label>
-
-          <label class="field">
-            <span data-i18n="jobs.fields.appliedDate">تاريخ التقديم</span>
-            <input id="job-applied-date" type="date">
           </label>
 
           <label class="field field-wide">
@@ -476,6 +446,45 @@
             <textarea id="job-notes" placeholder="ملاحظات قصيرة عن الفرصة..." data-i18n-placeholder="jobs.placeholders.notes"></textarea>
           </label>
         </div>
+
+        <details class="advanced-details">
+          <summary>
+            <span data-i18n="jobs.modal.advancedTitle">Advanced details</span>
+            <small data-i18n="jobs.modal.advancedHint">Optional fields for deeper tracking</small>
+          </summary>
+
+          <div class="form-grid two-columns">
+            <label class="field">
+              <span data-i18n="jobs.fields.jobType">نوع العمل</span>
+              <select id="job-type"></select>
+            </label>
+
+            <label class="field">
+              <span data-i18n="jobs.fields.priority">الأولوية</span>
+              <select id="job-priority"></select>
+            </label>
+
+            <label class="field">
+              <span data-i18n="jobs.fields.salary">الراتب</span>
+              <input id="job-salary" type="text" placeholder="€60k - €75k" data-i18n-placeholder="jobs.placeholders.salary">
+            </label>
+
+            <label class="field">
+              <span data-i18n="jobs.fields.followUpDate">تاريخ المتابعة</span>
+              <input id="job-follow-up-date" type="date">
+            </label>
+
+            <label class="field">
+              <span data-i18n="jobs.fields.contactName">اسم جهة التواصل</span>
+              <input id="job-contact-name" type="text" placeholder="Recruiter name" data-i18n-placeholder="jobs.placeholders.contactName">
+            </label>
+
+            <label class="field">
+              <span data-i18n="jobs.fields.contactEmail">بريد جهة التواصل</span>
+              <input id="job-contact-email" type="email" placeholder="name@company.com" data-i18n-placeholder="jobs.placeholders.contactEmail">
+            </label>
+          </div>
+        </details>
 
         <div class="button-row modal-actions">
           <button class="btn btn-secondary" type="button" id="cancel-job-modal" data-i18n="common.cancel">إلغاء</button>
@@ -497,7 +506,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260619-04"></script>
-  <script src="app.js?v=20260619-04"></script>
+  <script src="translations.js?v=20260619-05"></script>
+  <script src="app.js?v=20260619-05"></script>
 </body>
 </html>

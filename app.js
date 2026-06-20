@@ -199,6 +199,8 @@ const JOB_STATUS_OPTIONS = [
   "archived"
 ];
 
+const SIMPLE_APPLICATION_STATUS_OPTIONS = ["sent", "under_review", "interview", "rejected"];
+
 const JOB_PRIORITY_OPTIONS = ["high", "medium", "low"];
 
 const JOB_SOURCE_OPTIONS = [
@@ -1404,9 +1406,18 @@ function populateJobSelects() {
   populateSelect(document.getElementById("job-filter-priority"), JOB_PRIORITY_OPTIONS, "priority", true);
   populateSelect(document.getElementById("job-filter-source"), JOB_SOURCE_OPTIONS, "sources", true);
   populateSelect(document.getElementById("job-type"), JOB_TYPE_OPTIONS, "jobTypes");
-  populateSelect(document.getElementById("job-status"), JOB_STATUS_OPTIONS, "statuses");
+  populateSelect(document.getElementById("job-status"), SIMPLE_APPLICATION_STATUS_OPTIONS, "statuses");
   populateSelect(document.getElementById("job-priority"), JOB_PRIORITY_OPTIONS, "priority");
   populateSelect(document.getElementById("job-source"), JOB_SOURCE_OPTIONS, "sources");
+}
+
+function ensureSelectHasValue(select, value, translationGroup) {
+  if (!select || !value || [...select.options].some((option) => option.value === value)) return;
+
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = t(`${translationGroup}.${value}`);
+  select.appendChild(option);
 }
 
 function populateInterviewSelects(selectedJobId = "") {
@@ -1469,7 +1480,9 @@ function setJobFormData(job) {
   document.getElementById("job-company").value = job?.company || "";
   document.getElementById("job-location").value = job?.location || "";
   document.getElementById("job-type").value = job?.jobType || "full_time";
-  document.getElementById("job-status").value = job?.status || "sent";
+  const statusSelect = document.getElementById("job-status");
+  ensureSelectHasValue(statusSelect, job?.status, "statuses");
+  statusSelect.value = job?.status || "sent";
   document.getElementById("job-priority").value = job?.priority || "medium";
   document.getElementById("job-source").value = job?.source || "linkedin";
   document.getElementById("job-salary").value = job?.salary || "";
@@ -2704,7 +2717,7 @@ function renderJobListItem(job) {
         <div class="job-status-inline">
           <label for="job-status-${escapeHTML(job.id)}">${escapeHTML(t("applicationsDashboard.changeStatus"))}</label>
           <select id="job-status-${escapeHTML(job.id)}" data-job-status-select data-job-id="${escapeHTML(job.id)}">
-            ${JOB_STATUS_OPTIONS.map((status) => `<option value="${escapeHTML(status)}"${job.status === status ? " selected" : ""}>${escapeHTML(t(`statuses.${status}`))}</option>`).join("")}
+            ${[...new Set([...SIMPLE_APPLICATION_STATUS_OPTIONS, job.status])].map((status) => `<option value="${escapeHTML(status)}"${job.status === status ? " selected" : ""}>${escapeHTML(t(`statuses.${status}`))}</option>`).join("")}
           </select>
         </div>
 
