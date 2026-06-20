@@ -61,6 +61,7 @@
   --onboarding-blue-bright: #38BDF8;
   --onboarding-blue-glow: rgba(59, 130, 246, 0.35);
   --onboarding-blue-deep: #1D4ED8;
+  --blue-bright: var(--onboarding-blue-bright);
 }
 
 * {
@@ -1682,6 +1683,20 @@ textarea:focus {
   line-height: 1.6;
 }
 
+.applications-dashboard-actions {
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+  max-width: 440px;
+}
+
+.applications-dashboard-actions .btn.active {
+  color: #ffffff;
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(47, 107, 255, 0.18);
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.16);
+}
+
 .applications-status-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1827,8 +1842,8 @@ textarea:focus {
 
 .jobs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .interviews-grid {
@@ -1844,6 +1859,162 @@ textarea:focus {
   padding: 18px;
   position: relative;
   overflow: hidden;
+}
+
+.job-list-item {
+  padding: 0;
+}
+
+.job-list-item::before {
+  opacity: 0.58;
+}
+
+.job-list-item[open] {
+  border-color: rgba(56, 189, 248, 0.26);
+  box-shadow:
+    0 24px 70px rgba(59, 130, 246, 0.14),
+    0 0 0 1px rgba(56, 189, 248, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.job-list-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(120px, auto) auto 32px;
+  align-items: center;
+  gap: 14px;
+  min-height: 78px;
+  padding: 16px 18px 16px 22px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.job-list-summary::-webkit-details-marker {
+  display: none;
+}
+
+.job-list-main {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.job-list-main strong,
+.job-list-main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-list-main strong {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.job-list-main span {
+  color: rgba(248, 250, 252, 0.66);
+  font-weight: 800;
+}
+
+.job-list-date {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.job-list-chevron {
+  display: grid;
+  place-items: center;
+  color: rgba(248, 250, 252, 0.58);
+  transition: transform var(--transition-normal), color var(--transition-normal);
+}
+
+.job-list-item[open] .job-list-chevron {
+  color: var(--blue-bright);
+  transform: rotate(180deg);
+}
+
+.job-list-chevron svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.job-list-details {
+  display: grid;
+  gap: 14px;
+  border-top: 1px solid rgba(96, 165, 250, 0.12);
+  padding: 0 18px 18px 22px;
+}
+
+.job-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: 10px;
+}
+
+.job-detail-grid span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  border: 1px solid rgba(96, 165, 250, 0.12);
+  border-radius: 14px;
+  padding: 12px;
+  color: rgba(248, 250, 252, 0.76);
+  background: rgba(2, 6, 23, 0.26);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.job-detail-grid strong,
+.job-status-inline label,
+.job-interview-summary strong {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.job-status-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border: 1px solid rgba(96, 165, 250, 0.12);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(2, 6, 23, 0.22);
+}
+
+.job-status-inline select {
+  width: min(100%, 240px);
+}
+
+.job-detail-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 40px;
+  border: 1px solid rgba(56, 189, 248, 0.26);
+  border-radius: 12px;
+  padding: 8px 12px;
+  color: var(--blue-bright);
+  background: rgba(47, 107, 255, 0.1);
+  font-weight: 900;
+}
+
+.job-interview-summary {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(96, 165, 250, 0.12);
+  border-radius: 14px;
+  padding: 12px;
+  color: rgba(248, 250, 252, 0.72);
+  background: rgba(2, 6, 23, 0.22);
+  font-weight: 800;
 }
 
 .job-card::before {
@@ -2509,7 +2680,6 @@ textarea:focus-visible,
 
 .summary-cards-row,
 .stats-kpi-grid,
-.jobs-grid,
 .interviews-grid,
 .stats-grid,
 .today-sections-grid,
@@ -3185,7 +3355,6 @@ textarea:focus-visible,
     width: 100%;
   }
 
-  .jobs-grid,
   .interviews-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

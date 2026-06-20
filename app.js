@@ -2011,8 +2011,8 @@ function isFollowUpDue(job) {
 
 const APPLICATION_STATUS_CARDS = [
   { status: "sent", icon: "send" },
-  { status: "interview", icon: "calendar-check" },
   { status: "under_review", icon: "scan-search" },
+  { status: "interview", icon: "calendar-check" },
   { status: "rejected", icon: "x-circle" }
 ];
 
@@ -2028,6 +2028,13 @@ function renderApplicationsDashboardShell() {
   if (!grid) return;
 
   const counts = getApplicationStatusCounts();
+  const allButton = document.querySelector("[data-application-status='all']");
+  const isAllActive = !JobFilters.search && JobFilters.status === "all" && JobFilters.priority === "all" && JobFilters.source === "all";
+  if (allButton) {
+    allButton.classList.toggle("active", isAllActive);
+    allButton.setAttribute("aria-pressed", String(isAllActive));
+  }
+
   grid.innerHTML = APPLICATION_STATUS_CARDS.map((item) => {
     const isActive = JobFilters.status === item.status;
     return `
@@ -2044,12 +2051,42 @@ function renderApplicationsDashboardShell() {
 }
 
 function setApplicationStatusFilter(status) {
-  if (!APPLICATION_STATUS_CARDS.some((item) => item.status === status)) return;
+  if (status !== "all" && !APPLICATION_STATUS_CARDS.some((item) => item.status === status)) return;
+
+  if (status === "all") {
+    resetJobFilters();
+    return;
+  }
 
   JobFilters.status = status;
   const statusFilter = document.getElementById("job-filter-status");
   if (statusFilter) statusFilter.value = status;
   renderJobs();
+}
+
+function getJobInterviews(jobId) {
+  return AppState.interviews
+    .filter((interview) => interview.jobId === jobId)
+    .sort((first, second) => `${first.interviewDate || "9999-12-31"}T${first.interviewTime || "00:00"}`.localeCompare(`${second.interviewDate || "9999-12-31"}T${second.interviewTime || "00:00"}`));
+}
+
+function changeJobStatus(jobId, status) {
+  if (!JOB_STATUS_OPTIONS.includes(status)) return;
+
+  updateJob(jobId, (job) => {
+    if (job.status === status) return job;
+
+    return {
+      ...job,
+      status,
+      isArchived: status === "archived",
+      updatedAt: todayISO(),
+      activityLog: [
+        createActivity("status_changed", `${t(`statuses.${job.status}`)} → ${t(`statuses.${status}`)}`),
+        ...job.activityLog
+      ]
+    };
+  });
 }
 
 function getFilteredJobs() {
@@ -2637,6 +2674,68 @@ function renderStatsDashboard() {
   renderStats();
 }
 
+function renderJobListItem(job) {
+  const due = isFollowUpDue(job);
+  const interviews = getJobInterviews(job.id);
+  const nextInterview = interviews.find((interview) => interview.interviewDate >= todayISO()) || interviews[0];
+
+  return `
+    <details class="job-card job-list-item glass-card${due ? " follow-up-due" : ""}${job.isArchived ? " archived-card" : ""}${job.id === highlightedJobId ? " job-highlighted" : ""}" data-job-id="${escapeHTML(job.id)}">
+      <summary class="job-list-summary">
+        <span class="job-list-main">
+          <strong>${escapeHTML(job.company)}</strong>
+          <span>${escapeHTML(job.jobTitle)}</span>
+        </span>
+        <span class="job-list-date">${escapeHTML(formatDate(job.appliedDate))}</span>
+        <span class="badge badge-status badge-status-${escapeHTML(job.status)}">${escapeHTML(t(`statuses.${job.status}`))}</span>
+        <span class="job-list-chevron"><i data-lucide="chevron-down"></i></span>
+      </summary>
+
+      <div class="job-list-details">
+        <div class="job-detail-grid">
+          <span><strong>${escapeHTML(t("applicationsDashboard.position"))}</strong>${escapeHTML(job.jobTitle)}</span>
+          ${job.location ? `<span><strong>${escapeHTML(t("jobs.fields.location"))}</strong>${escapeHTML(job.location)}</span>` : ""}
+          <span><strong>${escapeHTML(t("jobs.fields.source"))}</strong>${escapeHTML(t(`sources.${job.source}`))}</span>
+          <span><strong>${escapeHTML(t("jobs.appliedDate"))}</strong>${escapeHTML(formatDate(job.appliedDate))}</span>
+          ${job.followUpDate ? `<span><strong>${escapeHTML(t("jobs.followUpDate"))}</strong>${escapeHTML(formatDate(job.followUpDate))}</span>` : ""}
+          <span><strong>${escapeHTML(t("jobs.followUpCount"))}</strong>${escapeHTML(job.followUpCount)}</span>
+        </div>
+
+        <div class="job-status-inline">
+          <label for="job-status-${escapeHTML(job.id)}">${escapeHTML(t("applicationsDashboard.changeStatus"))}</label>
+          <select id="job-status-${escapeHTML(job.id)}" data-job-status-select data-job-id="${escapeHTML(job.id)}">
+            ${JOB_STATUS_OPTIONS.map((status) => `<option value="${escapeHTML(status)}"${job.status === status ? " selected" : ""}>${escapeHTML(t(`statuses.${status}`))}</option>`).join("")}
+          </select>
+        </div>
+
+        <div class="job-badge-row">
+          <span class="badge badge-priority-${escapeHTML(job.priority)}">${escapeHTML(t(`priority.${job.priority}`))}</span>
+          <span class="badge">${escapeHTML(t(`jobTypes.${job.jobType}`))}</span>
+          ${due ? `<span class="job-due-label">${escapeHTML(t("jobs.followUpDue"))}</span>` : ""}
+        </div>
+
+        ${isSafeUrl(job.jobUrl) ? `<a class="job-detail-link" href="${escapeHTML(job.jobUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("jobs.openLink"))}</a>` : ""}
+        ${job.notes ? `<p class="job-notes">${escapeHTML(job.notes)}</p>` : ""}
+
+        <div class="job-interview-summary">
+          <strong>${escapeHTML(t("applicationsDashboard.interviewInfo"))}</strong>
+          ${nextInterview ? `
+            <span>${escapeHTML(formatDate(nextInterview.interviewDate))}${nextInterview.interviewTime ? ` · ${escapeHTML(nextInterview.interviewTime)}` : ""}</span>
+            <span>${escapeHTML(t(`interviewRoundTypes.${nextInterview.roundType}`))} · ${escapeHTML(t(`interviewFormats.${nextInterview.format}`))}</span>
+          ` : `<span>${escapeHTML(t("applicationsDashboard.noInterviewInfo"))}</span>`}
+        </div>
+
+        <div class="job-actions">
+          <button class="btn btn-small btn-secondary" type="button" data-job-action="edit" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("common.edit"))}</button>
+          <button class="btn btn-small btn-secondary" type="button" data-job-action="followUp" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("jobs.followUpDone"))}</button>
+          <button class="btn btn-small btn-secondary" type="button" data-job-action="archive" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("common.archive"))}</button>
+          <button class="btn btn-small btn-danger" type="button" data-job-action="delete" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("common.delete"))}</button>
+        </div>
+      </div>
+    </details>
+  `;
+}
+
 function renderJobs() {
   const grid = document.getElementById("jobs-grid");
   const empty = document.getElementById("jobs-empty-state");
@@ -2657,60 +2756,7 @@ function renderJobs() {
     return;
   }
 
-  jobs.forEach((job) => {
-    const card = document.createElement("article");
-    const due = isFollowUpDue(job);
-    card.className = `job-card glass-card${due ? " follow-up-due" : ""}${job.isArchived ? " archived-card" : ""}${job.id === highlightedJobId ? " job-highlighted" : ""}`;
-    card.dataset.jobId = job.id;
-
-    const activityItems = job.activityLog.slice(0, 3).map((item) => `
-      <div class="activity-log-item">${escapeHTML(formatDate(item.date))} · ${escapeHTML(t(`jobs.log.${item.action}`))}${item.note ? ` · ${escapeHTML(item.note)}` : ""}</div>
-    `).join("");
-
-    card.innerHTML = `
-      <div class="job-card-top">
-        <div class="job-title-group">
-          <h3>${escapeHTML(job.jobTitle)}</h3>
-          <p class="job-company">${escapeHTML(job.company)}</p>
-          ${job.location ? `<p class="job-location">${escapeHTML(job.location)}</p>` : ""}
-        </div>
-        ${due ? `<span class="job-due-label">${escapeHTML(t("jobs.followUpDue"))}</span>` : ""}
-      </div>
-
-      <div class="job-badge-row">
-        <span class="badge badge-status badge-status-${escapeHTML(job.status)}">${escapeHTML(t(`statuses.${job.status}`))}</span>
-        <span class="badge badge-priority-${escapeHTML(job.priority)}">${escapeHTML(t(`priority.${job.priority}`))}</span>
-        <span class="badge">${escapeHTML(t(`sources.${job.source}`))}</span>
-        <span class="badge">${escapeHTML(t(`jobTypes.${job.jobType}`))}</span>
-      </div>
-
-      <div class="job-meta-grid">
-        <span class="job-meta"><strong>${escapeHTML(t("jobs.appliedDate"))}:</strong> ${escapeHTML(formatDate(job.appliedDate))}</span>
-        ${job.followUpDate ? `<span class="job-meta"><strong>${escapeHTML(t("jobs.followUpDate"))}:</strong> ${escapeHTML(formatDate(job.followUpDate))}</span>` : ""}
-        <span class="job-meta"><strong>${escapeHTML(t("jobs.followUpCount"))}:</strong> ${escapeHTML(job.followUpCount)}</span>
-        ${job.salary ? `<span class="job-meta"><strong>${escapeHTML(t("jobs.fields.salary"))}:</strong> ${escapeHTML(job.salary)}</span>` : ""}
-      </div>
-
-      ${job.notes ? `<p class="job-notes">${escapeHTML(job.notes)}</p>` : ""}
-
-      <div class="job-actions">
-        <button class="btn btn-small btn-secondary" type="button" data-job-action="edit" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("common.edit"))}</button>
-        <button class="btn btn-small btn-secondary" type="button" data-job-action="followUp" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("jobs.followUpDone"))}</button>
-        <button class="btn btn-small btn-secondary" type="button" data-job-action="archive" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("common.archive"))}</button>
-        <button class="btn btn-small btn-danger" type="button" data-job-action="delete" data-job-id="${escapeHTML(job.id)}">${escapeHTML(t("common.delete"))}</button>
-        ${isSafeUrl(job.jobUrl) ? `<a class="btn btn-small btn-link" href="${escapeHTML(job.jobUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("jobs.openLink"))}</a>` : ""}
-      </div>
-
-      ${activityItems ? `
-        <div class="activity-log">
-          <span class="activity-log-title">${escapeHTML(t("jobs.activityTitle"))}</span>
-          ${activityItems}
-        </div>
-      ` : ""}
-    `;
-
-    grid.appendChild(card);
-  });
+  grid.innerHTML = jobs.map(renderJobListItem).join("");
 
   safeInitIcons();
 }
@@ -4044,6 +4090,12 @@ function bindJobsEvents() {
       const statusCard = event.target.closest("[data-application-status]");
       if (!statusCard) return;
       setApplicationStatusFilter(statusCard.dataset.applicationStatus);
+    });
+
+    jobsWorkspace.addEventListener("change", (event) => {
+      const statusSelect = event.target.closest("[data-job-status-select]");
+      if (!statusSelect) return;
+      changeJobStatus(statusSelect.dataset.jobId, statusSelect.value);
     });
   }
 

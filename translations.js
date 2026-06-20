@@ -419,6 +419,12 @@ const TRANSLATIONS = {
       kicker: "لوحة الطلبات",
       title: "تابع دورة التوظيف",
       subtitle: "اعرف أين يقف كل طلب، واضغط على أي حالة لتصفية القائمة فوراً.",
+      allApplications: "كل الطلبات",
+      details: "تفاصيل الطلب",
+      position: "المنصب",
+      changeStatus: "تغيير الحالة",
+      interviewInfo: "معلومات المقابلة",
+      noInterviewInfo: "لا توجد مقابلة مرتبطة بهذا الطلب بعد.",
       cards: {
         sent: {
           label: "تم الإرسال",
@@ -1110,6 +1116,12 @@ const TRANSLATIONS = {
       kicker: "Applications Dashboard",
       title: "Track the hiring cycle",
       subtitle: "See where every application stands, then filter the list with one tap.",
+      allApplications: "All Applications",
+      details: "Application details",
+      position: "Position",
+      changeStatus: "Change Status",
+      interviewInfo: "Interview info",
+      noInterviewInfo: "No interview linked to this application yet.",
       cards: {
         sent: {
           label: "Sent",
