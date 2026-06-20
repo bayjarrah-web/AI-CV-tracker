@@ -633,7 +633,8 @@ const TRANSLATIONS = {
       week: {
         kicker: "الأسبوع القادم",
         title: "نظرة سريعة على مقابلاتك",
-        today: "اليوم"
+        today: "اليوم",
+        allUpcoming: "كل القادمة"
       },
       modal: {
         kicker: "تفاصيل المقابلة",
@@ -686,6 +687,8 @@ const TRANSLATIONS = {
       empty: {
         upcomingTitle: "لا توجد مقابلات قادمة",
         upcomingBody: "عند جدولة مقابلة جديدة، ستظهر هنا مع كل تفاصيل التحضير.",
+        selectedDayTitle: "لا توجد مقابلات في هذا اليوم",
+        selectedDayBody: "اختر يوماً آخر أو اعرض كل المقابلات القادمة.",
         pastTitle: "لا توجد مقابلات سابقة",
         pastBody: "بعد انتهاء المقابلات، ستظهر هنا لتوثيق النتائج والملاحظات.",
         allTitle: "لا توجد مقابلات بعد",
@@ -1340,7 +1343,8 @@ const TRANSLATIONS = {
       week: {
         kicker: "Next 7 days",
         title: "Your interview week at a glance",
-        today: "Today"
+        today: "Today",
+        allUpcoming: "All Upcoming"
       },
       modal: {
         kicker: "Interview details",
@@ -1393,6 +1397,8 @@ const TRANSLATIONS = {
       empty: {
         upcomingTitle: "No upcoming interviews",
         upcomingBody: "Once you schedule an interview, it will appear here with preparation details.",
+        selectedDayTitle: "No interviews on this day",
+        selectedDayBody: "Pick another day or show all upcoming interviews.",
         pastTitle: "No past interviews",
         pastBody: "Completed interviews will appear here for results and notes.",
         allTitle: "No interviews yet",

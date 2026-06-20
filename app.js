@@ -73,6 +73,7 @@ let editingJobId = null;
 let highlightedJobId = null;
 let editingInterviewId = null;
 let currentInterviewView = "upcoming";
+let selectedInterviewDate = "";
 let analyzerMode = "cv_review";
 let analyzerCvText = "";
 let analyzerCvFileName = "";
@@ -1958,18 +1959,21 @@ function renderInterviewWeekStrip() {
         <p class="eyebrow">${escapeHTML(t("interviews.week.kicker"))}</p>
         <h3>${escapeHTML(t("interviews.week.title"))}</h3>
       </div>
-      <span>${escapeHTML(formatDate(todayISO()))}</span>
+      <button class="btn btn-small btn-secondary${selectedInterviewDate ? "" : " active"}" type="button" data-interview-date-reset>
+        ${escapeHTML(t("interviews.week.allUpcoming"))}
+      </button>
     </div>
     <div class="interview-week-days">
       ${days.map((day) => {
         const count = getInterviewCountForDate(day);
         const isToday = day === todayISO();
+        const isSelected = selectedInterviewDate === day;
         return `
-          <div class="interview-week-day${isToday ? " today" : ""}${count ? " has-interview" : ""}">
+          <button class="interview-week-day${isToday ? " today" : ""}${count ? " has-interview" : ""}${isSelected ? " selected" : ""}" type="button" data-interview-date="${escapeHTML(day)}" aria-pressed="${isSelected}">
             <span>${escapeHTML(isToday ? t("interviews.week.today") : formatWeekday(day))}</span>
             <strong>${escapeHTML(new Date(`${day}T00:00:00`).getDate())}</strong>
             ${count ? `<small>${escapeHTML(count)}</small>` : "<i></i>"}
-          </div>
+          </button>
         `;
       }).join("")}
     </div>
@@ -2006,6 +2010,15 @@ function prepareForInterview(interviewId) {
   const interview = AppState.interviews.find((item) => item.id === interviewId);
   if (!interview) return;
   switchTab("analyzer");
+}
+
+function renderInterviewEmptyState(titleKey, bodyKey) {
+  return `
+    <div class="interview-empty-inline glass-card">
+      <strong>${escapeHTML(t(titleKey))}</strong>
+      <span>${escapeHTML(t(bodyKey))}</span>
+    </div>
+  `;
 }
 
 function renderInterviewCard(interview) {
@@ -2060,8 +2073,12 @@ function renderInterviews(filter) {
 
   if (filter) currentInterviewView = ["upcoming", "past", "all"].includes(filter) ? filter : "upcoming";
   const groups = getInterviewGroups();
-  const upcoming = groups.upcoming;
+  const upcoming = selectedInterviewDate
+    ? groups.upcoming.filter((interview) => interview.interviewDate === selectedInterviewDate)
+    : groups.upcoming;
   const past = groups.past;
+  const emptyTitleKey = selectedInterviewDate ? "interviews.empty.selectedDayTitle" : "interviews.empty.upcomingTitle";
+  const emptyBodyKey = selectedInterviewDate ? "interviews.empty.selectedDayBody" : "interviews.empty.upcomingBody";
 
   renderInterviewWeekStrip();
 
@@ -2076,7 +2093,7 @@ function renderInterviews(filter) {
       </div>
       ${upcoming.length
         ? `<div class="interview-list">${upcoming.map(renderInterviewCard).join("")}</div>`
-        : `<div class="interview-empty-inline glass-card">${escapeHTML(t("interviews.empty.upcomingBody"))}</div>`}
+        : renderInterviewEmptyState(emptyTitleKey, emptyBodyKey)}
     </section>
 
     <details class="interview-past-section glass-card">
@@ -4225,6 +4242,7 @@ function bindInterviewsEvents() {
   const jobSelect = document.getElementById("interview-job-id");
   const dateInput = document.getElementById("interview-date");
   const interviewsGrid = document.getElementById("interviews-grid");
+  const interviewWeekStrip = document.getElementById("interview-week-strip");
 
   if (interviewForm) {
     interviewForm.addEventListener("submit", saveInterview);
@@ -4255,6 +4273,22 @@ function bindInterviewsEvents() {
   document.querySelectorAll("[data-interview-view]").forEach((button) => {
     button.addEventListener("click", () => setInterviewView(button.dataset.interviewView));
   });
+
+  if (interviewWeekStrip) {
+    interviewWeekStrip.addEventListener("click", (event) => {
+      const resetButton = event.target.closest("[data-interview-date-reset]");
+      if (resetButton) {
+        selectedInterviewDate = "";
+        renderInterviews();
+        return;
+      }
+
+      const dayButton = event.target.closest("[data-interview-date]");
+      if (!dayButton) return;
+      selectedInterviewDate = dayButton.dataset.interviewDate || "";
+      renderInterviews();
+    });
+  }
 
   if (interviewsGrid) {
     interviewsGrid.addEventListener("click", (event) => {
