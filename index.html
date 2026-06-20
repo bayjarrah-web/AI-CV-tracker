@@ -10,7 +10,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260619-05">
+  <link rel="stylesheet" href="styles.css?v=20260619-06">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
@@ -149,7 +149,7 @@
               </div>
               <button class="btn btn-primary" type="button" data-open-job-modal>
                 <span class="btn-plus">+</span>
-                <span data-i18n="jobs.addJob">إضافة وظيفة</span>
+                <span data-i18n="jobs.addJob">إضافة طلب</span>
               </button>
             </div>
 
@@ -171,7 +171,7 @@
             <div class="jobs-toolbar glass-card">
               <label class="field search-field">
                 <span data-i18n="jobs.searchLabel">بحث</span>
-                <input id="job-search" type="search" placeholder="ابحث بعنوان الوظيفة أو الشركة أو الموقع" data-i18n-placeholder="jobs.searchPlaceholder">
+                <input id="job-search" type="search" placeholder="ابحث بالمنصب أو الشركة أو الموقع" data-i18n-placeholder="jobs.searchPlaceholder">
               </label>
 
               <label class="field">
@@ -196,8 +196,8 @@
             <div class="empty-state glass-card hidden" id="jobs-empty-state">
               <div class="empty-state-inner">
                 <div class="empty-icon">JOB</div>
-                <h2 data-i18n="empty.jobs.title">لا توجد وظائف بعد</h2>
-                <p data-i18n="empty.jobs.body">ابدأ بإضافة أول فرصة، وبعدها ستظهر هنا كروت منظمة قابلة للبحث والفلترة.</p>
+                <h2 data-i18n="empty.jobs.title">لا توجد طلبات بعد</h2>
+                <p data-i18n="empty.jobs.body">ابدأ بإضافة أول طلب، وبعدها ستظهر هنا قائمة منظمة قابلة للبحث والفلترة.</p>
               </div>
             </div>
           </section>
@@ -397,7 +397,7 @@
       <div class="modal-header">
         <div>
           <p class="eyebrow" data-i18n="jobs.modal.kicker">تفاصيل الفرصة</p>
-          <h2 id="job-modal-title" data-i18n="jobs.modal.addTitle">إضافة وظيفة</h2>
+          <h2 id="job-modal-title" data-i18n="jobs.modal.addTitle">إضافة طلب</h2>
         </div>
         <button class="icon-btn" type="button" id="close-job-modal" aria-label="Close">×</button>
       </div>
@@ -407,7 +407,7 @@
 
         <div class="form-grid two-columns">
           <label class="field">
-            <span data-i18n="jobs.fields.jobTitle">عنوان الوظيفة</span>
+            <span data-i18n="jobs.fields.jobTitle">المنصب</span>
             <input id="job-title" type="text" required placeholder="Frontend Developer" data-i18n-placeholder="jobs.placeholders.jobTitle">
           </label>
 
@@ -437,7 +437,7 @@
           </label>
 
           <label class="field">
-            <span data-i18n="jobs.fields.jobUrl">رابط الوظيفة</span>
+            <span data-i18n="jobs.fields.jobUrl">رابط الإعلان</span>
             <input id="job-url" type="url" placeholder="https://..." data-i18n-placeholder="jobs.placeholders.jobUrl">
           </label>
 
@@ -506,7 +506,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260619-05"></script>
-  <script src="app.js?v=20260619-05"></script>
+  <script src="translations.js?v=20260619-06"></script>
+  <script src="app.js?v=20260619-06"></script>
 </body>
 </html>

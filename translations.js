@@ -1,7 +1,7 @@
 const TRANSLATIONS = {
   ar: {
     app: {
-      kicker: "لوحة تتبع الوظائف"
+      kicker: "لوحة تتبع الطلبات"
     },
     onboarding: {
       step1: {
@@ -164,7 +164,7 @@ const TRANSLATIONS = {
         security: "الأمان",
         cvReading: "قراءة السيرة الذاتية"
       },
-      unlockAnalytics: "أضف أول وظيفة لفتح الإحصائيات",
+      unlockAnalytics: "أضف أول طلب لفتح الإحصائيات",
       comingSoon: "قريباً",
       foundationReady: "الأساس جاهز",
       appearance: "المظهر",
@@ -365,8 +365,8 @@ const TRANSLATIONS = {
         body: "ستظهر معلوماتك وسيرتك الذاتية هنا في المراحل القادمة."
       },
       jobs: {
-        title: "لا توجد وظائف بعد",
-        body: "ابدأ بإضافة أول فرصة، وبعدها ستظهر هنا كروت منظمة قابلة للبحث والفلترة."
+        title: "لا توجد طلبات بعد",
+        body: "ابدأ بإضافة أول طلب، وبعدها ستظهر هنا قائمة منظمة قابلة للبحث والفلترة."
       },
       stats: {
         title: "الإحصائيات تبدأ بعد أول خطوة",
@@ -533,9 +533,9 @@ const TRANSLATIONS = {
     emotional: {
       welcomeBack: "أهلاً بعودتك. خطوة صغيرة اليوم تكفي لتحريك الأمور.",
       saved: "تم الحفظ. جميل، صار لدينا أساس نبني عليه.",
-      jobSaved: "تم حفظ الوظيفة. الفرصة صارت تحت السيطرة.",
-      jobDeleted: "تم حذف الوظيفة نهائياً.",
-      jobArchived: "تمت أرشفة الوظيفة.",
+      jobSaved: "تم حفظ الطلب. الفرصة صارت تحت السيطرة.",
+      jobDeleted: "تم حذف الطلب نهائياً.",
+      jobArchived: "تمت أرشفة الطلب.",
       followUpDone: "تم تسجيل المتابعة. خطوة ممتازة.",
       interviewSaved: "تم حفظ المقابلة. الجولة صارت واضحة ومجهزة.",
       interviewDeleted: "تم حذف المقابلة.",
@@ -545,7 +545,7 @@ const TRANSLATIONS = {
     errors: {
       requiredName: "يرجى إدخال الاسم للمتابعة.",
       requiredProfileInfo: "يرجى إدخال معلوماتك الأساسية للمتابعة.",
-      requiredJobFields: "يرجى إدخال عنوان الوظيفة واسم الشركة.",
+      requiredJobFields: "يرجى إدخال المنصب واسم الشركة.",
       invalidPdf: "يرجى اختيار ملف PDF فقط.",
       requiredInterviewFields: "يرجى اختيار وظيفة وتاريخ المقابلة.",
       storageUnavailable: "تعذر الوصول إلى التخزين المحلي في المتصفح.",
@@ -553,12 +553,12 @@ const TRANSLATIONS = {
     },
     jobs: {
       kicker: "إدارة الفرص",
-      title: "الوظائف",
-      addJob: "إضافة وظيفة",
+      title: "الطلبات",
+      addJob: "إضافة طلب",
       searchLabel: "بحث",
-      searchPlaceholder: "ابحث بعنوان الوظيفة أو الشركة أو الموقع",
-      noFiltersResult: "لا توجد وظائف مطابقة للفلاتر الحالية.",
-      noFiltersResultBody: "جرّب تعديل البحث أو إعادة ضبط الفلاتر لعرض المزيد من الوظائف.",
+      searchPlaceholder: "ابحث بالمنصب أو الشركة أو الموقع",
+      noFiltersResult: "لا توجد طلبات مطابقة للفلاتر الحالية.",
+      noFiltersResultBody: "جرّب تعديل البحث أو إعادة ضبط الفلاتر لعرض المزيد من الطلبات.",
       followUpDue: "المتابعة مستحقة",
       openLink: "فتح الرابط",
       followUpDone: "تمت المتابعة",
@@ -569,8 +569,8 @@ const TRANSLATIONS = {
       followUpDate: "تاريخ المتابعة",
       modal: {
         kicker: "تفاصيل الفرصة",
-        addTitle: "إضافة وظيفة",
-        editTitle: "تعديل وظيفة",
+        addTitle: "إضافة طلب",
+        editTitle: "تعديل طلب",
         advancedTitle: "تفاصيل متقدمة",
         advancedHint: "حقول اختيارية للتتبع العميق"
       },
@@ -581,7 +581,7 @@ const TRANSLATIONS = {
         reset: "إعادة ضبط"
       },
       fields: {
-        jobTitle: "عنوان الوظيفة",
+        jobTitle: "المنصب",
         company: "الشركة",
         location: "الموقع",
         jobType: "نوع العمل",
@@ -589,7 +589,7 @@ const TRANSLATIONS = {
         priority: "الأولوية",
         source: "المصدر",
         salary: "الراتب",
-        jobUrl: "رابط الوظيفة",
+        jobUrl: "رابط الإعلان",
         contactName: "اسم جهة التواصل",
         contactEmail: "بريد جهة التواصل",
         notes: "ملاحظات",
@@ -607,10 +607,10 @@ const TRANSLATIONS = {
         notes: "ملاحظات قصيرة عن الفرصة..."
       },
       log: {
-        created: "تم إنشاء الوظيفة",
-        updated: "تم تحديث الوظيفة",
+        created: "تم إنشاء الطلب",
+        updated: "تم تحديث الطلب",
         status_changed: "تم تغيير الحالة",
-        archived: "تمت أرشفة الوظيفة",
+        archived: "تمت أرشفة الطلب",
         followUpDone: "تم تسجيل متابعة",
         follow_up_done: "تم تسجيل متابعة",
         interview_scheduled: "تمت جدولة مقابلة",
@@ -700,7 +700,7 @@ const TRANSLATIONS = {
   },
   en: {
     app: {
-      kicker: "Job tracking dashboard"
+      kicker: "Application tracking dashboard"
     },
     onboarding: {
       step1: {
@@ -863,7 +863,7 @@ const TRANSLATIONS = {
         security: "Security",
         cvReading: "CV reading"
       },
-      unlockAnalytics: "Add your first job to unlock analytics",
+      unlockAnalytics: "Add your first application to unlock analytics",
       comingSoon: "Coming soon",
       foundationReady: "Foundation ready",
       appearance: "Appearance",
@@ -1064,8 +1064,8 @@ const TRANSLATIONS = {
         body: "Your information and resume will appear here in upcoming phases."
       },
       jobs: {
-        title: "No jobs yet",
-        body: "Add your first opportunity, then organized searchable cards will appear here."
+        title: "No applications yet",
+        body: "Add your first application, then an organized searchable list will appear here."
       },
       stats: {
         title: "Stats begin after the first step",
@@ -1232,9 +1232,9 @@ const TRANSLATIONS = {
     emotional: {
       welcomeBack: "Welcome back. One small step today is enough to move things forward.",
       saved: "Saved. Nice, we have a foundation to build on.",
-      jobSaved: "Job saved. This opportunity is under control.",
-      jobDeleted: "Job permanently deleted.",
-      jobArchived: "Job archived.",
+      jobSaved: "Application saved. This opportunity is under control.",
+      jobDeleted: "Application permanently deleted.",
+      jobArchived: "Application archived.",
       followUpDone: "Follow-up recorded. Excellent move.",
       interviewSaved: "Interview saved. This round is now clear and prepared.",
       interviewDeleted: "Interview deleted.",
@@ -1244,7 +1244,7 @@ const TRANSLATIONS = {
     errors: {
       requiredName: "Please enter your name to continue.",
       requiredProfileInfo: "Please enter your basic information to continue.",
-      requiredJobFields: "Please enter the job title and company name.",
+      requiredJobFields: "Please enter the position and company name.",
       invalidPdf: "Please choose a PDF file only.",
       requiredInterviewFields: "Please choose a job and interview date.",
       storageUnavailable: "Could not access browser local storage.",
@@ -1252,12 +1252,12 @@ const TRANSLATIONS = {
     },
     jobs: {
       kicker: "Opportunity management",
-      title: "Jobs",
-      addJob: "Add Job",
+      title: "Applications",
+      addJob: "Add Application",
       searchLabel: "Search",
-      searchPlaceholder: "Search by job title, company, or location",
-      noFiltersResult: "No jobs match the current filters.",
-      noFiltersResultBody: "Try changing the search terms or resetting filters to see more jobs.",
+      searchPlaceholder: "Search by position, company, or location",
+      noFiltersResult: "No applications match the current filters.",
+      noFiltersResultBody: "Try changing the search terms or resetting filters to see more applications.",
       followUpDue: "Follow-up due",
       openLink: "Open Link",
       followUpDone: "Mark Follow-up Done",
@@ -1268,8 +1268,8 @@ const TRANSLATIONS = {
       followUpDate: "Follow-up",
       modal: {
         kicker: "Opportunity details",
-        addTitle: "Add Job",
-        editTitle: "Edit Job",
+        addTitle: "Add Application",
+        editTitle: "Edit Application",
         advancedTitle: "Advanced details",
         advancedHint: "Optional fields for deeper tracking"
       },
@@ -1280,7 +1280,7 @@ const TRANSLATIONS = {
         reset: "Reset Filters"
       },
       fields: {
-        jobTitle: "Job title",
+        jobTitle: "Position",
         company: "Company",
         location: "Location",
         jobType: "Job type",
@@ -1288,7 +1288,7 @@ const TRANSLATIONS = {
         priority: "Priority",
         source: "Source",
         salary: "Salary",
-        jobUrl: "Job URL",
+        jobUrl: "Job link",
         contactName: "Contact name",
         contactEmail: "Contact email",
         notes: "Notes",
@@ -1306,10 +1306,10 @@ const TRANSLATIONS = {
         notes: "Short notes about this opportunity..."
       },
       log: {
-        created: "Job created",
-        updated: "Job updated",
+        created: "Application created",
+        updated: "Application updated",
         status_changed: "Status changed",
-        archived: "Job archived",
+        archived: "Application archived",
         followUpDone: "Follow-up recorded",
         follow_up_done: "Follow-up recorded",
         interview_scheduled: "Interview scheduled",
