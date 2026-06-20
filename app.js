@@ -1933,22 +1933,97 @@ function setInterviewView(view) {
   renderInterviews();
 }
 
+function getInterviewWeekDays() {
+  const today = todayISO();
+  return Array.from({ length: 7 }, (_, index) => addDaysToISO(today, index));
+}
+
+function formatWeekday(isoDate) {
+  const locale = AppState.language === "ar" ? "ar" : "en";
+  return new Intl.DateTimeFormat(locale, { weekday: "short" }).format(new Date(`${isoDate}T00:00:00`));
+}
+
+function getInterviewCountForDate(isoDate) {
+  return AppState.interviews.filter((interview) => interview.interviewDate === isoDate).length;
+}
+
+function renderInterviewWeekStrip() {
+  const strip = document.getElementById("interview-week-strip");
+  if (!strip) return;
+
+  const days = getInterviewWeekDays();
+  strip.innerHTML = `
+    <div class="interview-week-header">
+      <div>
+        <p class="eyebrow">${escapeHTML(t("interviews.week.kicker"))}</p>
+        <h3>${escapeHTML(t("interviews.week.title"))}</h3>
+      </div>
+      <span>${escapeHTML(formatDate(todayISO()))}</span>
+    </div>
+    <div class="interview-week-days">
+      ${days.map((day) => {
+        const count = getInterviewCountForDate(day);
+        const isToday = day === todayISO();
+        return `
+          <div class="interview-week-day${isToday ? " today" : ""}${count ? " has-interview" : ""}">
+            <span>${escapeHTML(isToday ? t("interviews.week.today") : formatWeekday(day))}</span>
+            <strong>${escapeHTML(new Date(`${day}T00:00:00`).getDate())}</strong>
+            ${count ? `<small>${escapeHTML(count)}</small>` : "<i></i>"}
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function getInterviewMapsUrl(interview) {
+  if (interview.format !== "in_person") return "";
+  if (isSafeUrl(interview.googleMapsUrl)) return interview.googleMapsUrl;
+  if (!interview.location) return "";
+
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(interview.location)}`;
+}
+
+function renderInterviewPrimaryActions(interview) {
+  const meetingButton = ["video", "async_video"].includes(interview.format) && isSafeUrl(interview.meetingUrl)
+    ? `<a class="btn btn-small btn-primary" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="video"></i>${escapeHTML(t("interviews.joinMeeting"))}</a>`
+    : "";
+  const mapsUrl = getInterviewMapsUrl(interview);
+  const mapsButton = mapsUrl
+    ? `<a class="btn btn-small btn-primary" href="${escapeHTML(mapsUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="map-pin"></i>${escapeHTML(t("interviews.openMap"))}</a>`
+    : "";
+
+  return `
+    <div class="interview-primary-actions">
+      ${meetingButton}
+      ${mapsButton}
+      <button class="btn btn-small btn-secondary" type="button" data-interview-action="prepare" data-interview-id="${escapeHTML(interview.id)}"><i data-lucide="sparkles"></i>${escapeHTML(t("interviews.prepare"))}</button>
+    </div>
+  `;
+}
+
+function prepareForInterview(interviewId) {
+  const interview = AppState.interviews.find((item) => item.id === interviewId);
+  if (!interview) return;
+  switchTab("analyzer");
+}
+
 function renderInterviewCard(interview) {
   const isPast = isPastInterview(interview);
   const isToday = interview.interviewDate === todayISO();
   const countdown = calculateCountdown(interview.interviewDate);
   const details = [
-    interview.interviewTime ? `${t("interviews.fields.interviewTime")}: ${interview.interviewTime}` : "",
-    interview.duration ? `${t("interviews.fields.duration")}: ${interview.duration}` : "",
+    interview.location ? `${t("interviews.fields.location")}: ${interview.location}` : "",
     interview.platform ? `${t("interviews.fields.platform")}: ${interview.platform}` : "",
-    interview.location ? `${t("interviews.fields.location")}: ${interview.location}` : ""
+    interview.interviewerName ? `${t("interviews.fields.interviewerName")}: ${interview.interviewerName}` : "",
+    interview.notes ? interview.notes : ""
   ].filter(Boolean);
 
   return `
-    <article class="interview-card glass-card${isPast ? " past-interview" : ""}${isToday ? " today-interview" : ""}">
+    <article class="interview-card interview-assistant-card glass-card${isPast ? " past-interview" : ""}${isToday ? " today-interview" : ""}">
       <div class="interview-card-top">
         <div>
-          <p class="eyebrow">${escapeHTML(t("interviews.round"))} ${escapeHTML(interview.round)}</p>
+          <p class="eyebrow">${escapeHTML(t("interviews.round"))} ${escapeHTML(interview.round)} · ${escapeHTML(t(`interviewRoundTypes.${interview.roundType}`))}</p>
           <h3>${escapeHTML(interview.jobTitle)}</h3>
           <p>${escapeHTML(interview.company)}</p>
         </div>
@@ -1960,28 +2035,19 @@ function renderInterviewCard(interview) {
       </div>
 
       <div class="job-badge-row">
-        <span class="badge badge-round-type">${escapeHTML(t(`interviewRoundTypes.${interview.roundType}`))}</span>
-        <span class="badge badge-interview-status-${escapeHTML(interview.status)}">${escapeHTML(t(`interviewStatuses.${interview.status}`))}</span>
         <span class="badge badge-format-${escapeHTML(interview.format)}">${escapeHTML(t(`interviewFormats.${interview.format}`))}</span>
+        <span class="badge badge-interview-status-${escapeHTML(interview.status)}">${escapeHTML(t(`interviewStatuses.${interview.status}`))}</span>
         ${interview.result ? `<span class="badge badge-result-${escapeHTML(interview.result)}">${escapeHTML(t(`interviewResults.${interview.result}`))}</span>` : ""}
       </div>
 
-      ${details.length ? `<div class="interview-detail-list">${details.map((detail) => `<span>${escapeHTML(detail)}</span>`).join("")}</div>` : ""}
-
-      ${(interview.interviewerName || interview.interviewerTitle) ? `
-        <p class="interview-person">${escapeHTML(interview.interviewerName)}${interview.interviewerTitle ? ` · ${escapeHTML(interview.interviewerTitle)}` : ""}</p>
-      ` : ""}
-
-      ${interview.preparationNotes ? `<p class="job-notes">${escapeHTML(interview.preparationNotes)}</p>` : ""}
-      ${interview.notes ? `<p class="job-notes">${escapeHTML(interview.notes)}</p>` : ""}
-      ${interview.postInterviewNotes ? `<p class="job-notes">${escapeHTML(interview.postInterviewNotes)}</p>` : ""}
-      ${interview.questionsAsked ? `<p class="job-notes">${escapeHTML(interview.questionsAsked)}</p>` : ""}
+      ${details.length ? `<div class="interview-detail-list">${details.slice(0, 3).map((detail) => `<span>${escapeHTML(detail)}</span>`).join("")}</div>` : ""}
 
       <div class="job-actions">
-        <button class="btn btn-small btn-secondary" type="button" data-interview-action="edit" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.edit"))}</button>
-        <button class="btn btn-small btn-danger" type="button" data-interview-action="delete" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.delete"))}</button>
-        ${interview.format === "video" && isSafeUrl(interview.meetingUrl) ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.joinMeeting"))}</a>` : ""}
-        ${interview.format === "in_person" && isSafeUrl(interview.googleMapsUrl) ? `<a class="btn btn-small btn-link" href="${escapeHTML(interview.googleMapsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t("interviews.openMap"))}</a>` : ""}
+        ${renderInterviewPrimaryActions(interview)}
+        <div class="interview-secondary-actions">
+          <button class="btn btn-small btn-secondary" type="button" data-interview-action="edit" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.edit"))}</button>
+          <button class="btn btn-small btn-danger" type="button" data-interview-action="delete" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.delete"))}</button>
+        </div>
       </div>
     </article>
   `;
@@ -1994,26 +2060,36 @@ function renderInterviews(filter) {
 
   if (filter) currentInterviewView = ["upcoming", "past", "all"].includes(filter) ? filter : "upcoming";
   const groups = getInterviewGroups();
-  const interviews = groups[currentInterviewView] || groups.upcoming;
+  const upcoming = groups.upcoming;
+  const past = groups.past;
 
-  document.querySelectorAll("[data-interview-view]").forEach((button) => {
-    button.classList.toggle("active", button.dataset.interviewView === currentInterviewView);
-  });
+  renderInterviewWeekStrip();
 
-  ["upcoming", "past", "all"].forEach((view) => {
-    const counter = document.getElementById(`interview-count-${view}`);
-    if (counter) counter.textContent = groups[view].length;
-  });
+  grid.innerHTML = `
+    <section class="interview-section">
+      <div class="interview-section-header">
+        <div>
+          <p class="eyebrow">${escapeHTML(t("interviews.views.upcoming"))}</p>
+          <h3>${escapeHTML(t("interviews.upcomingTitle"))}</h3>
+        </div>
+        <span>${escapeHTML(upcoming.length)}</span>
+      </div>
+      ${upcoming.length
+        ? `<div class="interview-list">${upcoming.map(renderInterviewCard).join("")}</div>`
+        : `<div class="interview-empty-inline glass-card">${escapeHTML(t("interviews.empty.upcomingBody"))}</div>`}
+    </section>
 
-  grid.innerHTML = interviews.map(renderInterviewCard).join("");
-  empty.classList.toggle("hidden", interviews.length > 0);
-
-  if (!interviews.length) {
-    const title = empty.querySelector("h2");
-    const body = empty.querySelector("p");
-    if (title) title.textContent = t(`interviews.empty.${currentInterviewView}Title`);
-    if (body) body.textContent = t(`interviews.empty.${currentInterviewView}Body`);
-  }
+    <details class="interview-past-section glass-card">
+      <summary>
+        <span>${escapeHTML(t("interviews.pastTitle"))}</span>
+        <strong>${escapeHTML(past.length)}</strong>
+      </summary>
+      ${past.length
+        ? `<div class="interview-list interview-past-list">${past.map(renderInterviewCard).join("")}</div>`
+        : `<p>${escapeHTML(t("interviews.empty.pastBody"))}</p>`}
+    </details>
+  `;
+  empty.classList.add("hidden");
 
   safeInitIcons();
 }
@@ -4190,6 +4266,7 @@ function bindInterviewsEvents() {
 
       if (action === "edit") openEditInterviewModal(interviewId);
       if (action === "delete") deleteInterview(interviewId);
+      if (action === "prepare") prepareForInterview(interviewId);
     });
   }
 }

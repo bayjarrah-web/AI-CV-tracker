@@ -2136,6 +2136,256 @@ textarea:focus {
   font-weight: 800;
 }
 
+.interview-week-strip {
+  display: grid;
+  gap: 16px;
+  border-radius: 22px;
+  padding: clamp(16px, 4vw, 22px);
+  border-color: rgba(96, 165, 250, 0.18);
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.13), rgba(56, 189, 248, 0.04) 42%, rgba(2, 6, 23, 0.42)),
+    rgba(8, 18, 32, 0.58);
+  box-shadow:
+    0 22px 70px rgba(0, 0, 0, 0.28),
+    0 0 42px rgba(59, 130, 246, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.interview-week-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.interview-week-header h3,
+.interview-section-header h3 {
+  font-size: clamp(1.12rem, 3vw, 1.55rem);
+}
+
+.interview-week-header > span {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.interview-week-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.interview-week-day {
+  position: relative;
+  display: grid;
+  min-height: 92px;
+  align-content: center;
+  justify-items: center;
+  gap: 6px;
+  border: 1px solid rgba(96, 165, 250, 0.11);
+  border-radius: 18px;
+  background: rgba(2, 6, 23, 0.34);
+}
+
+.interview-week-day span {
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.interview-week-day strong {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+}
+
+.interview-week-day i,
+.interview-week-day small {
+  display: grid;
+  width: 8px;
+  height: 8px;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  font-style: normal;
+}
+
+.interview-week-day small {
+  width: 24px;
+  height: 24px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.36);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.interview-week-day.today {
+  border-color: rgba(56, 189, 248, 0.34);
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.interview-week-day.has-interview {
+  border-color: rgba(56, 189, 248, 0.28);
+}
+
+.interview-section {
+  display: grid;
+  gap: 14px;
+}
+
+.interview-section-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  padding-inline: 4px;
+}
+
+.interview-section-header > span,
+.interview-past-section summary strong {
+  display: grid;
+  min-width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: var(--radius-pill);
+  color: #b9d6ff;
+  background: rgba(37, 99, 235, 0.12);
+  font-family: var(--font-mono);
+  font-weight: 900;
+}
+
+.interview-list {
+  display: grid;
+  gap: 12px;
+}
+
+.interview-assistant-card {
+  border-radius: 22px;
+  padding: clamp(15px, 3vw, 20px);
+  border-color: rgba(96, 165, 250, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 48%),
+    rgba(8, 18, 32, 0.62);
+}
+
+.interview-assistant-card::before {
+  width: 2px;
+  background: linear-gradient(180deg, #38bdf8, rgba(37, 99, 235, 0.16));
+}
+
+.interview-assistant-card .job-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.interview-primary-actions,
+.interview-secondary-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.interview-primary-actions .btn,
+.interview-secondary-actions .btn {
+  min-height: 38px;
+}
+
+.interview-primary-actions .btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.interview-secondary-actions {
+  opacity: 0.78;
+}
+
+.interview-empty-inline {
+  border-radius: 18px;
+  padding: 18px;
+  color: var(--text-secondary);
+  font-weight: 800;
+}
+
+.interview-past-section {
+  display: grid;
+  gap: 12px;
+  border-radius: 22px;
+  padding: 14px;
+}
+
+.interview-past-section summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-weight: 900;
+  list-style: none;
+}
+
+.interview-past-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.interview-past-section > p {
+  color: var(--text-secondary);
+  font-weight: 800;
+}
+
+.interview-past-list {
+  padding-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .interview-week-days {
+    grid-template-columns: repeat(7, minmax(62px, 1fr));
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .interview-week-day {
+    min-height: 82px;
+  }
+
+  .interview-assistant-card .job-actions,
+  .interview-primary-actions,
+  .interview-secondary-actions {
+    width: 100%;
+  }
+
+  .interview-primary-actions .btn,
+  .interview-secondary-actions .btn {
+    flex: 1 1 140px;
+  }
+}
+
+@media (max-width: 430px) {
+  .interview-week-strip,
+  .interview-assistant-card,
+  .interview-past-section {
+    border-radius: 18px;
+  }
+
+  .interview-card-top {
+    display: grid;
+  }
+
+  .interview-date-chip {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 .job-card-top {
   display: flex;
   align-items: flex-start;
@@ -4494,4 +4744,30 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-option {
   .settings-seg-btn.active:active::after {
     animation: none;
   }
+}
+
+/* Phase 6: focused interviews assistant */
+body:not(:has(#onboarding-screen:not(.hidden))) .interviews-grid {
+  grid-template-columns: 1fr;
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .interview-week-strip {
+  border-color: rgba(96, 165, 250, 0.18);
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.13), rgba(56, 189, 248, 0.04) 42%, rgba(2, 6, 23, 0.42)),
+    rgba(8, 18, 32, 0.58);
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .interview-assistant-card {
+  border-color: rgba(96, 165, 250, 0.16);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 48%),
+    rgba(8, 18, 32, 0.62);
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .interview-past-section {
+  border-color: rgba(96, 165, 250, 0.13);
+  border-radius: 22px;
+  background: rgba(8, 18, 32, 0.52);
 }

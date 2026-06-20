@@ -10,7 +10,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260619-06">
+  <link rel="stylesheet" href="styles.css?v=20260619-07">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
@@ -216,20 +216,7 @@
               </button>
             </div>
 
-            <div class="interview-inner-tabs glass-card" role="tablist" aria-label="Interview views">
-              <button class="interview-tab active" type="button" data-interview-view="upcoming">
-                <span data-i18n="interviews.views.upcoming">القادمة</span>
-                <strong id="interview-count-upcoming">0</strong>
-              </button>
-              <button class="interview-tab" type="button" data-interview-view="past">
-                <span data-i18n="interviews.views.past">السابقة</span>
-                <strong id="interview-count-past">0</strong>
-              </button>
-              <button class="interview-tab" type="button" data-interview-view="all">
-                <span data-i18n="interviews.views.all">الكل</span>
-                <strong id="interview-count-all">0</strong>
-              </button>
-            </div>
+            <div class="interview-week-strip glass-card" id="interview-week-strip" aria-label="Interview week overview"></div>
 
             <div class="interviews-grid" id="interviews-grid"></div>
             <div class="empty-state glass-card hidden" id="interviews-empty-state">
@@ -506,7 +493,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260619-06"></script>
-  <script src="app.js?v=20260619-06"></script>
+  <script src="translations.js?v=20260619-07"></script>
+  <script src="app.js?v=20260619-07"></script>
 </body>
 </html>

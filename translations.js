@@ -626,7 +626,15 @@ const TRANSLATIONS = {
       openMeeting: "فتح الاجتماع",
       joinMeeting: "دخول الاجتماع",
       openMap: "فتح الخريطة",
+      prepare: "تحضير",
+      upcomingTitle: "المقابلات القادمة",
+      pastTitle: "المقابلات السابقة",
       confirmDelete: "هل تريد حذف هذه المقابلة نهائياً؟",
+      week: {
+        kicker: "الأسبوع القادم",
+        title: "نظرة سريعة على مقابلاتك",
+        today: "اليوم"
+      },
       modal: {
         kicker: "تفاصيل المقابلة",
         addTitle: "إضافة مقابلة",
@@ -1325,7 +1333,15 @@ const TRANSLATIONS = {
       openMeeting: "Open Meeting",
       joinMeeting: "Join Meeting",
       openMap: "Open Map",
+      prepare: "Prepare",
+      upcomingTitle: "Upcoming Interviews",
+      pastTitle: "Past Interviews",
       confirmDelete: "Delete this interview permanently?",
+      week: {
+        kicker: "Next 7 days",
+        title: "Your interview week at a glance",
+        today: "Today"
+      },
       modal: {
         kicker: "Interview details",
         addTitle: "Add Interview",
