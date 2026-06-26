@@ -74,9 +74,10 @@ let highlightedJobId = null;
 let editingInterviewId = null;
 let currentInterviewView = "upcoming";
 let selectedInterviewDate = "";
-let analyzerMode = "cv_review";
+let analyzerMode = "job_match";
 let analyzerCvText = "";
 let analyzerCvFileName = "";
+let analyzerInterviewPrefill = null;
 let isAnalyzing = false;
 let lastAnalysisTime = 0;
 let statusChart = null;
@@ -2012,6 +2013,15 @@ function renderInterviewPrimaryActions(interview) {
 function prepareForInterview(interviewId) {
   const interview = AppState.interviews.find((item) => item.id === interviewId);
   if (!interview) return;
+  analyzerMode = "interview_prep";
+  analyzerInterviewPrefill = {
+    company: interview.company || "",
+    position: interview.jobTitle || "",
+    interviewType: ["technical"].includes(interview.roundType) ? "technical" : interview.roundType === "managerial" ? "manager" : "hr",
+    interviewerName: interview.interviewerName || "",
+    interviewerTitle: interview.interviewerTitle || "",
+    notes: interview.preparationNotes || interview.notes || ""
+  };
   switchTab("analyzer");
 }
 
@@ -3232,20 +3242,41 @@ function limitCvText(text) {
   return source.slice(0, MAX_CV_TEXT_CHARS);
 }
 
-function buildAnalyzerPrompt(mode, cvText, job) {
+function buildAnalyzerPrompt(mode, cvText, payload = {}) {
   const lang = AppState.language === "ar" ? "Arabic" : "English";
   const header = `You are an expert career coach and ATS specialist. Respond ONLY in ${lang}. Use clean Markdown with headings, bullet points, and a final summary. Be specific and actionable.`;
 
-  if (mode === "job_match" && job) {
-    const jobInfo = [
-      `Job Title: ${job.jobTitle}`,
-      `Company: ${job.company}`,
-      `Location: ${job.location}`,
-      `Type: ${job.jobType}`,
-      job.notes ? `Job Notes/Description: ${job.notes}` : ""
-    ].filter(Boolean).join("\n");
+  if (mode === "job_match") {
+    const jobDescription = payload.jobDescription || "";
+    const sections = [
+      t("analyzer.matchScore"),
+      t("analyzer.strongPoints"),
+      t("analyzer.missingKeywords"),
+      t("analyzer.weakPoints"),
+      t("analyzer.suggestedCvImprovements")
+    ].join(", ");
 
-    return `${header}\n\nTask: Compare the following CV against this job and give a match score out of 100, matched skills, missing skills, and concrete improvement tips.\n\n--- JOB ---\n${jobInfo}\n\n--- CV ---\n${cvText}`;
+    return `${header}\n\nTask: Compare the CV against the job description. Structure the answer with exactly these section headings: ${sections}. Give a score out of 100 and practical edits.\n\n--- JOB DESCRIPTION ---\n${jobDescription}\n\n--- CV ---\n${cvText}`;
+  }
+
+  if (mode === "interview_prep") {
+    const interviewInfo = [
+      payload.company ? `Company: ${payload.company}` : "",
+      payload.position ? `Position: ${payload.position}` : "",
+      payload.interviewType ? `Interview Type: ${payload.interviewType}` : "",
+      payload.interviewerName ? `Interviewer Name: ${payload.interviewerName}` : "",
+      payload.interviewerTitle ? `Interviewer Title: ${payload.interviewerTitle}` : "",
+      payload.notes ? `Notes: ${payload.notes}` : ""
+    ].filter(Boolean).join("\n");
+    const sections = [
+      t("analyzer.expectedQuestions"),
+      t("analyzer.bestTalkingPoints"),
+      t("analyzer.roleCompanyFocus"),
+      t("analyzer.weakAreasToPrepare"),
+      t("analyzer.shortSelfIntroduction")
+    ].join(", ");
+
+    return `${header}\n\nTask: Prepare the candidate for the following interview using their CV. Structure the answer with exactly these section headings: ${sections}. Keep it concrete and interview-ready.\n\n--- INTERVIEW ---\n${interviewInfo}\n\n--- CV ---\n${cvText}`;
   }
 
   if (mode === "career") {
@@ -3349,7 +3380,6 @@ function renderAnalyzerReadiness() {
   if (!panel) return;
 
   const apiKeySet = Boolean(getGeminiApiKey());
-  const activeJobs = getActiveJobs();
   const storedCv = getStoredCv();
 
   if (!analyzerCvText && storedCv?.text) {
@@ -3358,33 +3388,42 @@ function renderAnalyzerReadiness() {
   }
 
   const modes = [
-    { id: "cv_review", icon: "file-check", title: t("analyzer.modeCvReview"), desc: t("analyzer.modeCvReviewDesc") },
     { id: "job_match", icon: "target", title: t("analyzer.modeJobMatch"), desc: t("analyzer.modeJobMatchDesc") },
-    { id: "career", icon: "compass", title: t("analyzer.modeCareer"), desc: t("analyzer.modeCareerDesc") }
+    { id: "interview_prep", icon: "messages-square", title: t("analyzer.modeInterviewPrep"), desc: t("analyzer.modeInterviewPrepDesc") }
   ];
+  const prefill = analyzerInterviewPrefill || {};
 
   panel.innerHTML = `
-    <section class="analyzer-panel">
+    <section class="analyzer-panel analyzer-simple-panel">
       <div class="analyzer-hero glass-card">
         <div class="foundation-icon"><i data-lucide="brain"></i></div>
         <div>
           <p class="eyebrow">${escapeHTML(t("analyzer.kicker"))}</p>
-          <h2>${escapeHTML(t("analyzer.title"))}</h2>
-          <p>${escapeHTML(t("analyzer.subtitle"))}</p>
+          <h2>${escapeHTML(t("analyzer.simpleTitle"))}</h2>
+          <p>${escapeHTML(t("analyzer.simpleSubtitle"))}</p>
         </div>
       </div>
 
-      <section class="analyzer-card glass-card">
+      <section class="analyzer-card analyzer-compact-card glass-card">
         <div class="g-section-header">
           <h3>${escapeHTML(t("analyzer.apiSectionTitle"))}</h3>
           <span class="g-chip ${apiKeySet ? "is-ready" : ""}">${escapeHTML(apiKeySet ? t("analyzer.apiKeySet") : t("analyzer.apiKeyNotSet"))}</span>
         </div>
-        <p class="g-muted">${escapeHTML(t("analyzer.apiHint"))}</p>
         <div class="analyzer-api-row">
           <input id="analyzer-api-key" type="password" placeholder="${escapeHTML(t("analyzer.apiPlaceholder"))}" value="${escapeHTML(getGeminiApiKey())}">
           <button class="btn btn-primary" type="button" id="analyzer-save-key">${escapeHTML(t("analyzer.apiSave"))}</button>
         </div>
-        <a class="btn btn-link btn-small" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">${escapeHTML(t("analyzer.getApiKey"))}</a>
+        <p class="g-muted">${escapeHTML(t("analyzer.apiHint"))} <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">${escapeHTML(t("analyzer.getApiKey"))}</a></p>
+      </section>
+
+      <section class="analyzer-card glass-card">
+        <div class="g-section-header"><h3>${escapeHTML(t("analyzer.cvSource"))}</h3></div>
+        <label class="upload-box" for="analyzer-cv-file">
+          <span class="upload-icon">PDF</span>
+          <strong>${escapeHTML(t("analyzer.uploadCv"))}</strong>
+          <small id="analyzer-cv-name">${escapeHTML(analyzerCvFileName || (storedCv?.name ? `${t("analyzer.usingStoredCv")} · ${storedCv.name}` : t("analyzer.uploadCvToStart")))}</small>
+          <input id="analyzer-cv-file" type="file" accept="application/pdf">
+        </label>
       </section>
 
       <section class="analyzer-card glass-card">
@@ -3399,27 +3438,45 @@ function renderAnalyzerReadiness() {
           `).join("")}
         </div>
 
-        <div class="analyzer-mode-extra${analyzerMode === "job_match" ? "" : " hidden"}" id="analyzer-job-select-wrap">
+        <div class="analyzer-mode-form${analyzerMode === "job_match" ? "" : " hidden"}" data-analyzer-form="job_match">
           <label class="field">
-            <span>${escapeHTML(t("analyzer.selectJob"))}</span>
-            <select id="analyzer-job-select">
-              <option value="">${escapeHTML(t("analyzer.selectJobPlaceholder"))}</option>
-              ${activeJobs.map((job) => `<option value="${escapeHTML(job.id)}">${escapeHTML(job.jobTitle)} · ${escapeHTML(job.company)}</option>`).join("")}
-            </select>
+            <span>${escapeHTML(t("analyzer.jobDescription"))}</span>
+            <textarea id="analyzer-job-description" rows="8" placeholder="${escapeHTML(t("analyzer.jobDescriptionPlaceholder"))}"></textarea>
           </label>
-          ${activeJobs.length ? "" : `<p class="g-muted">${escapeHTML(t("analyzer.noJobsForMatch"))}</p>`}
+          <button class="btn btn-primary analyzer-run-btn" type="button" data-analyzer-run>${escapeHTML(t("analyzer.analyzeJobMatch"))}</button>
         </div>
-      </section>
 
-      <section class="analyzer-card glass-card">
-        <div class="g-section-header"><h3>${escapeHTML(t("analyzer.cvSource"))}</h3></div>
-        <label class="upload-box" for="analyzer-cv-file">
-          <span class="upload-icon">PDF</span>
-          <strong>${escapeHTML(t("analyzer.uploadCv"))}</strong>
-          <small id="analyzer-cv-name">${escapeHTML(analyzerCvFileName || (storedCv?.name ? `${t("analyzer.usingStoredCv")} · ${storedCv.name}` : t("analyzer.uploadHint")))}</small>
-          <input id="analyzer-cv-file" type="file" accept="application/pdf">
-        </label>
-        <button class="btn btn-primary analyzer-run-btn" type="button" id="analyzer-run">${escapeHTML(t("analyzer.analyzeButton"))}</button>
+        <div class="analyzer-mode-form${analyzerMode === "interview_prep" ? "" : " hidden"}" data-analyzer-form="interview_prep">
+          <div class="form-grid two-columns">
+            <label class="field">
+              <span>${escapeHTML(t("analyzer.company"))}</span>
+              <input id="analyzer-company" type="text" value="${escapeHTML(prefill.company || "")}">
+            </label>
+            <label class="field">
+              <span>${escapeHTML(t("analyzer.position"))}</span>
+              <input id="analyzer-position" type="text" value="${escapeHTML(prefill.position || "")}">
+            </label>
+            <label class="field">
+              <span>${escapeHTML(t("analyzer.interviewType"))}</span>
+              <select id="analyzer-interview-type">
+                ${["hr", "technical", "manager"].map((type) => `<option value="${escapeHTML(type)}"${(prefill.interviewType || "hr") === type ? " selected" : ""}>${escapeHTML(t(`analyzer.interviewTypes.${type}`))}</option>`).join("")}
+              </select>
+            </label>
+            <label class="field">
+              <span>${escapeHTML(t("analyzer.interviewerName"))}</span>
+              <input id="analyzer-interviewer-name" type="text" value="${escapeHTML(prefill.interviewerName || "")}">
+            </label>
+            <label class="field">
+              <span>${escapeHTML(t("analyzer.interviewerTitle"))}</span>
+              <input id="analyzer-interviewer-title" type="text" value="${escapeHTML(prefill.interviewerTitle || "")}">
+            </label>
+          </div>
+          <label class="field">
+            <span>${escapeHTML(t("jobs.fields.notes"))}</span>
+            <textarea id="analyzer-interview-notes" rows="4">${escapeHTML(prefill.notes || "")}</textarea>
+          </label>
+          <button class="btn btn-primary analyzer-run-btn" type="button" data-analyzer-run>${escapeHTML(t("analyzer.prepareForInterview"))}</button>
+        </div>
       </section>
 
       <section class="analyzer-card glass-card hidden" id="analyzer-result-card">
@@ -3430,12 +3487,8 @@ function renderAnalyzerReadiness() {
         <div class="analyzer-result markdown-body" id="analyzer-result-body"></div>
       </section>
 
-      <section class="analyzer-card glass-card">
-        <div class="g-section-header">
-          <h3>${escapeHTML(t("analyzer.savedTitle"))}</h3>
-          <span class="g-chip">${escapeHTML(AppState.analyses.length)}</span>
-        </div>
-        <div id="analyzer-saved-list">${renderSavedAnalysesList()}</div>
+      <section class="analyzer-card analyzer-empty-result glass-card" id="analyzer-empty-result">
+        <strong>${escapeHTML(analyzerCvText ? t("analyzer.chooseModeRun") : t("analyzer.uploadCvToStart"))}</strong>
       </section>
     </section>
   `;
@@ -3468,16 +3521,18 @@ function renderSavedAnalysesList() {
 }
 
 function setAnalyzerMode(mode) {
-  analyzerMode = ["cv_review", "job_match", "career"].includes(mode) ? mode : "cv_review";
+  analyzerMode = ["job_match", "interview_prep"].includes(mode) ? mode : "job_match";
   renderAnalyzerReadiness();
 }
 
 function showAnalyzerResult(markdown) {
   const card = document.getElementById("analyzer-result-card");
   const body = document.getElementById("analyzer-result-body");
+  const empty = document.getElementById("analyzer-empty-result");
   if (!card || !body) return;
   body.innerHTML = safeRenderMarkdown(markdown);
   card.classList.remove("hidden");
+  if (empty) empty.classList.add("hidden");
   card.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -3513,6 +3568,8 @@ async function handleAnalyzerCvUpload(event) {
       updatedAt: todayISO()
     });
     if (nameLabel) nameLabel.textContent = file.name;
+    const emptyState = document.querySelector("#analyzer-empty-result strong");
+    if (emptyState) emptyState.textContent = t("analyzer.chooseModeRun");
   } catch (error) {
     console.error(error);
     showToast("analyzer.errorPdfFailed");
@@ -3520,7 +3577,39 @@ async function handleAnalyzerCvUpload(event) {
   }
 }
 
-async function runAnalysis() {
+function getAnalyzerPayload() {
+  if (analyzerMode === "interview_prep") {
+    return {
+      company: document.getElementById("analyzer-company")?.value.trim() || "",
+      position: document.getElementById("analyzer-position")?.value.trim() || "",
+      interviewType: document.getElementById("analyzer-interview-type")?.value || "hr",
+      interviewerName: document.getElementById("analyzer-interviewer-name")?.value.trim() || "",
+      interviewerTitle: document.getElementById("analyzer-interviewer-title")?.value.trim() || "",
+      notes: document.getElementById("analyzer-interview-notes")?.value.trim() || ""
+    };
+  }
+
+  return {
+    jobDescription: document.getElementById("analyzer-job-description")?.value.trim() || ""
+  };
+}
+
+function validateAnalyzerPayload(payload) {
+  if (!analyzerCvText) return "analyzer.errorNoCv";
+  if (analyzerMode === "job_match" && !payload.jobDescription) return "analyzer.errorNoJobDescription";
+  if (analyzerMode === "interview_prep" && (!payload.interviewType || (!payload.company && !payload.position))) {
+    return "analyzer.errorNoInterviewInfo";
+  }
+  return "";
+}
+
+function getAnalyzerRunLabel() {
+  return analyzerMode === "interview_prep"
+    ? t("analyzer.prepareForInterview")
+    : t("analyzer.analyzeJobMatch");
+}
+
+async function runAnalysis(runButton = null) {
   if (isAnalyzing) return;
 
   const now = Date.now();
@@ -3533,22 +3622,13 @@ async function runAnalysis() {
     showToast("analyzer.errorNoApiKey");
     return;
   }
-  if (!analyzerCvText) {
-    showToast("analyzer.errorNoCv");
+  const payload = getAnalyzerPayload();
+  const validationError = validateAnalyzerPayload(payload);
+  if (validationError) {
+    showToast(validationError);
     return;
   }
 
-  let job = null;
-  if (analyzerMode === "job_match") {
-    const jobId = document.getElementById("analyzer-job-select")?.value || "";
-    job = AppState.jobs.find((item) => item.id === jobId);
-    if (!job) {
-      showToast("analyzer.errorNoJob");
-      return;
-    }
-  }
-
-  const runButton = document.getElementById("analyzer-run");
   isAnalyzing = true;
   lastAnalysisTime = now;
   if (runButton) {
@@ -3557,13 +3637,15 @@ async function runAnalysis() {
   }
 
   try {
-    const prompt = buildAnalyzerPrompt(analyzerMode, analyzerCvText, job);
+    const prompt = buildAnalyzerPrompt(analyzerMode, analyzerCvText, payload);
     const resultText = await callGemini(prompt);
 
     const analysis = {
       id: uuid(),
       mode: analyzerMode,
-      title: job ? `${job.jobTitle} · ${job.company}` : t(`analyzer.modeLabels.${analyzerMode}`),
+      title: analyzerMode === "interview_prep"
+        ? [payload.position, payload.company].filter(Boolean).join(" · ") || t("analyzer.modeInterviewPrep")
+        : t("analyzer.modeJobMatch"),
       content: resultText,
       date: todayISO(),
       createdAt: todayISO()
@@ -3573,8 +3655,6 @@ async function runAnalysis() {
     AppState.saveAnalyses();
     showAnalyzerResult(resultText);
 
-    const savedList = document.getElementById("analyzer-saved-list");
-    if (savedList) savedList.innerHTML = renderSavedAnalysesList();
     safeInitIcons();
   } catch (error) {
     console.error(error);
@@ -3589,7 +3669,7 @@ async function runAnalysis() {
     isAnalyzing = false;
     if (runButton) {
       runButton.disabled = false;
-      runButton.textContent = t("analyzer.analyzeButton");
+      runButton.textContent = getAnalyzerRunLabel();
     }
   }
 }
@@ -3639,8 +3719,9 @@ function bindAnalyzerEvents() {
       return;
     }
 
-    if (event.target.closest("#analyzer-run")) {
-      runAnalysis();
+    const runButton = event.target.closest("[data-analyzer-run]");
+    if (runButton) {
+      runAnalysis(runButton);
       return;
     }
 
@@ -4055,9 +4136,10 @@ async function deleteAllData() {
   JobFilters.source = "all";
   currentInterviewView = "upcoming";
   StatsFilters.period = "all";
-  analyzerMode = "cv_review";
+  analyzerMode = "job_match";
   analyzerCvText = "";
   analyzerCvFileName = "";
+  analyzerInterviewPrefill = null;
   pendingImport = null;
   pendingImportRaw = null;
 
