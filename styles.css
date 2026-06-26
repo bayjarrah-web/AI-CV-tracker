@@ -2455,6 +2455,17 @@ textarea:focus {
 }
 
 @media (max-width: 768px) {
+  .settings-modal-api-row,
+  .settings-modal-actions,
+  .settings-modal-reset {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-modal-actions .btn,
+  .settings-modal-reset .btn {
+    width: 100%;
+  }
+
   .stats-simple-kpi-grid,
   .stats-simple-grid {
     grid-template-columns: 1fr;
@@ -3418,6 +3429,78 @@ textarea:focus-visible,
 .settings-panel {
   display: grid;
   gap: 16px;
+}
+
+.settings-modal-box {
+  width: min(620px, calc(100vw - 28px));
+  max-height: min(760px, calc(100vh - 28px));
+  overflow: auto;
+  border-radius: 24px;
+  padding: 0;
+}
+
+.settings-modal-shell {
+  display: grid;
+  gap: 14px;
+  padding: clamp(16px, 4vw, 22px);
+}
+
+.settings-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-modal-header h2 {
+  font-size: clamp(1.35rem, 4vw, 1.9rem);
+}
+
+.settings-modal-section {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(96, 165, 250, 0.14);
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(8, 18, 32, 0.46);
+}
+
+.settings-modal-section h3 {
+  font-size: 1rem;
+}
+
+.settings-modal-api-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+}
+
+.settings-modal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.settings-modal-reset {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  border-top: 1px solid rgba(96, 165, 250, 0.12);
+  padding-top: 12px;
+}
+
+.settings-modal-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.settings-modal-info strong {
+  color: #b9d6ff;
 }
 
 .settings-hero {

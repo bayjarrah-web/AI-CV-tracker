@@ -78,6 +78,7 @@ let analyzerMode = "job_match";
 let analyzerCvText = "";
 let analyzerCvFileName = "";
 let analyzerInterviewPrefill = null;
+let settingsModalReturnFocus = null;
 let isAnalyzing = false;
 let lastAnalysisTime = 0;
 let statusChart = null;
@@ -3776,6 +3777,246 @@ function renderSettingsReadiness() {
   renderSettings();
 }
 
+function renderSettingsModal() {
+  const content = document.getElementById("settings-modal-content");
+  if (!content) return;
+
+  const apiKeySet = Boolean(getGeminiApiKey());
+  content.innerHTML = `
+    <div class="settings-modal-shell">
+      <div class="settings-modal-header">
+        <div>
+          <p class="eyebrow">${escapeHTML(t("settings.kicker"))}</p>
+          <h2 id="settings-modal-title">${escapeHTML(t("settings.modalTitle"))}</h2>
+        </div>
+        <button class="icon-btn" type="button" data-settings-modal-close aria-label="${escapeHTML(t("settings.closeSettings"))}">×</button>
+      </div>
+
+      <section class="settings-modal-section">
+        <h3>${escapeHTML(t("settings.language"))}</h3>
+        <div class="settings-segment" role="group" aria-label="${escapeHTML(t("settings.language"))}">
+          <button class="settings-seg-btn${AppState.language === "ar" ? " active" : ""}" type="button" data-settings-modal-language="ar">عربي</button>
+          <button class="settings-seg-btn${AppState.language === "en" ? " active" : ""}" type="button" data-settings-modal-language="en">English</button>
+        </div>
+      </section>
+
+      <section class="settings-modal-section">
+        <div class="g-section-header">
+          <h3>${escapeHTML(t("settings.geminiApiSettings"))}</h3>
+          <span class="settings-status-badge ${apiKeySet ? "active" : "missing"}">${escapeHTML(apiKeySet ? t("settings.apiActive") : t("settings.apiNotSetShort"))}</span>
+        </div>
+        <p class="g-muted">${escapeHTML(t("settings.apiLocalBrowser"))}</p>
+        <div class="settings-modal-api-row">
+          <input class="settings-input" id="settings-modal-api-key" type="password" placeholder="${escapeHTML(t("settings.apiInputPlaceholder"))}" value="${escapeHTML(getGeminiApiKey())}">
+          <button class="btn btn-primary" type="button" data-settings-modal-action="save-api">${escapeHTML(t("settings.saveApiKey"))}</button>
+          <button class="btn btn-secondary" type="button" data-settings-modal-action="clear-api"${apiKeySet ? "" : " disabled"}>${escapeHTML(t("settings.removeApiKey"))}</button>
+        </div>
+      </section>
+
+      <section class="settings-modal-section">
+        <h3>${escapeHTML(t("settings.data"))}</h3>
+        <div class="settings-modal-actions">
+          <button class="btn btn-primary" type="button" data-settings-modal-action="export">${escapeHTML(t("settings.exportData"))}</button>
+          <button class="btn btn-secondary" type="button" data-settings-modal-action="choose-import">${escapeHTML(t("settings.importData"))}</button>
+          <input class="settings-file-input" id="settings-modal-import-file" type="file" accept="application/json,.json">
+        </div>
+        <div class="import-preview hidden" id="settings-modal-import-preview">
+          <h4>${escapeHTML(t("settings.importPreview"))}</h4>
+          <div class="import-preview-grid" id="settings-modal-import-summary"></div>
+          <div class="settings-actions">
+            <button class="btn btn-secondary" type="button" data-settings-modal-action="import-merge">${escapeHTML(t("settings.mergeExisting"))}</button>
+            <button class="btn btn-danger" type="button" data-settings-modal-action="import-replace">${escapeHTML(t("settings.replaceExisting"))}</button>
+          </div>
+        </div>
+        <div class="settings-modal-reset">
+          <input class="settings-input" id="settings-modal-delete-confirm" type="text" placeholder="${escapeHTML(t("settings.deleteAllConfirm"))}">
+          <button class="btn btn-danger" type="button" data-settings-modal-action="reset-data">${escapeHTML(t("settings.resetData"))}</button>
+        </div>
+      </section>
+
+      <section class="settings-modal-info">
+        <span>AI CV Tracker</span>
+        <strong>${escapeHTML(t("settings.localBrowserStorage"))}</strong>
+      </section>
+
+      <div id="settings-toast-region" aria-live="polite"></div>
+    </div>
+  `;
+
+  safeInitIcons();
+}
+
+function openSettingsModal() {
+  const overlay = document.getElementById("settings-modal-overlay");
+  if (!overlay) return;
+
+  settingsModalReturnFocus = document.activeElement;
+  renderSettingsModal();
+  overlay.classList.remove("hidden");
+  overlay.setAttribute("aria-hidden", "false");
+  document.getElementById("header-settings-button")?.setAttribute("aria-expanded", "true");
+  const closeButton = overlay.querySelector("[data-settings-modal-close]");
+  closeButton?.focus();
+}
+
+function closeSettingsModal() {
+  const overlay = document.getElementById("settings-modal-overlay");
+  if (!overlay) return;
+
+  overlay.classList.add("hidden");
+  overlay.setAttribute("aria-hidden", "true");
+  document.getElementById("header-settings-button")?.setAttribute("aria-expanded", "false");
+  if (settingsModalReturnFocus && typeof settingsModalReturnFocus.focus === "function") {
+    settingsModalReturnFocus.focus();
+  }
+  settingsModalReturnFocus = null;
+}
+
+function trapSettingsModalFocus(event) {
+  if (event.key !== "Tab") return;
+  const overlay = document.getElementById("settings-modal-overlay");
+  if (!overlay || overlay.classList.contains("hidden")) return;
+
+  const focusable = Array.from(overlay.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"))
+    .filter((element) => !element.disabled && element.offsetParent !== null);
+  if (!focusable.length) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function showSettingsModalImportPreview(summary) {
+  const preview = document.getElementById("settings-modal-import-preview");
+  const summaryBox = document.getElementById("settings-modal-import-summary");
+  if (!preview || !summaryBox) return;
+
+  summaryBox.innerHTML = `
+    <div><span>Jobs</span><strong>${escapeHTML(summary.jobs)}</strong></div>
+    <div><span>Interviews</span><strong>${escapeHTML(summary.interviews)}</strong></div>
+    <div><span>Analyses</span><strong>${escapeHTML(summary.analyses)}</strong></div>
+    <div><span>User</span><strong>${escapeHTML(summary.hasUser ? t("settings.present") : t("settings.absent"))}</strong></div>
+    <div><span>Settings</span><strong>${escapeHTML(summary.hasSettings ? t("settings.present") : t("settings.absent"))}</strong></div>
+  `;
+  preview.classList.remove("hidden");
+}
+
+async function handleSettingsModalImportFile(file) {
+  if (!file) {
+    showSettingsToast("settings.invalidBackupFile", "error");
+    return;
+  }
+
+  try {
+    pendingImportRaw = await readImportFile(file);
+    pendingImport = validateImportData(pendingImportRaw);
+    if (!pendingImport) {
+      showSettingsToast("settings.invalidBackupFile", "error");
+      return;
+    }
+    showSettingsModalImportPreview(getImportSummary(pendingImport));
+  } catch (error) {
+    console.error(error);
+    pendingImport = null;
+    pendingImportRaw = null;
+    showSettingsToast("settings.invalidBackupFile", "error");
+  }
+}
+
+async function confirmSettingsModalImport(mode) {
+  if (!pendingImport) return;
+  const confirmKey = mode === "replace" ? "settings.confirmImportReplace" : "settings.confirmImportMerge";
+  const confirmed = await confirmDangerAction(confirmKey);
+  if (!confirmed) return;
+
+  importData(pendingImport, mode);
+  pendingImport = null;
+  pendingImportRaw = null;
+  showSettingsToast("settings.importCompleted", "success");
+  renderSettingsModal();
+}
+
+function bindSettingsModalEvents() {
+  const overlay = document.getElementById("settings-modal-overlay");
+  if (!overlay || overlay.dataset.settingsModalEventsBound === "true") return;
+  overlay.dataset.settingsModalEventsBound = "true";
+
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay || event.target.closest("[data-settings-modal-close]")) {
+      closeSettingsModal();
+      return;
+    }
+
+    const languageButton = event.target.closest("[data-settings-modal-language]");
+    if (languageButton) {
+      setLanguage(languageButton.dataset.settingsModalLanguage);
+      renderSettingsModal();
+      return;
+    }
+
+    const actionButton = event.target.closest("[data-settings-modal-action]");
+    if (!actionButton) return;
+    const action = actionButton.dataset.settingsModalAction;
+
+    if (action === "save-api") {
+      const input = document.getElementById("settings-modal-api-key");
+      setGeminiApiKey(input?.value || "");
+      showSettingsToast("analyzer.apiSaved", "success");
+      renderSettingsModal();
+      return;
+    }
+
+    if (action === "clear-api") {
+      setGeminiApiKey("");
+      showSettingsToast("settings.apiCleared", "success");
+      renderSettingsModal();
+      return;
+    }
+
+    if (action === "export") {
+      exportData("all");
+      return;
+    }
+
+    if (action === "choose-import") {
+      document.getElementById("settings-modal-import-file")?.click();
+      return;
+    }
+
+    if (action === "import-merge") {
+      confirmSettingsModalImport("merge");
+      return;
+    }
+
+    if (action === "import-replace") {
+      confirmSettingsModalImport("replace");
+      return;
+    }
+
+    if (action === "reset-data") {
+      deleteAllData();
+    }
+  });
+
+  overlay.addEventListener("change", (event) => {
+    if (event.target.id === "settings-modal-import-file") {
+      handleSettingsModalImportFile(event.target.files?.[0]);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (overlay.classList.contains("hidden")) return;
+    if (event.key === "Escape") closeSettingsModal();
+    trapSettingsModalFocus(event);
+  });
+}
+
 function settingsCard(title, description, body, extraClass = "") {
   return `
     <section class="settings-card glass-card ${extraClass}">
@@ -4107,7 +4348,7 @@ function resetSettingsOnly() {
 }
 
 async function deleteAllData() {
-  const input = document.getElementById("settings-delete-confirm");
+  const input = document.getElementById("settings-modal-delete-confirm") || document.getElementById("settings-delete-confirm");
   if (!input || input.value.trim() !== "DELETE") {
     showSettingsToast("settings.deleteAllNeedsText", "error");
     return;
@@ -4144,6 +4385,7 @@ async function deleteAllData() {
   pendingImportRaw = null;
 
   applyPreferences();
+  closeSettingsModal();
   document.getElementById("main-app")?.classList.add("hidden");
   onboardingStep = 1;
   populateSuggestionLists();
@@ -4187,7 +4429,9 @@ async function handleSettingsCvUpload(event) {
 }
 
 function showSettingsToast(message, type = "success") {
-  const region = document.getElementById("settings-toast-region");
+  const region =
+    document.querySelector("#settings-modal-overlay:not(.hidden) #settings-toast-region") ||
+    document.getElementById("settings-toast-region");
   if (!region) {
     showToast(message);
     return;
@@ -4537,7 +4781,7 @@ function bindNavigation() {
 
   const settingsButton = document.getElementById("header-settings-button");
   if (settingsButton) {
-    settingsButton.addEventListener("click", () => switchTab("settings"));
+    settingsButton.addEventListener("click", openSettingsModal);
   }
 
   document.querySelectorAll("[data-language-option]").forEach((button) => {
@@ -4550,6 +4794,7 @@ function bindNavigation() {
   bindStatsEvents();
   bindAnalyzerEvents();
   bindSettingsEvents();
+  bindSettingsModalEvents();
 }
 
 function init() {

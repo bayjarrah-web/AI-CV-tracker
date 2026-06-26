@@ -10,7 +10,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260626-01">
+  <link rel="stylesheet" href="styles.css?v=20260626-02">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
@@ -112,7 +112,7 @@
         </div>
         <div class="header-actions">
           <span class="user-chip" id="header-user-name">ضيف</span>
-          <button class="header-icon-button" type="button" id="header-settings-button" aria-label="Settings">
+          <button class="header-icon-button" type="button" id="header-settings-button" aria-label="Settings" aria-haspopup="dialog" aria-expanded="false">
             <i data-lucide="settings"></i>
           </button>
         </div>
@@ -379,6 +379,12 @@
     </div>
   </div>
 
+  <div class="modal-overlay hidden" id="settings-modal-overlay" aria-hidden="true">
+    <div class="modal-box settings-modal-box glass-card" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+      <div id="settings-modal-content"></div>
+    </div>
+  </div>
+
   <div class="modal-overlay hidden" id="modal-overlay" aria-hidden="true">
     <div class="modal-box job-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="job-modal-title">
       <div class="modal-header">
@@ -493,7 +499,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260626-01"></script>
-  <script src="app.js?v=20260626-01"></script>
+  <script src="translations.js?v=20260626-02"></script>
+  <script src="app.js?v=20260626-02"></script>
 </body>
 </html>
