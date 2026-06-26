@@ -489,6 +489,8 @@ const TRANSLATIONS = {
       days: "أيام",
       notAvailable: "غير متاح",
       noDataYet: "لا توجد بيانات بعد",
+      emptyStats: "أضف طلبات لعرض إحصائياتك.",
+      sourcePerformanceLine: "{applications} طلبات · {interviews} مقابلة · {rate}%",
       chartView: "طريقة عرض الرسم",
       chartTypes: {
         bar: "أعمدة",
@@ -1211,6 +1213,8 @@ const TRANSLATIONS = {
       days: "days",
       notAvailable: "N/A",
       noDataYet: "No data yet",
+      emptyStats: "Add applications to see your statistics.",
+      sourcePerformanceLine: "{applications} applications · {interviews} interviews · {rate}%",
       chartView: "Chart view",
       chartTypes: {
         bar: "Bar",

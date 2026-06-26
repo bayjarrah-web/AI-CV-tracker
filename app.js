@@ -2810,6 +2810,7 @@ function getSimplifiedSourcePerformance(jobs = getStatsJobs()) {
     return {
       ...group,
       count: groupJobs.length,
+      interviews,
       interviewRate: toPercent(interviews, groupJobs.length)
     };
   }).filter((group) => group.count > 0).sort((first, second) => second.interviewRate - first.interviewRate || second.count - first.count);
@@ -2831,7 +2832,11 @@ function renderSimplifiedSourcePerformance(data) {
               <div class="source-row">
                 <div>
                   <strong>${escapeHTML(source.label)}</strong>
-                  <span>${escapeHTML(source.count)} ${escapeHTML(t("statsDashboard.applications"))}</span>
+                  <span>${escapeHTML(formatMessage("statsDashboard.sourcePerformanceLine", {
+                    applications: source.count,
+                    interviews: source.interviews,
+                    rate: source.interviewRate
+                  }))}</span>
                 </div>
                 <div class="source-meter" aria-hidden="true"><span style="width: ${escapeHTML(source.interviewRate)}%"></span></div>
                 <em>${escapeHTML(source.interviewRate)}%</em>
@@ -2882,7 +2887,7 @@ function renderStats() {
           </div>
           ${data.total
             ? `${renderStatsChartTypeToggle()}<div class="chart-wrap"><canvas id="stats-simple-chart"></canvas></div>`
-            : `<div class="today-positive-state muted-state">${escapeHTML(t("foundation.unlockAnalytics"))}</div>`}
+            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.emptyStats"))}</div>`}
         </section>
 
         ${renderSimplifiedSourcePerformance(data)}
