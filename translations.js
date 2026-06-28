@@ -5,6 +5,7 @@ const TRANSLATIONS = {
     },
     onboarding: {
       stepLabel: "الخطوة 1 من 3",
+      footer: "AI CV Tracker © 2024 • جميع الحقوق محفوظة",
       stepLabels: {
         1: "الخطوة 1 من 3",
         2: "الخطوة 2 من 3",
@@ -19,8 +20,11 @@ const TRANSLATIONS = {
         subtitle: "تابع طلباتك، نظّم مقابلاتك، وحلّل رحلة بحثك عن العمل من مكان واحد.",
         helper: "بدون تسجيل. بياناتك تبقى محفوظة محلياً في متصفحك.",
         featureApplications: "متابعة الطلبات",
+        featureApplicationsDesc: "ابقَ منظماً ولا تفوّت أي تحديث",
         featureInterviews: "تنظيم المقابلات",
+        featureInterviewsDesc: "حضّر، ادخل المقابلة، وتابع بثقة",
         featureAnalyze: "تحليل مطابقة السيرة",
+        featureAnalyzeDesc: "احصل على رؤى ذكية وحسّن فرصك",
         cta: "ابدأ الآن"
       },
       step2: {
@@ -781,6 +785,7 @@ const TRANSLATIONS = {
     },
     onboarding: {
       stepLabel: "Step 1 of 3",
+      footer: "AI CV Tracker © 2024 • All rights reserved",
       stepLabels: {
         1: "Step 1 of 3",
         2: "Step 2 of 3",
@@ -795,8 +800,11 @@ const TRANSLATIONS = {
         subtitle: "Track applications, manage interviews, and analyze your job search in one place.",
         helper: "No signup. Your data stays in your browser.",
         featureApplications: "Track applications",
+        featureApplicationsDesc: "Stay organized and never miss an update",
         featureInterviews: "Manage interviews",
+        featureInterviewsDesc: "Prepare, join, and follow up with confidence",
         featureAnalyze: "Analyze CV match",
+        featureAnalyzeDesc: "Get AI-powered insights and improve your fit",
         cta: "Get Started"
       },
       step2: {

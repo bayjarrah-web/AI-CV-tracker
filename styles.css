@@ -163,12 +163,13 @@ svg {
 .global-language-switch {
   position: fixed;
   top: 20px;
-  left: 20px;
+  right: 36px;
+  left: auto;
   z-index: 40;
   display: inline-flex;
   gap: 4px;
   padding: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.14);
   border-radius: 999px;
   background: rgba(5, 8, 22, 0.72);
   box-shadow:
@@ -233,13 +234,13 @@ svg {
 
 .onboarding-screen .brand-mark-large {
   position: relative;
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 18px;
+  width: 68px;
+  height: 58px;
+  margin: 0 auto 24px;
   overflow: hidden;
   border: 1px solid rgba(77, 163, 255, 0.34);
-  border-radius: 18px;
-  color: transparent;
+  border-radius: 14px;
+  color: rgba(77, 163, 255, 0.86);
   background:
     radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.34), transparent 16%),
     radial-gradient(circle at 72% 74%, rgba(77, 163, 255, 0.55), transparent 34%),
@@ -249,6 +250,14 @@ svg {
     0 14px 34px rgba(47, 107, 255, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
     inset 0 -22px 38px rgba(5, 8, 22, 0.42);
+  font-size: 1.35rem;
+  text-shadow: 0 0 18px rgba(77, 163, 255, 0.72);
+}
+
+.onboarding-screen .brand-mark-large span {
+  position: relative;
+  z-index: 2;
+  transform: translateY(4px);
 }
 
 .onboarding-screen .brand-mark-large::before,
@@ -258,21 +267,22 @@ svg {
 }
 
 .onboarding-screen .brand-mark-large::before {
-  inset: 14px;
+  inset: 8px 8px 16px;
   border: 1px solid rgba(77, 163, 255, 0.36);
-  border-radius: 12px;
-  transform: rotate(45deg);
+  border-radius: 10px;
+  transform: translateX(-10px);
   box-shadow: 0 0 24px rgba(77, 163, 255, 0.28);
 }
 
 .onboarding-screen .brand-mark-large::after {
-  width: 32px;
-  height: 32px;
-  left: 10px;
-  top: 10px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(77, 163, 255, 0.8), transparent 58%);
-  filter: blur(10px);
+  width: 46px;
+  height: 22px;
+  left: 20px;
+  top: 6px;
+  border-radius: 10px 10px 4px 4px;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.92), rgba(37, 99, 235, 0.45));
+  filter: blur(0);
+  opacity: 0.78;
 }
 
 .eyebrow,
@@ -301,54 +311,61 @@ p {
   min-height: calc(100vh - 48px);
   place-items: center;
   isolation: isolate;
-  padding-top: 56px;
+  padding-top: 46px;
 }
 
 .onboarding-topbar {
   position: fixed;
   top: 20px;
-  right: 24px;
+  left: 36px;
+  right: auto;
   z-index: 30;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-height: 40px;
-  padding: 6px 12px 6px 7px;
-  border: 1px solid rgba(96, 165, 250, 0.16);
-  border-radius: 999px;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   color: rgba(248, 250, 252, 0.88);
-  background: rgba(8, 18, 32, 0.48);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  font-size: 0.9rem;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  font-size: 1.02rem;
   font-weight: 800;
 }
 
 [dir="rtl"] .onboarding-topbar {
-  right: auto;
-  left: 24px;
+  right: 36px;
+  left: auto;
 }
 
 .onboarding-product-mark {
-  width: 26px;
-  height: 26px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
   border: 1px solid rgba(96, 165, 250, 0.28);
-  border-radius: 9px;
+  border-radius: 11px;
+  color: #EAF4FF;
   background:
     radial-gradient(circle at 36% 28%, rgba(255, 255, 255, 0.36), transparent 18%),
     linear-gradient(145deg, rgba(56, 189, 248, 0.35), rgba(37, 99, 235, 0.68));
   box-shadow: 0 0 18px rgba(59, 130, 246, 0.18);
+  font-family: var(--font-mono);
+  font-weight: 900;
+  text-shadow: 0 0 14px rgba(77, 163, 255, 0.58);
 }
 
 .onboarding-card {
   position: relative;
-  width: min(100%, 680px);
+  width: min(100%, 720px);
   min-height: 0;
   overflow: hidden;
   border: 1px solid var(--onboarding-border);
   border-radius: 30px;
-  padding: clamp(24px, 4vw, 42px);
+  padding: clamp(26px, 4vw, 38px);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 34%),
     var(--onboarding-surface);
@@ -360,6 +377,14 @@ p {
     inset 0 0 54px rgba(56, 189, 248, 0.045);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
+}
+
+.onboarding-footer {
+  margin-top: 24px;
+  color: rgba(169, 180, 199, 0.72);
+  font-size: 0.86rem;
+  font-weight: 650;
+  text-align: center;
 }
 
 .onboarding-card::before,
@@ -379,46 +404,50 @@ p {
 }
 
 .onboarding-card::after {
-  width: 44%;
+  width: calc(100% - 56px);
   height: 1px;
-  left: 28%;
-  top: 51%;
+  left: 28px;
+  top: calc(100% - 238px);
   background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.16), rgba(56, 189, 248, 0.58), rgba(37, 99, 235, 0.16), transparent);
   box-shadow: 0 0 16px rgba(56, 189, 248, 0.38);
 }
 
 .step-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 24px;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
   position: relative;
   z-index: 1;
 }
 
 .step-dot {
-  width: 6px;
-  height: 6px;
+  width: 9px;
+  height: 9px;
   border-radius: 999px;
   background: rgba(169, 180, 199, 0.46);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .step-dot.active {
-  width: 28px;
-  background: linear-gradient(90deg, #2F6BFF, #4DA3FF);
+  width: 9px;
+  background: #38BDF8;
   box-shadow:
     0 0 24px rgba(77, 163, 255, 0.58),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .step-label {
-  margin-inline-start: 6px;
-  color: rgba(169, 180, 199, 0.64);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  margin-inline-start: 0;
+  color: rgba(248, 250, 252, 0.84);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
   font-weight: 700;
+}
+
+.step-dots {
+  display: flex;
+  gap: 14px;
 }
 
 .onboarding-step {
@@ -445,7 +474,7 @@ p {
   gap: 4px;
   color: var(--onboarding-text);
   font-family: "Plus Jakarta Sans", Inter, "Cairo", sans-serif;
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-size: clamp(2.8rem, 5.2vw, 4.25rem);
   font-weight: 800;
   line-height: 1.16;
   text-align: center;
@@ -474,45 +503,88 @@ p {
 
 .onboarding-premium-copy {
   max-width: 520px;
-  margin: 14px auto 0;
-  font-size: clamp(0.98rem, 1.6vw, 1.08rem);
+  margin: 16px auto 0;
+  font-size: clamp(1.1rem, 1.7vw, 1.28rem);
   line-height: 1.65;
   letter-spacing: 0;
 }
 
 .onboarding-helper-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin-top: 10px;
-  color: rgba(169, 180, 199, 0.7);
+  color: rgba(147, 197, 253, 0.86);
   font-size: 0.86rem;
   font-weight: 700;
   text-align: center;
 }
 
-.onboarding-feature-chips {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 24px auto 26px;
+.onboarding-helper-text svg {
+  width: 16px;
+  height: 16px;
+  color: #2F8CFF;
 }
 
-.onboarding-feature-chips span {
-  display: inline-flex;
-  min-height: 34px;
-  align-items: center;
+.onboarding-feature-cards {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 50px auto 0;
+}
+
+.onboarding-feature-card {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  min-height: 152px;
   border: 1px solid rgba(96, 165, 250, 0.16);
+  border-radius: 16px;
+  padding: 22px 16px 18px;
+  color: rgba(248, 250, 252, 0.94);
+  background:
+    linear-gradient(180deg, rgba(59, 130, 246, 0.075), transparent 62%),
+    rgba(3, 12, 28, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.055),
+    0 18px 44px rgba(0, 0, 0, 0.18);
+  text-align: center;
+}
+
+.feature-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
   border-radius: 999px;
-  padding: 7px 12px;
-  color: rgba(226, 232, 240, 0.84);
-  background: rgba(15, 23, 42, 0.5);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
-  font-size: 0.82rem;
+  color: #38BDF8;
+  background: linear-gradient(145deg, rgba(37, 99, 235, 0.6), rgba(14, 165, 233, 0.18));
+  box-shadow: 0 0 28px rgba(59, 130, 246, 0.22);
+}
+
+.feature-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.2;
+}
+
+.onboarding-feature-card strong {
+  font-size: 0.98rem;
   font-weight: 800;
 }
 
+.onboarding-feature-card small {
+  max-width: 165px;
+  color: rgba(203, 213, 225, 0.78);
+  font-size: 0.83rem;
+  font-weight: 650;
+  line-height: 1.55;
+}
+
 .onboarding-screen .btn-primary {
-  min-width: min(100%, 320px);
-  min-height: 54px;
+  min-width: min(100%, 365px);
+  min-height: 64px;
   border: 1px solid rgba(96, 165, 250, 0.44);
   border-radius: 18px;
   color: #FFFFFF;
@@ -749,6 +821,10 @@ textarea:focus {
   width: min(100%, 1240px);
   gap: 18px;
   margin: 0 auto;
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
+  display: none;
 }
 
 .app-header {
@@ -1377,7 +1453,8 @@ textarea:focus {
 .stats-simple-kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 22px;
+  margin-top: 26px;
 }
 
 .stats-simple-kpi {
@@ -4016,26 +4093,32 @@ textarea:focus-visible,
 
   .global-language-switch {
     top: 12px;
-    left: 12px;
-    right: auto;
+    right: 12px;
+    left: auto;
   }
 
   [dir="ltr"] .global-language-switch {
-    left: 12px;
+    right: 12px;
+    left: auto;
+  }
+
+  [dir="rtl"] .global-language-switch {
     right: auto;
+    left: 12px;
   }
 
   .onboarding-topbar {
     top: 12px;
-    right: 12px;
+    left: 12px;
+    right: auto;
     min-height: 36px;
-    padding: 5px 10px 5px 6px;
+    padding: 0;
     font-size: 0.8rem;
   }
 
   [dir="rtl"] .onboarding-topbar {
-    right: auto;
-    left: 12px;
+    right: 12px;
+    left: auto;
   }
 
   .onboarding-product-mark {
@@ -4066,15 +4149,38 @@ textarea:focus-visible,
   }
 
   .onboarding-screen .brand-mark-large {
-    width: 46px;
-    height: 46px;
+    width: 56px;
+    height: 48px;
     margin-bottom: 16px;
     border-radius: 16px;
+  }
+
+  .onboarding-helper-text {
+    font-size: 0.8rem;
+  }
+
+  .onboarding-feature-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 30px;
+  }
+
+  .onboarding-feature-card {
+    min-height: auto;
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-items: start;
+    text-align: start;
+    padding: 14px;
+  }
+
+  .onboarding-feature-card small {
+    max-width: none;
   }
 
   .onboarding-screen .btn-primary {
     min-height: 52px;
     width: 100%;
+    margin-top: 20px;
   }
 
   .app-header,
@@ -4789,8 +4895,8 @@ select:disabled {
 }
 
 body:has(#onboarding-screen:not(.hidden)) .global-language-switch {
-  left: 20px;
-  right: auto;
+  right: 36px;
+  left: auto;
   border-color: rgba(96, 165, 250, 0.18);
   border-radius: 999px;
   background: rgba(2, 6, 23, 0.72);
@@ -4802,9 +4908,24 @@ body:has(#onboarding-screen:not(.hidden)) .global-language-switch {
   -webkit-backdrop-filter: blur(18px);
 }
 
+.language-globe {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  margin-inline-end: 6px;
+  color: rgba(226, 232, 240, 0.86);
+}
+
+.language-globe svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.8;
+}
+
 [dir="rtl"] body:has(#onboarding-screen:not(.hidden)) .global-language-switch {
-  right: 20px;
-  left: auto;
+  right: auto;
+  left: 36px;
 }
 
 body:has(#onboarding-screen:not(.hidden)) .language-option {
@@ -4840,13 +4961,13 @@ body:has(#onboarding-screen:not(.hidden)) .onboarding-card.glass-card {
 
 @media (max-width: 640px) {
   body:has(#onboarding-screen:not(.hidden)) .global-language-switch {
-    left: 12px;
-    right: auto;
+    right: 12px;
+    left: auto;
   }
 
   [dir="rtl"] body:has(#onboarding-screen:not(.hidden)) .global-language-switch {
-    right: 12px;
-    left: auto;
+    right: auto;
+    left: 12px;
   }
 
   body:has(#onboarding-screen:not(.hidden)) .onboarding-card.glass-card {

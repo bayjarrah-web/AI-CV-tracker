@@ -10,10 +10,11 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260628-02">
+  <link rel="stylesheet" href="styles.css?v=20260628-03">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
+    <span class="language-globe" aria-hidden="true"><i data-lucide="globe-2"></i></span>
     <button class="language-option" type="button" data-language-option="ar">عربي</button>
     <button class="language-option active" type="button" data-language-option="en">English</button>
   </div>
@@ -21,29 +22,48 @@
   <div class="app-shell">
     <section id="onboarding-screen" class="onboarding-screen" aria-live="polite">
       <div class="onboarding-topbar" aria-label="Product">
-        <div class="onboarding-product-mark" aria-hidden="true"></div>
+        <div class="onboarding-product-mark" aria-hidden="true">AI</div>
         <span>AI CV Tracker</span>
       </div>
 
       <div class="onboarding-card glass-card">
         <div class="step-indicator" aria-label="Onboarding progress">
-          <span class="step-dot active" data-step-dot="1"></span>
-          <span class="step-dot" data-step-dot="2"></span>
-          <span class="step-dot" data-step-dot="3"></span>
           <span class="step-label" data-i18n="onboarding.stepLabel">Step 1 of 3</span>
+          <span class="step-dots" aria-hidden="true">
+            <span class="step-dot active" data-step-dot="1"></span>
+            <span class="step-dot" data-step-dot="2"></span>
+            <span class="step-dot" data-step-dot="3"></span>
+          </span>
         </div>
 
         <div class="onboarding-step active" data-step="1">
-          <div class="brand-mark brand-mark-large" aria-hidden="true"></div>
+          <div class="brand-mark brand-mark-large" aria-hidden="true">
+            <span>AI</span>
+          </div>
           <h1 class="onboarding-premium-title">
             <span><strong data-i18n="onboarding.step1.ai">AI</strong> <span data-i18n="onboarding.step1.product">CV Tracker</span></span>
           </h1>
           <p class="onboarding-copy onboarding-premium-copy" data-i18n="onboarding.step1.subtitle">Track applications, manage interviews, and analyze your job search in one place.</p>
-          <p class="onboarding-helper-text" data-i18n="onboarding.step1.helper">No signup. Your data stays in your browser.</p>
-          <div class="onboarding-feature-chips" aria-label="Product features">
-            <span data-i18n="onboarding.step1.featureApplications">Track applications</span>
-            <span data-i18n="onboarding.step1.featureInterviews">Manage interviews</span>
-            <span data-i18n="onboarding.step1.featureAnalyze">Analyze CV match</span>
+          <p class="onboarding-helper-text">
+            <i data-lucide="shield-check" aria-hidden="true"></i>
+            <span data-i18n="onboarding.step1.helper">No signup. Your data stays in your browser.</span>
+          </p>
+          <div class="onboarding-feature-cards" aria-label="Product features">
+            <article class="onboarding-feature-card">
+              <span class="feature-icon"><i data-lucide="briefcase-business"></i></span>
+              <strong data-i18n="onboarding.step1.featureApplications">Track applications</strong>
+              <small data-i18n="onboarding.step1.featureApplicationsDesc">Stay organized and never miss an update</small>
+            </article>
+            <article class="onboarding-feature-card">
+              <span class="feature-icon"><i data-lucide="calendar-days"></i></span>
+              <strong data-i18n="onboarding.step1.featureInterviews">Manage interviews</strong>
+              <small data-i18n="onboarding.step1.featureInterviewsDesc">Prepare, join, and follow up with confidence</small>
+            </article>
+            <article class="onboarding-feature-card">
+              <span class="feature-icon"><i data-lucide="chart-no-axes-combined"></i></span>
+              <strong data-i18n="onboarding.step1.featureAnalyze">Analyze CV match</strong>
+              <small data-i18n="onboarding.step1.featureAnalyzeDesc">Get AI-powered insights and improve your fit</small>
+            </article>
           </div>
           <button class="btn btn-primary" type="button" data-next-step>
             <span data-i18n="onboarding.step1.cta">Get Started</span>
@@ -110,6 +130,8 @@
           </div>
         </div>
       </div>
+
+      <p class="onboarding-footer" data-i18n="onboarding.footer">AI CV Tracker © 2024 • All rights reserved</p>
     </section>
 
     <main id="main-app" class="main-app hidden">
@@ -510,7 +532,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260628-02"></script>
-  <script src="app.js?v=20260628-02"></script>
+  <script src="translations.js?v=20260628-03"></script>
+  <script src="app.js?v=20260628-03"></script>
 </body>
 </html>
