@@ -845,6 +845,17 @@ textarea:focus {
   color: rgba(249, 250, 251, 0.64);
 }
 
+.empty-state,
+.today-positive-state,
+.interview-empty-inline,
+.analyzer-empty-result,
+.chart-fallback {
+  border-color: rgba(96, 165, 250, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 42%),
+    rgba(8, 18, 32, 0.54);
+}
+
 .today-dashboard {
   display: grid;
   gap: 16px;
@@ -5032,4 +5043,91 @@ body:not(:has(#onboarding-screen:not(.hidden))) .analyzer-result.markdown-body h
 body:not(:has(#onboarding-screen:not(.hidden))) .analyzer-result.markdown-body h2,
 body:not(:has(#onboarding-screen:not(.hidden))) .analyzer-result.markdown-body h3 {
   color: #4da3ff;
+}
+
+/* Phase 10 final responsive polish */
+.content-area,
+.tab-panel,
+.jobs-workspace,
+.interviews-workspace,
+.stats-dashboard,
+.analyzer-panel {
+  min-width: 0;
+}
+
+.job-list-summary,
+.job-detail-grid,
+.source-row,
+.settings-modal-api-row,
+.settings-modal-reset {
+  min-width: 0;
+}
+
+@media (max-width: 520px) {
+  .app-shell {
+    padding-inline: 12px;
+  }
+
+  .app-header,
+  .jobs-header,
+  .interviews-header,
+  .stats-hero,
+  .analyzer-hero {
+    border-radius: 18px;
+  }
+
+  .applications-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .application-status-card {
+    min-height: 104px;
+  }
+
+  .job-list-summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .job-list-date,
+  .job-list-summary > .badge {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .job-list-chevron {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .job-actions,
+  .today-mini-actions {
+    width: 100%;
+  }
+
+  .job-actions .btn,
+  .today-mini-actions .btn {
+    flex: 1 1 140px;
+  }
+
+  .chart-wrap,
+  .stats-simple-card .chart-wrap {
+    min-height: 240px;
+  }
+
+  .settings-modal-box {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  .settings-modal-shell {
+    padding: 18px 14px calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .settings-modal-info {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

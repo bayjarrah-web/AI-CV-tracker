@@ -104,6 +104,55 @@ const STATS_PERIOD_OPTIONS = ["week", "month", "quarter", "all"];
 const APP_VERSION = "1.0.0";
 const EXPORT_FORMAT = "cv-tracker-export";
 
+const CAREER_OPS_PROFILE = {
+  targetCountry: "Germany",
+  targetCities: [
+    "Mannheim",
+    "Frankfurt",
+    "Heidelberg",
+    "Ludwigshafen",
+    "Frankfurt area",
+    "nearby cities"
+  ],
+  background: [
+    "ELV / ICT / Facility Management technical professional",
+    "Qatar major stadium and city command center project experience",
+    "Lusail Stadium, Al Bayt Stadium, and Lusail City Command & Control"
+  ],
+  strengths: [
+    "CCTV",
+    "Access Control",
+    "BMS",
+    "Fire Alarm Systems",
+    "AV systems",
+    "Turnstiles",
+    "OCC / LCCC coordination",
+    "Contractor coordination",
+    "Facility operations",
+    "Issue tracking and documentation",
+    "Working under event pressure"
+  ],
+  targetRoles: [
+    "ELV Engineer",
+    "Facility Management Engineer",
+    "IT Support Engineer",
+    "IT Operations Specialist",
+    "Technical Project Coordinator",
+    "Security Systems Engineer",
+    "Gebäudeautomation",
+    "Sicherheitstechnik",
+    "Junior Bauleiter / Assistant Project Coordinator only if realistic"
+  ],
+  rules: [
+    "Never suggest auto-submitting applications. Only analyze jobs and prepare materials for the user's review.",
+    "Penalize jobs requiring fluent German C1.",
+    "Flag jobs requiring a German driving license as a risk.",
+    "Prioritize jobs where English or German B1/B2 is enough.",
+    "Avoid pure software developer jobs.",
+    "Prefer practical facility operations, ELV, ICT, security systems, building automation, IT support, and technical coordination roles."
+  ]
+};
+
 const SPECIALTY_OPTIONS = [
   { ar: "تطوير برمجيات", en: "Software Development" },
   { ar: "تطوير واجهات أمامية", en: "Frontend Development" },
@@ -148,6 +197,12 @@ const SPECIALTY_OPTIONS = [
   { ar: "الهندسة المدنية", en: "Civil Engineering" },
   { ar: "الهندسة الميكانيكية", en: "Mechanical Engineering" },
   { ar: "الهندسة الكهربائية", en: "Electrical Engineering" },
+  { ar: "أنظمة ELV و ICT", en: "ELV and ICT Systems" },
+  { ar: "إدارة المرافق", en: "Facility Management" },
+  { ar: "أنظمة الأمن والسلامة", en: "Security Systems Engineering" },
+  { ar: "أتمتة المباني", en: "Building Automation / Gebäudeautomation" },
+  { ar: "الدعم الفني لتقنية المعلومات", en: "IT Support and Operations" },
+  { ar: "تنسيق المشاريع الفنية", en: "Technical Project Coordination" },
   { ar: "الهندسة الصناعية", en: "Industrial Engineering" },
   { ar: "العمارة والتصميم الداخلي", en: "Architecture and Interior Design" },
   { ar: "البناء وإدارة المواقع", en: "Construction and Site Management" },
@@ -3898,7 +3953,7 @@ function showSettingsModalImportPreview(summary) {
   if (!preview || !summaryBox) return;
 
   summaryBox.innerHTML = `
-    <div><span>Jobs</span><strong>${escapeHTML(summary.jobs)}</strong></div>
+    <div><span>Applications</span><strong>${escapeHTML(summary.jobs)}</strong></div>
     <div><span>Interviews</span><strong>${escapeHTML(summary.interviews)}</strong></div>
     <div><span>Analyses</span><strong>${escapeHTML(summary.analyses)}</strong></div>
     <div><span>User</span><strong>${escapeHTML(summary.hasUser ? t("settings.present") : t("settings.absent"))}</strong></div>
@@ -4245,7 +4300,7 @@ function showImportPreview(summary) {
   if (!preview || !summaryBox) return;
 
   summaryBox.innerHTML = `
-    <div><span>Jobs</span><strong>${escapeHTML(summary.jobs)}</strong></div>
+    <div><span>Applications</span><strong>${escapeHTML(summary.jobs)}</strong></div>
     <div><span>Interviews</span><strong>${escapeHTML(summary.interviews)}</strong></div>
     <div><span>Analyses</span><strong>${escapeHTML(summary.analyses)}</strong></div>
     <div><span>User</span><strong>${escapeHTML(summary.hasUser ? t("settings.present") : t("settings.absent"))}</strong></div>
