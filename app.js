@@ -391,6 +391,9 @@ function setLanguage(lang) {
 
   StorageManager.set(StorageManager.KEYS.SETTINGS, AppState.settings);
   translatePage();
+  if (!document.getElementById("onboarding-screen")?.classList.contains("hidden")) {
+    showStep(onboardingStep);
+  }
   populateSuggestionLists();
   populateJobSelects();
   populateInterviewSelects();
@@ -3104,6 +3107,11 @@ function showStep(step) {
   document.querySelectorAll(".step-dot").forEach((element) => {
     element.classList.toggle("active", Number(element.dataset.stepDot) === onboardingStep);
   });
+
+  const stepLabel = document.querySelector(".step-label");
+  if (stepLabel) {
+    stepLabel.textContent = t(`onboarding.stepLabels.${onboardingStep}`);
+  }
 }
 
 function nextStep() {

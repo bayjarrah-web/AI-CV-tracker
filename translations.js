@@ -4,13 +4,23 @@ const TRANSLATIONS = {
       kicker: "لوحة تتبع الطلبات"
     },
     onboarding: {
+      stepLabel: "الخطوة 1 من 3",
+      stepLabels: {
+        1: "الخطوة 1 من 3",
+        2: "الخطوة 2 من 3",
+        3: "الخطوة 3 من 3"
+      },
       step1: {
         welcome: "مرحباً بك في",
         ai: "AI",
-        product: "CV tracker",
+        product: "CV Tracker",
         eyebrow: "رفيقك الذكي للبحث عن عمل",
         title: "مرحباً بك في CV Tracker AI",
-        subtitle: "افهم وحلّل طلباتك من مكان واحد",
+        subtitle: "تابع طلباتك، نظّم مقابلاتك، وحلّل رحلة بحثك عن العمل من مكان واحد.",
+        helper: "بدون تسجيل. بياناتك تبقى محفوظة محلياً في متصفحك.",
+        featureApplications: "متابعة الطلبات",
+        featureInterviews: "تنظيم المقابلات",
+        featureAnalyze: "تحليل مطابقة السيرة",
         cta: "ابدأ الآن"
       },
       step2: {
@@ -770,13 +780,23 @@ const TRANSLATIONS = {
       kicker: "Application tracking dashboard"
     },
     onboarding: {
+      stepLabel: "Step 1 of 3",
+      stepLabels: {
+        1: "Step 1 of 3",
+        2: "Step 2 of 3",
+        3: "Step 3 of 3"
+      },
       step1: {
         welcome: "Welcome to",
         ai: "AI",
-        product: "CV tracker",
+        product: "CV Tracker",
         eyebrow: "Your focused job-search companion",
         title: "Welcome to CV Tracker AI",
-        subtitle: "understand and analyse your applications from one place",
+        subtitle: "Track applications, manage interviews, and analyze your job search in one place.",
+        helper: "No signup. Your data stays in your browser.",
+        featureApplications: "Track applications",
+        featureInterviews: "Manage interviews",
+        featureAnalyze: "Analyze CV match",
         cta: "Get Started"
       },
       step2: {
