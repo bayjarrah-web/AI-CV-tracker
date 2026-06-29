@@ -5278,6 +5278,118 @@ body:not(:has(#onboarding-screen:not(.hidden))) .analyzer-result.markdown-body h
   color: #4da3ff;
 }
 
+/* Design Phase 1.1: simplify Applications hierarchy */
+body:not(:has(#onboarding-screen:not(.hidden))) .global-language-switch {
+  display: none;
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .app-shell {
+  padding-top: 18px;
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .app-header {
+  min-height: 64px;
+  padding: 10px 14px;
+  border-radius: 18px;
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .app-kicker {
+  display: none;
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .app-header h1 {
+  font-size: clamp(1.05rem, 2vw, 1.28rem);
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
+  padding: 6px;
+}
+
+body:not(:has(#onboarding-screen:not(.hidden))) .tab-button {
+  min-height: 42px;
+}
+
+.jobs-workspace {
+  gap: 12px;
+}
+
+.jobs-header {
+  padding: clamp(18px, 3vw, 28px);
+  border-radius: 18px;
+}
+
+.jobs-header h2 {
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+}
+
+.jobs-header p {
+  margin-top: 6px;
+  color: rgba(203, 213, 225, 0.82);
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  font-weight: 700;
+}
+
+.applications-dashboard-shell {
+  padding: 14px;
+  border-radius: 18px;
+}
+
+.applications-status-grid {
+  gap: 10px;
+}
+
+.application-status-card {
+  min-height: 112px;
+  border-radius: 14px;
+}
+
+.application-status-content small {
+  line-height: 1.35;
+}
+
+.jobs-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+.jobs-list-heading h2 {
+  font-size: 1.1rem;
+}
+
+.jobs-toolbar {
+  gap: 12px;
+  padding: 14px;
+}
+
+.fab-add-job,
+.main-app:not(.hidden) .fab-add-job {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-shell {
+    padding-top: 12px;
+  }
+
+  .jobs-header {
+    align-items: stretch;
+  }
+
+  .jobs-list-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
 /* Phase 10 final responsive polish */
 .content-area,
 .tab-panel,

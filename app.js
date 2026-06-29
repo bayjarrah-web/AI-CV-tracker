@@ -3210,8 +3210,14 @@ function showMainApp() {
 
 function updateHeader() {
   const userName = document.getElementById("header-user-name");
+  const displayName = AppState.user?.name || t("common.guest");
   if (userName) {
-    userName.textContent = AppState.user?.name || t("common.guest");
+    userName.textContent = displayName;
+  }
+
+  const applicationsHeroUser = document.getElementById("applications-hero-user");
+  if (applicationsHeroUser) {
+    applicationsHeroUser.textContent = displayName;
   }
 }
 
@@ -3233,9 +3239,7 @@ function switchTab(tabName) {
   });
 
   const fab = document.querySelector(".fab-add-job");
-  if (fab) {
-    fab.classList.toggle("hidden", nextTab !== "jobs");
-  }
+  if (fab) fab.classList.add("hidden");
 
   if (nextTab === "today") {
     renderTodayDashboard();

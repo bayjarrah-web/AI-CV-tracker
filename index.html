@@ -10,7 +10,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260628-03">
+  <link rel="stylesheet" href="styles.css?v=20260628-04">
 </head>
 <body>
   <div class="global-language-switch" aria-label="Language switcher">
@@ -166,7 +166,7 @@
         </button>
         <button class="tab-button" type="button" data-tab="analyzer">
           <span class="tab-icon"><i data-lucide="brain"></i></span>
-          <span data-i18n="tabs.analyzer">المحلل</span>
+          <span data-i18n="tabs.analyzer">Analyze</span>
         </button>
       </nav>
 
@@ -177,8 +177,11 @@
           <section class="jobs-workspace">
             <div class="jobs-header glass-card">
               <div>
-                <p class="eyebrow" data-i18n="applicationsDashboard.kicker">Applications Dashboard</p>
-                <h2 data-i18n="tabs.applications">Applications</h2>
+                <h2>
+                  <span data-i18n="applicationsDashboard.welcomeBack">Welcome back</span>,
+                  <span id="applications-hero-user">Bayhass</span>
+                </h2>
+                <p data-i18n="applicationsDashboard.heroSubtitle">Track your applications from one clean dashboard.</p>
               </div>
               <button class="btn btn-primary" type="button" data-open-job-modal>
                 <span class="btn-plus">+</span>
@@ -186,22 +189,15 @@
               </button>
             </div>
 
-            <section class="applications-dashboard-shell glass-card" aria-labelledby="applications-dashboard-title">
-              <div class="applications-dashboard-header">
-                <div>
-                  <p class="eyebrow" data-i18n="applicationsDashboard.kicker">Applications Dashboard</p>
-                  <h2 id="applications-dashboard-title" data-i18n="applicationsDashboard.title">Track the hiring cycle</h2>
-                </div>
-                <div class="applications-dashboard-actions">
-                  <p data-i18n="applicationsDashboard.subtitle">See where every application stands, then filter the list with one tap.</p>
-                  <button class="btn btn-small btn-secondary" type="button" data-application-status="all" data-i18n="applicationsDashboard.allApplications">All Applications</button>
-                </div>
-              </div>
-
+            <section class="applications-dashboard-shell glass-card" aria-label="Application status summary">
               <div class="applications-status-grid" id="applications-status-grid" aria-label="Application status summary"></div>
             </section>
 
             <div class="jobs-toolbar glass-card">
+              <div class="jobs-list-heading">
+                <h2 data-i18n="applicationsDashboard.allApplications">All Applications</h2>
+                <button class="btn btn-small btn-secondary" type="button" data-application-status="all" data-i18n="applicationsDashboard.resetView">All Applications</button>
+              </div>
               <label class="field search-field">
                 <span data-i18n="jobs.searchLabel">بحث</span>
                 <input id="job-search" type="search" placeholder="ابحث بالمنصب أو الشركة أو الموقع" data-i18n-placeholder="jobs.searchPlaceholder">
@@ -265,7 +261,6 @@
         <div class="tab-panel" id="tab-settings"></div>
       </section>
 
-      <button class="fab-add-job hidden" type="button" data-open-job-modal aria-label="Add application">+</button>
     </main>
   </div>
 
@@ -532,7 +527,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="translations.js?v=20260628-03"></script>
-  <script src="app.js?v=20260628-03"></script>
+  <script src="translations.js?v=20260628-04"></script>
+  <script src="app.js?v=20260628-04"></script>
 </body>
 </html>

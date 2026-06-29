@@ -57,7 +57,7 @@ const TRANSLATIONS = {
       jobs: "الوظائف",
       stats: "الإحصائيات",
       interviews: "المقابلات",
-      analyzer: "المحلل",
+      analyzer: "Analyze",
       settings: "الإعدادات"
     },
     statuses: {
@@ -475,7 +475,10 @@ const TRANSLATIONS = {
       kicker: "لوحة الطلبات",
       title: "تابع دورة التوظيف",
       subtitle: "اعرف أين يقف كل طلب، واضغط على أي حالة لتصفية القائمة فوراً.",
+      welcomeBack: "أهلاً بعودتك",
+      heroSubtitle: "تابع طلباتك من لوحة واحدة نظيفة.",
       allApplications: "كل الطلبات",
+      resetView: "كل الطلبات",
       details: "تفاصيل الطلب",
       position: "المنصب",
       changeStatus: "تغيير الحالة",
@@ -484,19 +487,19 @@ const TRANSLATIONS = {
       cards: {
         sent: {
           label: "تم الإرسال",
-          hint: "طلبات أرسلتها وتنتظر أول رد."
-        },
-        interview: {
-          label: "تم تحديد مقابلة",
-          hint: "طلبات وصلت إلى مرحلة مقابلة."
+          hint: "طلبات تم إرسالها"
         },
         under_review: {
           label: "تحت الدراسة",
-          hint: "طلبات قيد المراجعة من الشركة."
+          hint: "تتم مراجعتها حالياً"
+        },
+        interview: {
+          label: "مقابلة",
+          hint: "مرحلة المقابلة"
         },
         rejected: {
           label: "رفض",
-          hint: "طلبات تم رفضها أو إغلاقها."
+          hint: "مرفوضة أو مغلقة"
         }
       }
     },
@@ -837,7 +840,7 @@ const TRANSLATIONS = {
       jobs: "Jobs",
       stats: "Stats",
       interviews: "Interviews",
-      analyzer: "Analyzer",
+      analyzer: "Analyze",
       settings: "Settings"
     },
     statuses: {
@@ -1255,7 +1258,10 @@ const TRANSLATIONS = {
       kicker: "Applications Dashboard",
       title: "Track the hiring cycle",
       subtitle: "See where every application stands, then filter the list with one tap.",
+      welcomeBack: "Welcome back",
+      heroSubtitle: "Track your applications from one clean dashboard.",
       allApplications: "All Applications",
+      resetView: "All Applications",
       details: "Application details",
       position: "Position",
       changeStatus: "Change Status",
@@ -1264,19 +1270,19 @@ const TRANSLATIONS = {
       cards: {
         sent: {
           label: "Sent",
-          hint: "Applications sent and waiting for a first reply."
-        },
-        interview: {
-          label: "Interview Scheduled",
-          hint: "Applications that reached the interview stage."
+          hint: "Submitted applications"
         },
         under_review: {
           label: "Under Review",
-          hint: "Applications currently being reviewed."
+          hint: "Currently being reviewed"
+        },
+        interview: {
+          label: "Interview",
+          hint: "Interview stage"
         },
         rejected: {
           label: "Rejected",
-          hint: "Applications that were declined or closed."
+          hint: "Declined or closed"
         }
       }
     },
