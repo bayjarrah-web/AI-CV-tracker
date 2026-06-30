@@ -2,10 +2,11 @@
 
 ## Product Context
 
-* **What this is:** A modern web app for job applications, interview tracking, calendar management, CV preparation, and career progress.
+* **What this is:** A modern web app for job applications, interview tracking, focused analytics, CV matching, and interview preparation.
 * **Who it's for:** Job seekers, professionals, candidates applying to multiple companies, and users preparing for interviews.
-* **Project type:** Productivity dashboard + career management tool.
-* **Main goal:** Help users track job applications, interviews, preparation tasks, and follow-up actions in a clean, premium, mobile-first interface.
+* **Project type:** Static, local-first productivity dashboard + career management tool.
+* **Main goal:** Help users track job applications, interviews, simple performance stats, and AI-assisted preparation in a clean, premium, mobile-first interface.
+* **Current structure:** Applications, Interviews, Stats, Analyze, and a Settings modal from the header.
 
 ## Design Philosophy
 
@@ -24,20 +25,22 @@ The interface should be:
 
 The user should immediately understand:
 
-* What interviews are coming next
-* What applications need action
-* What tasks are pending
-* What should be done today
+* Where applications stand in the hiring cycle
+* Which interviews are coming next
+* How application performance looks at a glance
+* How to use Analyze for CV matching or interview preparation
 
 The design should reduce stress and make job searching feel organized.
 
 ## Aesthetic Direction
 
-* **Direction:** Premium productivity dashboard with industrial/utilitarian influence.
+* **Direction:** Premium dark navy AI SaaS dashboard.
 * **Decoration level:** Intentional and restrained.
 * **Mood:** Serious, crafted, calm, professional, and reliable.
-* **Visual personality:** Clean cards, clear hierarchy, subtle borders, controlled color use, strong typography.
+* **Visual personality:** Clean glass-like cards, clear hierarchy, subtle blue borders, controlled electric-blue accents, strong typography.
 * **Design inspiration:** Linear, Notion, Vercel, Raycast, Warp, modern HR platforms, and premium SaaS dashboards.
+
+The current brand direction is blue-only. Do not use amber, yellow, orange, or warm accent systems for new UI work.
 
 ## What to Avoid
 
@@ -55,6 +58,19 @@ Avoid:
 * Popups that are too small on mobile
 * Huge empty spaces without purpose
 * Generic template look
+
+### Current Anti-Patterns
+
+Do not:
+
+* Add yellow, orange, gold, or amber accents.
+* Add large glowing circles or decorative clutter.
+* Repeat section labels like “Applications Dashboard”.
+* Create two CTAs for the same action.
+* Add a floating action button when a page CTA already exists.
+* Redesign unrelated pages during page-specific polish.
+* Change data logic while doing design polish.
+* Generate images or embed reference screenshots as final UI.
 
 ## Typography
 
@@ -129,78 +145,55 @@ Color should help the user understand:
 
 ## Primary Palette
 
-### Dark Mode
+### Blue-Only Dark Mode
 
-Dark mode should feel premium and focused.
+Dark mode should feel premium, focused, calm, and AI-native.
 
-* Base background: `#0C0C0C`
-* Surface / card: `#141414`
-* Elevated surface: `#1A1A1A`
-* Border: `#262626`
-* Main text: `#FAFAFA`
-* Muted text: `#A1A1AA`
-* Secondary text: `#71717A`
-
-### Light Mode
-
-Light mode should feel clean and warm.
-
-* Base background: `#FAFAF9`
-* Surface / card: `#FFFFFF`
-* Elevated surface: `#F5F5F4`
-* Border: `#E7E5E4`
-* Main text: `#18181B`
-* Muted text: `#71717A`
-* Secondary text: `#A1A1AA`
-
-## Accent Color
-
-Use amber as the main accent inspired by gstack.
-
-### Dark Mode Accent
-
-* Primary: `#F59E0B`
-* Text accent: `#FBBF24`
-
-### Light Mode Accent
-
-* Primary: `#D97706`
-* Text accent: `#B45309`
+* Background deep navy: `#020B18`
+* Background blue: `#071427`
+* Surface / card: `rgba(15, 30, 50, 0.72)`
+* Surface elevated: `rgba(20, 38, 64, 0.82)`
+* Border soft blue: `rgba(96, 165, 250, 0.18)`
+* Border active: `rgba(56, 189, 248, 0.55)`
+* Primary blue: `#1D7CFF`
+* Cyan accent: `#10BDF5`
+* Main text: `#F8FAFC`
+* Secondary text: `#A8B4C7`
+* Muted text: `#718096`
 
 ### Accent Usage Rules
 
-Use amber for:
+Use blue and cyan for:
 
 * Primary actions
-* Active states
-* Selected calendar day
-* Important interview indicators
+* Active navigation and selected states
 * Focus states
-* Highlighted metrics
+* Important metrics
+* AI-related highlights
 
-Do not use amber everywhere.
-It should feel rare and meaningful.
+Do not introduce yellow, orange, gold, or amber for new interface work. Warning states should be rare and should not become a visual identity.
 
 ## Semantic Colors
 
 Use semantic colors consistently:
 
-* Success: `#22C55E`
-* Warning: `#F59E0B`
-* Error / Danger: `#EF4444`
-* Info: `#3B82F6`
+* Success: `#2DD4BF`
+* Warning: avoid unless absolutely necessary
+* Error / Danger: `#FF4D6D`
+* Info: `#1D7CFF`
 
 ### Job Status Colors
 
 Suggested mapping:
 
-* Applied: Info blue
-* Interview scheduled: Amber
+* Sent: cyan / blue
+* Under review: blue
+* Interview scheduled: violet or cyan-blue, depending on contrast
 * Interview completed: Purple or neutral
 * Offer: Success green
 * Rejected: Error red
 * Waiting response: Muted gray
-* Follow-up needed: Warning amber
+* Follow-up needed: primary blue or subtle cyan outline
 
 ## Neutral Colors
 
@@ -261,9 +254,19 @@ Use a 4px spacing system.
 
 ### Max Width
 
-* Main content max width: `1200px`
+* Main content max width: `1200px` to `1320px`
 * Center content on large screens.
 * Do not stretch cards too wide without reason.
+
+### Hierarchy Rules
+
+* Use one clear hero or page header per page.
+* Use one primary CTA per screen.
+* Avoid cards inside cards inside cards.
+* Avoid repeated labels such as “Applications Dashboard”.
+* Avoid huge empty panels.
+* Reduce visual layers before adding decoration.
+* Reference images are visual direction only unless the user explicitly asks for a close match.
 
 ### Responsive Requirements
 
@@ -341,11 +344,12 @@ Use for main actions:
 
 Style:
 
-* Amber or main accent background
+* Blue gradient background
 * Clear text
 * Large enough tap target
 * Rounded corners
 * Strong contrast
+* Not oversized inside dashboard screens
 
 ### Secondary Button
 
@@ -396,12 +400,12 @@ Forms should be simple and mobile-friendly.
 
 ## Calendar Design
 
-Calendar is a core screen and must be very clear.
+The Interviews screen uses a lightweight calendar strip, not a full calendar app.
 
 ### Calendar Must Show
 
-* Current month
-* Selected day
+* Current week or next 7 days
+* Selected day when day filtering is enabled
 * Today
 * Days with interviews
 * Multiple interviews on same day
@@ -465,26 +469,23 @@ Possible actions:
 * Avoid long paragraphs.
 * Use compact but readable layout.
 
-## Dashboard Design
+## Applications Dashboard Design
 
-Dashboard should answer:
+Applications is the primary dashboard and should answer:
 
-* What is happening today?
-* What is my next interview?
-* How many applications are active?
-* What needs my attention?
+* How many applications are sent, under review, interviewing, or rejected?
+* Which applications are visible in the current filtered list?
+* What is the next action: add, edit, delete, or change status?
 
-### Dashboard Sections
+### Applications Sections
 
 Recommended:
 
-* Next interview hero card
+* Compact welcome / page hero
+* One Add Application CTA
 * Application status summary
-* Upcoming interviews
-* Follow-up reminders
-* Recent applications
-* CV readiness / profile completion
-* Quick actions
+* Search and filters
+* Accordion list
 
 ### Dashboard Rules
 
@@ -517,30 +518,16 @@ Use badges for:
 
 ## Navigation
 
-### Mobile
+Navigation must stay exactly:
 
-Preferred:
+* Applications
+* Interviews
+* Stats
+* Analyze
 
-* Bottom navigation for main sections
-* Clear active state
-* Maximum 4 to 5 main items
+Settings is not a navigation tab. It stays a compact icon button that opens a modal.
 
-Possible items:
-
-* Dashboard
-* Jobs
-* Calendar
-* Tasks
-* Profile
-
-### Desktop
-
-Preferred:
-
-* Sidebar navigation
-* Clear section grouping
-* Active state
-* User/profile area at bottom if needed
+Mobile and desktop navigation should keep a clear active state and avoid adding extra primary sections.
 
 ## Empty States
 
@@ -676,9 +663,9 @@ Hero card should show the most important next action.
 For example:
 
 * Next interview
-* Today’s task
-* Missing follow-up
-* CV readiness issue
+* Add application
+* Start CV match
+* Prepare interview
 
 ### Tabs
 
@@ -706,53 +693,44 @@ On desktop:
 
 ## Screen-Specific Guidelines
 
-### Dashboard Screen
+### Applications Screen
 
 Must prioritize:
 
-1. Next interview
-2. Pending follow-ups
-3. Active applications
-4. Quick actions
+1. Application status summary
+2. Company and position
+3. Applied date and status
+4. Search and filters
+5. One Add Application action
 
-### Calendar Screen
-
-Must prioritize:
-
-1. Selected date
-2. Interview indicators
-3. Interview list for selected day
-4. Add interview action
-
-### Job Applications Screen
+### Interviews Screen
 
 Must prioritize:
 
-1. Application status
-2. Company
-3. Position
-4. Last update
-5. Next action
+1. Upcoming interviews
+2. Week strip indicators
+3. Join Meeting / Open Maps / Prepare actions
+4. Past interviews as secondary content
 
-### Interview Details Screen
-
-Must prioritize:
-
-1. Company and position
-2. Date and time
-3. Meeting link or location
-4. Preparation checklist
-5. Notes
-6. Follow-up action
-
-### CV / Profile Screen
+### Stats Screen
 
 Must prioritize:
 
-1. Completion percentage
-2. Missing sections
-3. ATS improvements
-4. Suggested next actions
+1. Total applications
+2. Interview rate
+3. Rejection rate
+4. Under review count
+5. One clear chart
+
+### Analyze Screen
+
+Must prioritize:
+
+1. CV upload status
+2. Job Match
+3. Interview Prep
+4. Clear validation messages
+5. AI result readability
 
 ## Design Review Checklist
 
@@ -777,9 +755,9 @@ Before accepting any UI change, check:
 
 | Date       | Decision                    | Rationale                                                                                                        |
 | ---------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| 2026-06-17 | Initial design system       | Built from gstack-inspired design principles and adapted for a job/interview tracking web app.                   |
-| 2026-06-17 | Amber accent system         | Amber gives a warm, focused, professional feel and should be used only for meaningful actions and active states. |
+| 2026-06-17 | Initial design system       | Started from premium SaaS principles and adapted for a job/interview tracking web app.                           |
+| 2026-06-30 | Blue-only identity          | The product now uses a premium dark navy / electric-blue identity. Yellow, orange, gold, and amber are retired.  |
 | 2026-06-17 | Dark and light mode support | The app should look premium in dark mode and clean/professional in light mode.                                   |
 | 2026-06-17 | Mobile-first layout         | The app must work reliably on small phones, iPhone-size screens, Samsung S24 Ultra, tablets, and desktop.        |
-| 2026-06-17 | Calendar as core experience | Interview tracking depends heavily on a clear, mobile-friendly calendar and selected-day detail view.            |
+| 2026-06-30 | Four-section product        | Main navigation is Applications, Interviews, Stats, Analyze. Settings is a secondary modal.                      |
 | 2026-06-17 | Grain texture optional      | Subtle material texture can improve the premium feel, but only if it does not reduce readability or performance. |

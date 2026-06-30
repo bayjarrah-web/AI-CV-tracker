@@ -222,6 +222,24 @@ When Codex creates a pull request, the summary must include:
 * What was tested
 * What still needs manual review
 
+## AI CV Tracker UI Design Rules
+
+Before UI work, Codex must read `DESIGN.md`. Before finishing UI work, Codex must read `UI_REVIEW_CHECKLIST.md` and use it as a final review gate.
+
+This project is a plain static HTML/CSS/JS GitHub Pages app. Do not introduce React, Next.js, Tailwind, npm packages, package managers, or build steps.
+
+Do not change schema, localStorage keys, routes, or data behavior during design work unless the user explicitly asks for that change. Keep the current product structure:
+
+* Applications
+* Interviews
+* Stats
+* Analyze
+* Settings modal from the header
+
+Work page by page. Touch only the requested page or shared shell elements needed for that page. Do not redesign unrelated pages, do not add duplicate CTAs, and do not reintroduce hidden clutter.
+
+Reference images are visual direction only. Do not generate images, do not embed reference screenshots as final UI, and do not use screenshots as UI assets unless the user explicitly requests that.
+
 ## Important Instruction
 
 Always read this file before making changes.
@@ -229,6 +247,7 @@ Always read this file before making changes.
 For design tasks, also read:
 
 * DESIGN.md
+* UI_REVIEW_CHECKLIST.md
 * docs/responsive-rules.md
 * docs/screens.md
 
