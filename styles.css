@@ -2072,6 +2072,11 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
   gap: 12px;
 }
 
+.jobs-toolbar .field,
+.jobs-toolbar .btn {
+  min-width: 0;
+}
+
 .search-field input {
   min-width: 0;
 }
@@ -2079,6 +2084,15 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
 .reset-filters-btn {
   min-height: 48px;
   white-space: nowrap;
+}
+
+.clear-status-filter-btn[hidden] {
+  display: none;
+}
+
+.empty-state-action {
+  justify-self: center;
+  margin-top: 4px;
 }
 
 .jobs-grid {
@@ -5388,6 +5402,25 @@ body:not(:has(#onboarding-screen:not(.hidden))) .tab-button {
     align-items: stretch;
     flex-direction: column;
   }
+
+  .jobs-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .jobs-toolbar .search-field,
+  .jobs-list-heading,
+  .reset-filters-btn {
+    grid-column: 1 / -1;
+  }
+
+  .jobs-toolbar select,
+  .jobs-toolbar input {
+    width: 100%;
+  }
+
+  .clear-status-filter-btn {
+    width: 100%;
+  }
 }
 
 /* Phase 10 final responsive polish */
@@ -5427,6 +5460,15 @@ body:not(:has(#onboarding-screen:not(.hidden))) .tab-button {
 
   .application-status-card {
     min-height: 104px;
+  }
+
+  .jobs-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .jobs-toolbar .field,
+  .jobs-toolbar .btn {
+    width: 100%;
   }
 
   .job-list-summary {

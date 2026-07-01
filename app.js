@@ -2207,10 +2207,10 @@ function renderApplicationsDashboardShell() {
 
   const counts = getApplicationStatusCounts();
   const allButton = document.querySelector("[data-application-status='all']");
-  const isAllActive = !JobFilters.search && JobFilters.status === "all" && JobFilters.priority === "all" && JobFilters.source === "all";
+  const hasStatusFilter = JobFilters.status !== "all";
   if (allButton) {
-    allButton.classList.toggle("active", isAllActive);
-    allButton.setAttribute("aria-pressed", String(isAllActive));
+    allButton.hidden = !hasStatusFilter;
+    allButton.setAttribute("aria-pressed", "false");
   }
 
   grid.innerHTML = APPLICATION_STATUS_CARDS.map((item) => {
@@ -2232,7 +2232,10 @@ function setApplicationStatusFilter(status) {
   if (status !== "all" && !APPLICATION_STATUS_CARDS.some((item) => item.status === status)) return;
 
   if (status === "all") {
-    resetJobFilters();
+    JobFilters.status = "all";
+    const statusFilter = document.getElementById("job-filter-status");
+    if (statusFilter) statusFilter.value = "all";
+    renderJobs();
     return;
   }
 
@@ -3049,8 +3052,12 @@ function renderJobs() {
   if (!jobs.length) {
     const emptyTitle = empty.querySelector("h2");
     const emptyBody = empty.querySelector("p");
+    const emptyAction = empty.querySelector(".empty-state-action");
+    const hasAnyJobs = AppState.jobs.length > 0;
+    empty.classList.toggle("empty-no-results", hasAnyJobs);
     if (emptyTitle) emptyTitle.textContent = AppState.jobs.length ? t("jobs.noFiltersResult") : t("empty.jobs.title");
     if (emptyBody) emptyBody.textContent = AppState.jobs.length ? t("jobs.noFiltersResultBody") : t("empty.jobs.body");
+    if (emptyAction) emptyAction.classList.toggle("hidden", hasAnyJobs);
     safeInitIcons();
     return;
   }

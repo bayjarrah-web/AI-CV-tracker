@@ -422,7 +422,8 @@ const TRANSLATIONS = {
       },
       jobs: {
         title: "لا توجد طلبات بعد",
-        body: "ابدأ بإضافة أول طلب، وبعدها ستظهر هنا قائمة منظمة قابلة للبحث والفلترة."
+        body: "أضف أول طلب لتبدأ متابعة رحلة البحث عن عمل.",
+        action: "إضافة طلب"
       },
       stats: {
         title: "الإحصائيات تبدأ بعد أول خطوة",
@@ -479,6 +480,7 @@ const TRANSLATIONS = {
       heroSubtitle: "تابع طلباتك من لوحة واحدة نظيفة.",
       allApplications: "كل الطلبات",
       resetView: "كل الطلبات",
+      clearStatusFilter: "إلغاء فلتر الحالة",
       details: "تفاصيل الطلب",
       position: "المنصب",
       changeStatus: "تغيير الحالة",
@@ -1205,7 +1207,8 @@ const TRANSLATIONS = {
       },
       jobs: {
         title: "No applications yet",
-        body: "Add your first application, then an organized searchable list will appear here."
+        body: "Add your first application to start tracking your job search.",
+        action: "Add Application"
       },
       stats: {
         title: "Stats begin after the first step",
@@ -1262,6 +1265,7 @@ const TRANSLATIONS = {
       heroSubtitle: "Track your applications from one clean dashboard.",
       allApplications: "All Applications",
       resetView: "All Applications",
+      clearStatusFilter: "Clear status filter",
       details: "Application details",
       position: "Position",
       changeStatus: "Change Status",

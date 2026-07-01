@@ -196,7 +196,7 @@
             <div class="jobs-toolbar glass-card">
               <div class="jobs-list-heading">
                 <h2 data-i18n="applicationsDashboard.allApplications">All Applications</h2>
-                <button class="btn btn-small btn-secondary" type="button" data-application-status="all" data-i18n="applicationsDashboard.resetView">All Applications</button>
+                <button class="btn btn-small btn-secondary clear-status-filter-btn" type="button" data-application-status="all" data-i18n="applicationsDashboard.clearStatusFilter" hidden>Clear status filter</button>
               </div>
               <label class="field search-field">
                 <span data-i18n="jobs.searchLabel">بحث</span>
@@ -227,6 +227,7 @@
                 <div class="empty-icon">JOB</div>
                 <h2 data-i18n="empty.jobs.title">لا توجد طلبات بعد</h2>
                 <p data-i18n="empty.jobs.body">ابدأ بإضافة أول طلب، وبعدها ستظهر هنا قائمة منظمة قابلة للبحث والفلترة.</p>
+                <button class="btn btn-primary empty-state-action" type="button" data-open-job-modal data-i18n="empty.jobs.action">إضافة طلب</button>
               </div>
             </div>
           </section>
