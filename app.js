@@ -2011,6 +2011,31 @@ function getInterviewCountForDate(isoDate) {
   return AppState.interviews.filter((interview) => interview.interviewDate === isoDate).length;
 }
 
+function getInterviewCountLabel(count) {
+  if (AppState.language === "ar") {
+    if (count === 1) return t("interviews.week.countOne");
+    if (count === 2) return t("interviews.week.countTwo");
+  }
+
+  return formatMessage("interviews.week.countMany", { count });
+}
+
+function getSelectedInterviewContext(count) {
+  if (!selectedInterviewDate) {
+    return t("interviews.week.contextAll");
+  }
+
+  if (count === 0) {
+    return t("interviews.empty.selectedDayTitle");
+  }
+
+  const dateLabel = selectedInterviewDate === todayISO()
+    ? t("interviews.week.today")
+    : formatDate(selectedInterviewDate);
+
+  return `${dateLabel} · ${getInterviewCountLabel(count)}`;
+}
+
 function renderInterviewWeekStrip() {
   const strip = document.getElementById("interview-week-strip");
   if (!strip) return;
@@ -2032,10 +2057,10 @@ function renderInterviewWeekStrip() {
         const isToday = day === todayISO();
         const isSelected = selectedInterviewDate === day;
         return `
-          <button class="interview-week-day${isToday ? " today" : ""}${count ? " has-interview" : ""}${isSelected ? " selected" : ""}" type="button" data-interview-date="${escapeHTML(day)}" aria-pressed="${isSelected}">
+          <button class="interview-week-day${isToday ? " today" : ""}${count ? " has-interview" : ""}${isSelected ? " selected" : ""}" type="button" data-interview-date="${escapeHTML(day)}" aria-pressed="${isSelected}" aria-label="${escapeHTML(`${isToday ? t("interviews.week.today") : formatDate(day)} · ${count ? getInterviewCountLabel(count) : t("interviews.week.noInterviews")}`)}">
             <span>${escapeHTML(isToday ? t("interviews.week.today") : formatWeekday(day))}</span>
             <strong>${escapeHTML(new Date(`${day}T00:00:00`).getDate())}</strong>
-            ${count ? `<small>${escapeHTML(count)}</small>` : "<i></i>"}
+            ${count ? `<small>${escapeHTML(getInterviewCountLabel(count))}</small>` : "<i></i>"}
           </button>
         `;
       }).join("")}
@@ -2084,11 +2109,17 @@ function prepareForInterview(interviewId) {
   switchTab("analyzer");
 }
 
-function renderInterviewEmptyState(titleKey, bodyKey) {
+function renderInterviewEmptyState(titleKey, bodyKey, options = {}) {
   return `
     <div class="interview-empty-inline glass-card">
       <strong>${escapeHTML(t(titleKey))}</strong>
       <span>${escapeHTML(t(bodyKey))}</span>
+      ${options.showAction ? `
+        <button class="btn btn-primary btn-small" type="button" data-open-interview-modal>
+          <span class="btn-plus">+</span>
+          ${escapeHTML(t("interviews.addInterview"))}
+        </button>
+      ` : ""}
     </div>
   `;
 }
@@ -2149,8 +2180,12 @@ function renderInterviews(filter) {
     ? groups.upcoming.filter((interview) => interview.interviewDate === selectedInterviewDate)
     : groups.upcoming;
   const past = groups.past;
+  const hasAnyInterviews = AppState.interviews.length > 0;
   const emptyTitleKey = selectedInterviewDate ? "interviews.empty.selectedDayTitle" : "interviews.empty.upcomingTitle";
   const emptyBodyKey = selectedInterviewDate ? "interviews.empty.selectedDayBody" : "interviews.empty.upcomingBody";
+  const zeroEmptyTitleKey = "interviews.empty.zeroTitle";
+  const zeroEmptyBodyKey = "interviews.empty.zeroBody";
+  const contextLabel = getSelectedInterviewContext(upcoming.length);
 
   renderInterviewWeekStrip();
 
@@ -2160,12 +2195,15 @@ function renderInterviews(filter) {
         <div>
           <p class="eyebrow">${escapeHTML(t("interviews.views.upcoming"))}</p>
           <h3>${escapeHTML(t("interviews.upcomingTitle"))}</h3>
+          <small class="interview-selected-context">${escapeHTML(contextLabel)}</small>
         </div>
         <span>${escapeHTML(upcoming.length)}</span>
       </div>
       ${upcoming.length
         ? `<div class="interview-list">${upcoming.map(renderInterviewCard).join("")}</div>`
-        : renderInterviewEmptyState(emptyTitleKey, emptyBodyKey)}
+        : hasAnyInterviews
+          ? renderInterviewEmptyState(emptyTitleKey, emptyBodyKey)
+          : renderInterviewEmptyState(zeroEmptyTitleKey, zeroEmptyBodyKey, { showAction: true })}
     </section>
 
     <details class="interview-past-section glass-card">
@@ -4816,6 +4854,12 @@ function bindInterviewsEvents() {
 
   if (interviewsGrid) {
     interviewsGrid.addEventListener("click", (event) => {
+      const openModalButton = event.target.closest("[data-open-interview-modal]");
+      if (openModalButton) {
+        openAddInterviewModal();
+        return;
+      }
+
       const button = event.target.closest("[data-interview-action]");
       if (!button) return;
 
