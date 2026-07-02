@@ -2078,18 +2078,18 @@ function getInterviewMapsUrl(interview) {
 
 function renderInterviewPrimaryActions(interview) {
   const meetingButton = ["video", "async_video"].includes(interview.format) && isSafeUrl(interview.meetingUrl)
-    ? `<a class="btn btn-small btn-primary" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="video"></i>${escapeHTML(t("interviews.joinMeeting"))}</a>`
+    ? `<a class="btn btn-small btn-primary interview-join-action" href="${escapeHTML(interview.meetingUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="video"></i>${escapeHTML(t("interviews.joinMeeting"))}</a>`
     : "";
   const mapsUrl = getInterviewMapsUrl(interview);
   const mapsButton = mapsUrl
-    ? `<a class="btn btn-small btn-primary" href="${escapeHTML(mapsUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="map-pin"></i>${escapeHTML(t("interviews.openMap"))}</a>`
+    ? `<a class="btn btn-small btn-secondary interview-map-action" href="${escapeHTML(mapsUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="map-pin"></i>${escapeHTML(t("interviews.openMap"))}</a>`
     : "";
 
   return `
     <div class="interview-primary-actions">
       ${meetingButton}
       ${mapsButton}
-      <button class="btn btn-small btn-secondary" type="button" data-interview-action="prepare" data-interview-id="${escapeHTML(interview.id)}"><i data-lucide="sparkles"></i>${escapeHTML(t("interviews.prepare"))}</button>
+      <button class="btn btn-small btn-secondary interview-prepare-action" type="button" data-interview-action="prepare" data-interview-id="${escapeHTML(interview.id)}"><i data-lucide="sparkles"></i>${escapeHTML(t("interviews.prepare"))}</button>
     </div>
   `;
 }
@@ -2140,8 +2140,8 @@ function renderInterviewCard(interview) {
       <div class="interview-card-top">
         <div>
           <p class="eyebrow">${escapeHTML(t("interviews.round"))} ${escapeHTML(interview.round)} · ${escapeHTML(t(`interviewRoundTypes.${interview.roundType}`))}</p>
-          <h3>${escapeHTML(interview.jobTitle)}</h3>
-          <p>${escapeHTML(interview.company)}</p>
+          <h3 class="interview-company-name">${escapeHTML(interview.company)}</h3>
+          <p class="interview-position-title">${escapeHTML(interview.jobTitle)}</p>
         </div>
         <div class="interview-date-chip">
           <strong>${escapeHTML(formatDate(interview.interviewDate))}</strong>
@@ -2161,8 +2161,8 @@ function renderInterviewCard(interview) {
       <div class="job-actions">
         ${renderInterviewPrimaryActions(interview)}
         <div class="interview-secondary-actions">
-          <button class="btn btn-small btn-secondary" type="button" data-interview-action="edit" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.edit"))}</button>
-          <button class="btn btn-small btn-danger" type="button" data-interview-action="delete" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.delete"))}</button>
+          <button class="btn btn-small btn-secondary interview-edit-action" type="button" data-interview-action="edit" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.edit"))}</button>
+          <button class="btn btn-small btn-danger interview-delete-action" type="button" data-interview-action="delete" data-interview-id="${escapeHTML(interview.id)}">${escapeHTML(t("common.delete"))}</button>
         </div>
       </div>
     </article>

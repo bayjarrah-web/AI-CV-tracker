@@ -2529,9 +2529,9 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
 
 .interview-card {
   display: grid;
-  gap: 16px;
-  border-radius: 8px;
-  padding: 18px;
+  gap: 14px;
+  border-radius: 18px;
+  padding: clamp(15px, 3vw, 20px);
   position: relative;
   overflow: hidden;
 }
@@ -2548,7 +2548,15 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
 }
 
 .interview-card.past-interview::before {
-  background: linear-gradient(180deg, var(--surface-mid), var(--text-muted));
+  background: linear-gradient(180deg, rgba(96, 165, 250, 0.28), rgba(113, 128, 150, 0.14));
+  opacity: 0.56;
+}
+
+.interview-card.past-interview {
+  border-color: rgba(96, 165, 250, 0.09);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 46%),
+    rgba(8, 18, 32, 0.42);
 }
 
 .interview-card.today-interview {
@@ -2566,24 +2574,36 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
 
 .interview-card-top h3 {
   overflow-wrap: anywhere;
-  font-size: 1.12rem;
+  font-size: clamp(1.08rem, 2.5vw, 1.28rem);
+  letter-spacing: 0;
+  line-height: 1.15;
 }
 
-.interview-card-top p:not(.eyebrow) {
+.interview-card .eyebrow {
+  color: rgba(168, 180, 199, 0.72);
+  font-size: 0.72rem;
+}
+
+.interview-card-top p:not(.eyebrow),
+.interview-position-title {
   margin-top: 4px;
-  color: rgba(249, 250, 251, 0.68);
-  font-weight: 800;
+  color: rgba(168, 180, 199, 0.82);
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .interview-date-chip {
   display: grid;
   gap: 4px;
-  min-width: 140px;
-  border: 1px solid rgba(34, 211, 238, 0.2);
-  border-radius: 8px;
-  padding: 10px;
+  min-width: 136px;
+  border: 1px solid rgba(96, 165, 250, 0.18);
+  border-radius: 14px;
+  padding: 10px 12px;
   text-align: center;
-  background: rgba(34, 211, 238, 0.08);
+  background:
+    linear-gradient(180deg, rgba(56, 189, 248, 0.08), transparent),
+    rgba(2, 6, 23, 0.26);
 }
 
 .interview-date-chip strong {
@@ -2591,7 +2611,7 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
 }
 
 .interview-date-chip span {
-  color: var(--cyan);
+  color: #7dd3fc;
   font-family: var(--font-mono);
   font-weight: 900;
 }
@@ -2605,14 +2625,17 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
 
 .interview-detail-list {
   display: grid;
-  gap: 8px;
+  gap: 7px;
+  border-top: 1px solid rgba(96, 165, 250, 0.08);
+  padding-top: 12px;
 }
 
 .interview-detail-list span,
 .interview-person {
-  color: rgba(249, 250, 251, 0.64);
+  color: rgba(203, 213, 225, 0.74);
   font-size: 0.88rem;
-  font-weight: 800;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .interview-week-strip {
@@ -2794,6 +2817,8 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  border-top: 1px solid rgba(96, 165, 250, 0.08);
+  padding-top: 12px;
   flex-wrap: wrap;
 }
 
@@ -2807,7 +2832,9 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
 
 .interview-primary-actions .btn,
 .interview-secondary-actions .btn {
-  min-height: 38px;
+  min-height: 40px;
+  border-radius: 12px;
+  padding-inline: 12px;
 }
 
 .interview-primary-actions .btn svg {
@@ -2815,8 +2842,47 @@ body:not(:has(#onboarding-screen:not(.hidden))) .language-globe {
   height: 1rem;
 }
 
+.interview-map-action,
+.interview-prepare-action,
+.interview-edit-action {
+  color: rgba(219, 234, 254, 0.88);
+  border-color: rgba(96, 165, 250, 0.16);
+  background: rgba(15, 30, 50, 0.42);
+  box-shadow: none;
+}
+
+.interview-prepare-action {
+  border-color: rgba(56, 189, 248, 0.22);
+  background: rgba(29, 124, 255, 0.08);
+}
+
+.interview-map-action {
+  color: rgba(191, 219, 254, 0.86);
+}
+
+.interview-delete-action {
+  color: #fecdd3;
+  border-color: rgba(255, 77, 109, 0.34);
+  background: rgba(255, 77, 109, 0.075);
+  box-shadow: none;
+}
+
 .interview-secondary-actions {
-  opacity: 0.78;
+  opacity: 0.8;
+}
+
+.interview-card.past-interview .interview-date-chip,
+.interview-card.past-interview .interview-map-action,
+.interview-card.past-interview .interview-prepare-action,
+.interview-card.past-interview .interview-edit-action {
+  background: rgba(15, 30, 50, 0.28);
+  border-color: rgba(96, 165, 250, 0.1);
+}
+
+.interview-card.past-interview .interview-company-name,
+.interview-card.past-interview .interview-position-title,
+.interview-card.past-interview .interview-detail-list span {
+  opacity: 0.82;
 }
 
 .interview-empty-inline {
