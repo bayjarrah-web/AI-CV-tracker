@@ -2840,12 +2840,42 @@ function renderStatsChartTypeToggle() {
   return `
     <div class="stats-chart-toggle" role="tablist" aria-label="${escapeHTML(t("statsDashboard.chartView"))}">
       ${["bar", "donut"].map((type) => `
-        <button class="period-filter-tab${statsChartType === type ? " active" : ""}" type="button" data-stats-chart="${escapeHTML(type)}">
+        <button class="period-filter-tab${statsChartType === type ? " active" : ""}" type="button" data-stats-chart="${escapeHTML(type)}" role="tab" aria-selected="${statsChartType === type}">
           ${escapeHTML(t(`statsDashboard.chartTypes.${type}`))}
         </button>
       `).join("")}
     </div>
   `;
+}
+
+function formatStatsApplicationCount(count) {
+  const value = Number(count) || 0;
+  if (AppState.language === "ar") {
+    if (value === 1) return "طلب واحد";
+    if (value === 2) return "طلبان";
+    return `${value} طلبات`;
+  }
+  return `${value} ${value === 1 ? "application" : "applications"}`;
+}
+
+function formatStatsInterviewCount(count) {
+  const value = Number(count) || 0;
+  if (AppState.language === "ar") {
+    if (value === 1) return "مقابلة واحدة";
+    if (value === 2) return "مقابلتان";
+    return `${value} مقابلات`;
+  }
+  return `${value} ${value === 1 ? "interview" : "interviews"}`;
+}
+
+function formatStatsSourceCount(count) {
+  const value = Number(count) || 0;
+  if (AppState.language === "ar") {
+    if (value === 1) return "مصدر واحد";
+    if (value === 2) return "مصدران";
+    return `${value} مصادر`;
+  }
+  return `${value} ${value === 1 ? "source" : "sources"}`;
 }
 
 function renderStatsEmptyState() {
@@ -2952,13 +2982,12 @@ function getSimplifiedSourcePerformance(jobs = getStatsJobs()) {
 
 function renderSimplifiedSourcePerformance(data) {
   const sources = getSimplifiedSourcePerformance(getStatsJobs(StatsFilters.period));
-  const best = sources[0] || null;
 
   return `
     <section class="stats-simple-card stats-source-card glass-card">
       <div class="stats-card-header">
         <h3>${escapeHTML(t("statsDashboard.sourcePerformance"))}</h3>
-        <span>${escapeHTML(best ? best.label : t("statsDashboard.noDataShort"))}</span>
+        <span>${escapeHTML(sources.length ? formatStatsSourceCount(sources.length) : t("statsDashboard.noDataShort"))}</span>
       </div>
       ${sources.length
         ? `<div class="source-analytics-list">
@@ -2967,8 +2996,8 @@ function renderSimplifiedSourcePerformance(data) {
                 <div>
                   <strong>${escapeHTML(source.label)}</strong>
                   <span>${escapeHTML(formatMessage("statsDashboard.sourcePerformanceLine", {
-                    applications: source.count,
-                    interviews: source.interviews,
+                    applications: formatStatsApplicationCount(source.count),
+                    interviews: formatStatsInterviewCount(source.interviews),
                     rate: source.interviewRate
                   }))}</span>
                 </div>

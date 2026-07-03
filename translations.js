@@ -555,7 +555,7 @@ const TRANSLATIONS = {
       emptyBody: "أضف أول طلب لتبدأ رؤية مؤشرات رحلة البحث عن عمل.",
       emptyAction: "إضافة طلب",
       limitedDataNote: "البيانات ما زالت قليلة. أضف طلبات أكثر للحصول على مؤشرات أدق.",
-      sourcePerformanceLine: "{applications} طلبات · {interviews} مقابلة · {rate}%",
+      sourcePerformanceLine: "{applications} · {interviews} · {rate}%",
       chartView: "طريقة عرض الرسم",
       chartTypes: {
         bar: "أعمدة",
@@ -571,8 +571,8 @@ const TRANSLATIONS = {
         quarter: "آخر 3 أشهر",
         all: "كل الوقت"
       },
-      noData: "أضف أول وظيفة لتظهر الرسوم والتحليلات هنا.",
-      noSources: "لا توجد مصادر بعد. ستظهر القنوات الأقوى بعد إضافة الوظائف.",
+      noData: "أضف أول طلب لتظهر الرسوم والتحليلات هنا.",
+      noSources: "لا توجد مصادر بعد. ستظهر القنوات الأقوى بعد إضافة الطلبات.",
       noTimeline: "لا يوجد نشاط خلال آخر 30 يوم.",
       timelineApplication: "تم تسجيل طلب وظيفة",
       timelineInterview: "تمت جدولة مقابلة",
@@ -1351,7 +1351,7 @@ const TRANSLATIONS = {
       emptyBody: "Add your first application to start seeing your job search insights.",
       emptyAction: "Add Application",
       limitedDataNote: "Based on limited data. Add more applications for more reliable insights.",
-      sourcePerformanceLine: "{applications} applications · {interviews} interviews · {rate}%",
+      sourcePerformanceLine: "{applications} · {interviews} · {rate}%",
       chartView: "Chart view",
       chartTypes: {
         bar: "Bar",
@@ -1367,8 +1367,8 @@ const TRANSLATIONS = {
         quarter: "Last 3 Months",
         all: "All Time"
       },
-      noData: "Add your first job to unlock charts and analytics here.",
-      noSources: "No sources yet. Your strongest channels will appear after adding jobs.",
+      noData: "Add your first application to unlock charts and analytics here.",
+      noSources: "No sources yet. Your strongest channels will appear after adding applications.",
       noTimeline: "No activity in the last 30 days yet.",
       timelineApplication: "Application recorded",
       timelineInterview: "Interview scheduled",
