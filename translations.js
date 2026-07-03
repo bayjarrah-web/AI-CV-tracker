@@ -551,6 +551,10 @@ const TRANSLATIONS = {
       notAvailable: "غير متاح",
       noDataYet: "لا توجد بيانات بعد",
       emptyStats: "أضف طلبات لعرض إحصائياتك.",
+      emptyTitle: "لا توجد إحصائيات بعد",
+      emptyBody: "أضف أول طلب لتبدأ رؤية مؤشرات رحلة البحث عن عمل.",
+      emptyAction: "إضافة طلب",
+      limitedDataNote: "البيانات ما زالت قليلة. أضف طلبات أكثر للحصول على مؤشرات أدق.",
       sourcePerformanceLine: "{applications} طلبات · {interviews} مقابلة · {rate}%",
       chartView: "طريقة عرض الرسم",
       chartTypes: {
@@ -1343,6 +1347,10 @@ const TRANSLATIONS = {
       notAvailable: "N/A",
       noDataYet: "No data yet",
       emptyStats: "Add applications to see your statistics.",
+      emptyTitle: "No stats yet",
+      emptyBody: "Add your first application to start seeing your job search insights.",
+      emptyAction: "Add Application",
+      limitedDataNote: "Based on limited data. Add more applications for more reliable insights.",
       sourcePerformanceLine: "{applications} applications · {interviews} interviews · {rate}%",
       chartView: "Chart view",
       chartTypes: {

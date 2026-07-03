@@ -2848,6 +2848,30 @@ function renderStatsChartTypeToggle() {
   `;
 }
 
+function renderStatsEmptyState() {
+  return `
+    <div class="stats-empty-state">
+      <div class="foundation-icon stats-empty-icon"><i data-lucide="bar-chart-3"></i></div>
+      <strong>${escapeHTML(t("statsDashboard.emptyTitle"))}</strong>
+      <p>${escapeHTML(t("statsDashboard.emptyBody"))}</p>
+      <button class="btn btn-primary" type="button" data-stats-add-application>
+        ${escapeHTML(t("statsDashboard.emptyAction"))}
+      </button>
+    </div>
+  `;
+}
+
+function renderStatsLimitedDataNote(data) {
+  if (data.total < 1 || data.total > 2) return "";
+
+  return `
+    <div class="stats-limited-note" role="note">
+      <i data-lucide="info"></i>
+      <span>${escapeHTML(t("statsDashboard.limitedDataNote"))}</span>
+    </div>
+  `;
+}
+
 function renderSimplifiedStatsChart(data) {
   const canvas = document.getElementById("stats-simple-chart");
   if (!canvas) return;
@@ -2988,6 +3012,7 @@ function renderStats() {
       </div>
 
       ${renderSimplifiedStatsKpis(data)}
+      ${renderStatsLimitedDataNote(data)}
 
       <div class="stats-simple-grid">
         <section class="stats-simple-card chart-card glass-card">
@@ -2997,7 +3022,7 @@ function renderStats() {
           </div>
           ${data.total
             ? `${renderStatsChartTypeToggle()}<div class="chart-wrap"><canvas id="stats-simple-chart"></canvas></div>`
-            : `<div class="today-positive-state muted-state">${escapeHTML(t("statsDashboard.emptyStats"))}</div>`}
+            : renderStatsEmptyState()}
         </section>
 
         ${renderSimplifiedSourcePerformance(data)}
@@ -4888,6 +4913,14 @@ function bindStatsEvents() {
     if (chartButton) {
       statsChartType = ["bar", "donut"].includes(chartButton.dataset.statsChart) ? chartButton.dataset.statsChart : "bar";
       renderStats();
+      return;
+    }
+
+    const addApplicationButton = event.target.closest("[data-stats-add-application]");
+    if (addApplicationButton) {
+      switchTab("jobs");
+      window.requestAnimationFrame(openAddJobModal);
+      return;
     }
   });
 }

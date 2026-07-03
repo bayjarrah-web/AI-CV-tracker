@@ -5988,3 +5988,77 @@ body:not(:has(#onboarding-screen:not(.hidden))) .tab-button {
     flex-direction: column;
   }
 }
+
+/* Phase E.2: Stats P1 scoped polish */
+.stats-dashboard .period-filter-tab.active,
+.stats-dashboard .stats-chart-toggle .period-filter-tab.active {
+  color: #f8fafc;
+  border-color: rgba(56, 189, 248, 0.58);
+  background: linear-gradient(135deg, rgba(29, 124, 255, 0.92), rgba(16, 189, 245, 0.82));
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.16), 0 14px 34px rgba(29, 124, 255, 0.18);
+}
+
+.stats-dashboard .stats-hero-score {
+  border-color: rgba(56, 189, 248, 0.3);
+  background: rgba(15, 30, 50, 0.56);
+  box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.05), 0 16px 42px rgba(29, 124, 255, 0.1);
+}
+
+.stats-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  min-height: 260px;
+  padding: clamp(20px, 5vw, 34px);
+  text-align: center;
+  border: 1px solid rgba(96, 165, 250, 0.16);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(15, 30, 50, 0.56), rgba(2, 11, 24, 0.38));
+}
+
+.stats-empty-icon {
+  width: 54px;
+  height: 54px;
+  color: #bae6fd;
+  border-color: rgba(56, 189, 248, 0.26);
+  background: radial-gradient(circle at 32% 24%, rgba(56, 189, 248, 0.28), rgba(29, 124, 255, 0.12) 54%, rgba(2, 11, 24, 0.36));
+}
+
+.stats-empty-state strong {
+  color: var(--text-primary);
+  font-size: clamp(1.15rem, 3vw, 1.35rem);
+  font-weight: 900;
+}
+
+.stats-empty-state p {
+  max-width: 38ch;
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.stats-limited-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: -4px;
+  padding: 12px 14px;
+  color: rgba(186, 230, 253, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 16px;
+  background: rgba(15, 30, 50, 0.48);
+}
+
+.stats-limited-note svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: var(--cyan);
+}
+
+.stats-limited-note span {
+  color: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.55;
+}
