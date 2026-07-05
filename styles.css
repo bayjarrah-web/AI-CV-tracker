@@ -89,11 +89,20 @@ body {
 
 body:has(#onboarding-screen:not(.hidden)) {
   overflow-x: hidden;
+  overflow-y: hidden;
+  min-height: 100svh;
   background:
     radial-gradient(ellipse at 50% 48%, rgba(59, 130, 246, 0.18), transparent 34%),
     radial-gradient(ellipse at 8% 72%, rgba(56, 189, 248, 0.1), transparent 28%),
     radial-gradient(ellipse at 90% 18%, rgba(37, 99, 235, 0.1), transparent 28%),
     linear-gradient(135deg, #020617 0%, #06111F 52%, #02040B 100%);
+}
+
+body:has(#onboarding-screen:not(.hidden)) .app-shell {
+  height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+  padding: 0;
 }
 
 body:has(#onboarding-screen:not(.hidden))::before,
@@ -308,10 +317,13 @@ p {
 
 .onboarding-screen {
   display: grid;
-  min-height: calc(100vh - 48px);
+  height: 100svh;
+  min-height: 100svh;
+  grid-template-rows: minmax(0, 1fr) auto;
   place-items: center;
   isolation: isolate;
-  padding-top: 46px;
+  padding: 70px clamp(18px, 4vw, 48px) 18px;
+  overflow: hidden;
 }
 
 .onboarding-topbar {
@@ -360,12 +372,12 @@ p {
 
 .onboarding-card {
   position: relative;
-  width: min(100%, 720px);
+  width: min(100%, 680px);
   min-height: 0;
   overflow: hidden;
   border: 1px solid var(--onboarding-border);
   border-radius: 30px;
-  padding: clamp(26px, 4vw, 38px);
+  padding: clamp(20px, 3vw, 28px);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 34%),
     var(--onboarding-surface);
@@ -380,7 +392,7 @@ p {
 }
 
 .onboarding-footer {
-  margin-top: 24px;
+  margin-top: 14px;
   color: rgba(169, 180, 199, 0.72);
   font-size: 0.86rem;
   font-weight: 650;
@@ -407,7 +419,7 @@ p {
   width: calc(100% - 56px);
   height: 1px;
   left: 28px;
-  top: calc(100% - 238px);
+  top: calc(100% - 198px);
   background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.16), rgba(56, 189, 248, 0.58), rgba(37, 99, 235, 0.16), transparent);
   box-shadow: 0 0 16px rgba(56, 189, 248, 0.38);
 }
@@ -474,7 +486,7 @@ p {
   gap: 4px;
   color: var(--onboarding-text);
   font-family: "Plus Jakarta Sans", Inter, "Cairo", sans-serif;
-  font-size: clamp(2.8rem, 5.2vw, 4.25rem);
+  font-size: clamp(2.25rem, 4.4vw, 3.45rem);
   font-weight: 800;
   line-height: 1.16;
   text-align: center;
@@ -503,9 +515,9 @@ p {
 
 .onboarding-premium-copy {
   max-width: 520px;
-  margin: 16px auto 0;
-  font-size: clamp(1.1rem, 1.7vw, 1.28rem);
-  line-height: 1.65;
+  margin: 10px auto 0;
+  font-size: clamp(1rem, 1.35vw, 1.14rem);
+  line-height: 1.55;
   letter-spacing: 0;
 }
 
@@ -531,14 +543,14 @@ p {
   width: 100%;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
-  margin: 50px auto 0;
+  margin: 30px auto 0;
 }
 
 .onboarding-feature-card {
   display: grid;
   justify-items: center;
   gap: 10px;
-  min-height: 152px;
+  min-height: 126px;
   border: 1px solid rgba(96, 165, 250, 0.16);
   border-radius: 16px;
   padding: 22px 16px 18px;
@@ -554,8 +566,8 @@ p {
 
 .feature-icon {
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   place-items: center;
   border-radius: 999px;
   color: #38BDF8;
@@ -564,27 +576,27 @@ p {
 }
 
 .feature-icon svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   stroke-width: 2.2;
 }
 
 .onboarding-feature-card strong {
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   font-weight: 800;
 }
 
 .onboarding-feature-card small {
   max-width: 165px;
   color: rgba(203, 213, 225, 0.78);
-  font-size: 0.83rem;
+  font-size: 0.78rem;
   font-weight: 650;
   line-height: 1.55;
 }
 
 .onboarding-screen .btn-primary {
   min-width: min(100%, 365px);
-  min-height: 64px;
+  min-height: 56px;
   border: 1px solid rgba(96, 165, 250, 0.44);
   border-radius: 18px;
   color: #FFFFFF;
@@ -4568,8 +4580,10 @@ textarea:focus-visible,
   }
 
   .onboarding-screen {
-    min-height: calc(100vh - 28px);
-    padding-top: 42px;
+    height: auto;
+    min-height: 100svh;
+    padding: 56px 12px 18px;
+    overflow: visible;
   }
 
   .onboarding-card {
@@ -5402,6 +5416,16 @@ body:has(#onboarding-screen:not(.hidden)) .onboarding-card.glass-card {
 }
 
 @media (max-width: 640px) {
+  body:has(#onboarding-screen:not(.hidden)) {
+    overflow-y: auto;
+  }
+
+  body:has(#onboarding-screen:not(.hidden)) .app-shell {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
   body:has(#onboarding-screen:not(.hidden)) .global-language-switch {
     right: 12px;
     left: auto;
