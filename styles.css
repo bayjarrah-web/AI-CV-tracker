@@ -355,19 +355,24 @@ p {
 
 .onboarding-product-mark {
   display: grid;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   place-items: center;
-  border: 1px solid rgba(96, 165, 250, 0.28);
-  border-radius: 11px;
-  color: #EAF4FF;
-  background:
-    radial-gradient(circle at 36% 28%, rgba(255, 255, 255, 0.36), transparent 18%),
-    linear-gradient(145deg, rgba(56, 189, 248, 0.35), rgba(37, 99, 235, 0.68));
-  box-shadow: 0 0 18px rgba(59, 130, 246, 0.18);
-  font-family: var(--font-mono);
-  font-weight: 900;
-  text-shadow: 0 0 14px rgba(77, 163, 255, 0.58);
+  overflow: hidden;
+  border: 1px solid rgba(96, 165, 250, 0.22);
+  border-radius: 13px;
+  background: rgba(8, 18, 32, 0.56);
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.28),
+    0 0 22px rgba(59, 130, 246, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.onboarding-product-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .onboarding-card {
@@ -4574,9 +4579,9 @@ textarea:focus-visible,
   }
 
   .onboarding-product-mark {
-    width: 22px;
-    height: 22px;
-    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
   }
 
   .onboarding-screen {
