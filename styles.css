@@ -87,6 +87,249 @@ body {
   line-height: 1.7;
 }
 
+.startup-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: auto;
+  touch-action: none;
+  overscroll-behavior: contain;
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(59, 130, 246, 0.28), transparent 35%),
+    radial-gradient(ellipse at 18% 78%, rgba(56, 189, 248, 0.16), transparent 30%),
+    radial-gradient(ellipse at 86% 18%, rgba(37, 99, 235, 0.18), transparent 28%),
+    linear-gradient(135deg, #020617 0%, #06111f 52%, #02040b 100%);
+  animation: splashExit 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.startup-splash::before,
+.startup-splash::after,
+.startup-splash__aurora {
+  position: absolute;
+  pointer-events: none;
+  content: "";
+}
+
+.startup-splash::before {
+  width: 118vw;
+  height: 118vw;
+  left: -62vw;
+  bottom: -78vw;
+  border: 1px solid transparent;
+  border-top-color: rgba(56, 189, 248, 0.34);
+  border-left-color: rgba(37, 99, 235, 0.15);
+  border-radius: 50%;
+  box-shadow:
+    -12px -18px 40px rgba(56, 189, 248, 0.14),
+    -34px -34px 90px rgba(37, 99, 235, 0.12);
+  opacity: 0.66;
+}
+
+.startup-splash::after {
+  width: 96vw;
+  height: 96vw;
+  right: -58vw;
+  top: -66vw;
+  border: 1px solid transparent;
+  border-right-color: rgba(56, 189, 248, 0.12);
+  border-bottom-color: rgba(59, 130, 246, 0.24);
+  border-radius: 50%;
+  opacity: 0.48;
+}
+
+.startup-splash__aurora {
+  inset: -18%;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(56, 189, 248, 0.12), transparent 36%),
+    linear-gradient(110deg, transparent 20%, rgba(37, 99, 235, 0.12) 42%, rgba(56, 189, 248, 0.18) 50%, rgba(37, 99, 235, 0.08) 58%, transparent 78%);
+  filter: blur(28px);
+  opacity: 0.8;
+  transform: translateX(-8%);
+  animation: splashAurora 3s ease-out forwards;
+}
+
+.startup-splash__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  opacity: 0;
+  transform: translateX(-54px) scale(0.96);
+  animation: splashContentIn 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.startup-splash__brand {
+  margin: 0;
+  color: #F8FAFC;
+  font-family: "Plus Jakarta Sans", Inter, "Cairo", sans-serif;
+  font-size: clamp(1.25rem, 3.2vw, 2rem);
+  font-weight: 850;
+  letter-spacing: 0;
+  text-shadow:
+    0 0 24px rgba(56, 189, 248, 0.3),
+    0 12px 40px rgba(0, 0, 0, 0.42);
+}
+
+.startup-splash__logo {
+  position: relative;
+  display: grid;
+  width: clamp(148px, 21vw, 245px);
+  aspect-ratio: 1;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(96, 165, 250, 0.24);
+  border-radius: 32px;
+  background: rgba(8, 18, 32, 0.68);
+  box-shadow:
+    0 32px 100px rgba(0, 0, 0, 0.5),
+    0 0 90px rgba(59, 130, 246, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.startup-splash__logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  animation: splashLogoFloat 3s ease-in-out forwards;
+}
+
+.startup-splash__logo::before {
+  position: absolute;
+  inset: -38%;
+  content: "";
+  background: linear-gradient(115deg, transparent 24%, rgba(255, 255, 255, 0.22) 46%, rgba(56, 189, 248, 0.16) 50%, transparent 64%);
+  transform: translateX(-72%) rotate(10deg);
+  animation: splashLogoSweep 3s ease-out forwards;
+}
+
+.startup-splash__logo::after {
+  position: absolute;
+  right: 17%;
+  bottom: 17%;
+  width: 27%;
+  aspect-ratio: 1;
+  border: 3px solid rgba(56, 189, 248, 0.74);
+  border-radius: 50%;
+  box-shadow:
+    0 0 18px rgba(56, 189, 248, 0.58),
+    inset 0 0 14px rgba(59, 130, 246, 0.24);
+  content: "";
+  opacity: 0.72;
+  transform: translate(-10px, 6px) scale(0.92);
+  animation: splashMagnifier 3s ease-in-out forwards;
+}
+
+.startup-splash__line {
+  width: min(280px, 58vw);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.72), transparent);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.46);
+  opacity: 0;
+  animation: splashLineIn 3s ease-out forwards;
+}
+
+@keyframes splashExit {
+  0%, 78% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes splashContentIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-54px) scale(0.96);
+    filter: blur(8px);
+  }
+  20%, 76% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(18px) scale(0.985);
+    filter: blur(6px);
+  }
+}
+
+@keyframes splashAurora {
+  0% { transform: translateX(-10%) scale(1); }
+  78% { transform: translateX(4%) scale(1.02); }
+  100% { transform: translateX(8%) scale(1.04); }
+}
+
+@keyframes splashLogoFloat {
+  0% { transform: scale(1.02) translateX(-3px); }
+  45%, 76% { transform: scale(1.08) translateX(0); }
+  100% { transform: scale(1.06) translateX(4px); }
+}
+
+@keyframes splashLogoSweep {
+  0%, 18% {
+    opacity: 0;
+    transform: translateX(-72%) rotate(10deg);
+  }
+  44% { opacity: 1; }
+  72%, 100% {
+    opacity: 0;
+    transform: translateX(72%) rotate(10deg);
+  }
+}
+
+@keyframes splashMagnifier {
+  0% {
+    opacity: 0;
+    transform: translate(-18px, 8px) scale(0.82);
+  }
+  24% { opacity: 0.82; }
+  48% { transform: translate(4px, -2px) scale(1); }
+  74% {
+    opacity: 0.72;
+    transform: translate(0, 0) scale(0.96);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(12px, -6px) scale(0.9);
+  }
+}
+
+@keyframes splashLineIn {
+  0%, 18% {
+    opacity: 0;
+    transform: scaleX(0.36);
+  }
+  36%, 76% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0.72);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-splash,
+  .startup-splash *,
+  .startup-splash::before,
+  .startup-splash::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+
 body:has(#onboarding-screen:not(.hidden)) {
   overflow-x: hidden;
   overflow-y: hidden;
