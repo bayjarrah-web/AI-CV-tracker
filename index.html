@@ -49,39 +49,80 @@
           </span>
         </div>
 
-        <div class="onboarding-step active" data-step="1">
-          <div class="brand-mark brand-mark-large" aria-hidden="true">
-            <span>AI</span>
+        <div class="onboarding-step onboarding-welcome-step active" data-step="1">
+          <div class="welcome-copy-panel">
+            <div class="welcome-mobile-mark brand-mark brand-mark-large" aria-hidden="true">
+              <span>AI</span>
+            </div>
+            <h1 class="onboarding-premium-title">
+              <span><strong data-i18n="onboarding.step1.ai">AI</strong> <span data-i18n="onboarding.step1.product">CV Tracker</span></span>
+            </h1>
+            <p class="onboarding-copy onboarding-premium-copy" data-i18n="onboarding.step1.subtitle">Track applications, manage interviews, and analyze your job search in one place.</p>
+            <p class="onboarding-helper-text">
+              <i data-lucide="shield-check" aria-hidden="true"></i>
+              <span data-i18n="onboarding.step1.helper">No signup. Your data stays in your browser.</span>
+            </p>
+            <div class="onboarding-feature-cards" aria-label="Product features">
+              <article class="onboarding-feature-card">
+                <span class="feature-icon"><i data-lucide="briefcase-business"></i></span>
+                <strong data-i18n="onboarding.step1.featureApplications">Track applications</strong>
+                <small data-i18n="onboarding.step1.featureApplicationsDesc">Stay organized and never miss an update</small>
+              </article>
+              <article class="onboarding-feature-card">
+                <span class="feature-icon"><i data-lucide="calendar-days"></i></span>
+                <strong data-i18n="onboarding.step1.featureInterviews">Manage interviews</strong>
+                <small data-i18n="onboarding.step1.featureInterviewsDesc">Prepare, join, and follow up with confidence</small>
+              </article>
+              <article class="onboarding-feature-card">
+                <span class="feature-icon"><i data-lucide="chart-no-axes-combined"></i></span>
+                <strong data-i18n="onboarding.step1.featureAnalyze">AI-powered insights</strong>
+                <small data-i18n="onboarding.step1.featureAnalyzeDesc">Get AI-powered insights and improve your fit</small>
+              </article>
+            </div>
+            <button class="btn btn-primary" type="button" data-next-step>
+              <span data-i18n="onboarding.step1.cta">Get Started</span>
+              <span class="btn-arrow" aria-hidden="true">→</span>
+            </button>
+            <p class="welcome-setup-note">
+              <i data-lucide="sparkles" aria-hidden="true"></i>
+              <span data-i18n="onboarding.step1.setupNote">Setup takes less than 1 minute</span>
+            </p>
           </div>
-          <h1 class="onboarding-premium-title">
-            <span><strong data-i18n="onboarding.step1.ai">AI</strong> <span data-i18n="onboarding.step1.product">CV Tracker</span></span>
-          </h1>
-          <p class="onboarding-copy onboarding-premium-copy" data-i18n="onboarding.step1.subtitle">Track applications, manage interviews, and analyze your job search in one place.</p>
-          <p class="onboarding-helper-text">
-            <i data-lucide="shield-check" aria-hidden="true"></i>
-            <span data-i18n="onboarding.step1.helper">No signup. Your data stays in your browser.</span>
-          </p>
-          <div class="onboarding-feature-cards" aria-label="Product features">
-            <article class="onboarding-feature-card">
-              <span class="feature-icon"><i data-lucide="briefcase-business"></i></span>
-              <strong data-i18n="onboarding.step1.featureApplications">Track applications</strong>
-              <small data-i18n="onboarding.step1.featureApplicationsDesc">Stay organized and never miss an update</small>
-            </article>
-            <article class="onboarding-feature-card">
-              <span class="feature-icon"><i data-lucide="calendar-days"></i></span>
-              <strong data-i18n="onboarding.step1.featureInterviews">Manage interviews</strong>
-              <small data-i18n="onboarding.step1.featureInterviewsDesc">Prepare, join, and follow up with confidence</small>
-            </article>
-            <article class="onboarding-feature-card">
-              <span class="feature-icon"><i data-lucide="chart-no-axes-combined"></i></span>
-              <strong data-i18n="onboarding.step1.featureAnalyze">Analyze CV match</strong>
-              <small data-i18n="onboarding.step1.featureAnalyzeDesc">Get AI-powered insights and improve your fit</small>
-            </article>
-          </div>
-          <button class="btn btn-primary" type="button" data-next-step>
-            <span data-i18n="onboarding.step1.cta">Get Started</span>
-            <span class="btn-arrow" aria-hidden="true">→</span>
-          </button>
+
+          <aside class="welcome-product-preview" aria-hidden="true">
+            <div class="preview-shell">
+              <div class="preview-sidebar">
+                <div class="preview-brand-dot">
+                  <img src="assets/ai-cv-logo-mark.png" alt="">
+                </div>
+                <span class="preview-brand-name">AI CV Tracker</span>
+                <div class="preview-nav">
+                  <span class="active"><i data-lucide="home"></i><b data-i18n="tabs.applications">Applications</b></span>
+                  <span><i data-lucide="calendar-days"></i><b data-i18n="tabs.interviews">Interviews</b></span>
+                  <span><i data-lucide="pie-chart"></i><b data-i18n="tabs.stats">Stats</b></span>
+                  <span><i data-lucide="wand-sparkles"></i><b data-i18n="tabs.analyzer">Analyze</b></span>
+                </div>
+              </div>
+              <div class="preview-main">
+                <div class="preview-header-row">
+                  <strong data-i18n="onboarding.step1.previewTitle">Applications Overview</strong>
+                  <span>+ <b data-i18n="jobs.addJob">Add Application</b></span>
+                </div>
+                <div class="preview-stats">
+                  <div><i data-lucide="send"></i><small data-i18n="statuses.sent">Sent</small><b>24</b></div>
+                  <div><i data-lucide="eye"></i><small data-i18n="statuses.under_review">Under Review</small><b>12</b></div>
+                  <div><i data-lucide="calendar-check"></i><small data-i18n="statuses.interview">Interview</small><b>5</b></div>
+                  <div><i data-lucide="x"></i><small data-i18n="statuses.rejected">Rejected</small><b>3</b></div>
+                </div>
+                <div class="preview-list">
+                  <strong data-i18n="onboarding.step1.previewRecent">Recent Applications</strong>
+                  <div class="preview-row"><span>MA</span><b>Meta</b><small data-i18n="statuses.under_review">Under Review</small></div>
+                  <div class="preview-row"><span>GO</span><b>Google</b><small data-i18n="statuses.sent">Sent</small></div>
+                  <div class="preview-row"><span>MS</span><b>Microsoft</b><small data-i18n="statuses.interview">Interview</small></div>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
 
         <div class="onboarding-step" data-step="2">

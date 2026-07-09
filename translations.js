@@ -18,14 +18,18 @@ const TRANSLATIONS = {
         eyebrow: "رفيقك الذكي للبحث عن عمل",
         title: "مرحباً بك في AI CV Tracker",
         subtitle: "تابع طلباتك، نظّم مقابلاتك، وحلّل رحلة بحثك عن العمل من مكان واحد.",
-        helper: "بدون تسجيل. بياناتك تبقى محفوظة محلياً في متصفحك.",
+        helper: "بدون تسجيل. خصوصية 100%. محفوظ محلياً في متصفحك.",
         featureApplications: "متابعة الطلبات",
         featureApplicationsDesc: "ابقَ منظماً ولا تفوّت أي تحديث",
         featureInterviews: "تنظيم المقابلات",
         featureInterviewsDesc: "حضّر، ادخل المقابلة، وتابع بثقة",
-        featureAnalyze: "تحليل مطابقة السيرة",
+        featureAnalyze: "رؤى مدعومة بالذكاء",
         featureAnalyzeDesc: "احصل على رؤى ذكية وحسّن فرصك",
-        cta: "ابدأ الآن"
+        cta: "ابدأ الآن",
+        setupNote: "الإعداد يستغرق أقل من دقيقة",
+        privacyNote: "خصوصية 100% • محفوظ محلياً في متصفحك",
+        previewTitle: "نظرة عامة على الطلبات",
+        previewRecent: "أحدث الطلبات"
       },
       step2: {
         eyebrow: "إعداد الملف الشخصي",
@@ -814,14 +818,18 @@ const TRANSLATIONS = {
         eyebrow: "Your focused job-search companion",
         title: "Welcome to AI CV Tracker",
         subtitle: "Track applications, manage interviews, and analyze your job search in one place.",
-        helper: "No signup. Your data stays in your browser.",
+        helper: "No signup. 100% private. Stored locally in your browser.",
         featureApplications: "Track applications",
         featureApplicationsDesc: "Stay organized and never miss an update",
         featureInterviews: "Manage interviews",
         featureInterviewsDesc: "Prepare, join, and follow up with confidence",
-        featureAnalyze: "Analyze CV match",
+        featureAnalyze: "AI-powered insights",
         featureAnalyzeDesc: "Get AI-powered insights and improve your fit",
-        cta: "Get Started"
+        cta: "Get Started",
+        setupNote: "Setup takes less than 1 minute",
+        privacyNote: "100% private • Stored locally in your browser",
+        previewTitle: "Applications Overview",
+        previewRecent: "Recent Applications"
       },
       step2: {
         eyebrow: "Profile setup",
