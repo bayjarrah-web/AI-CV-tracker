@@ -3338,6 +3338,8 @@ function normalizeVisibleTab(tabName) {
 function switchTab(tabName) {
   const nextTab = normalizeVisibleTab(tabName);
   AppState.currentTab = nextTab;
+  const mainApp = document.getElementById("main-app");
+  if (mainApp) mainApp.dataset.activeTab = nextTab;
 
   document.querySelectorAll(".tab-button").forEach((button) => {
     const isActive = button.dataset.tab === nextTab;

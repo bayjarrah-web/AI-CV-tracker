@@ -7896,3 +7896,154 @@ body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
     transform: none;
   }
 }
+
+/* Applications uses one compact command header instead of stacked utility and hero bars. */
+@media (min-width: 901px) {
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .app-header {
+    display: contents;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .header-actions {
+    position: relative;
+    z-index: 5;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    justify-self: end;
+    margin: 14px 16px 0 0;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .content-area {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header {
+    min-height: 88px;
+    padding: 14px clamp(320px, 31vw, 370px) 14px 20px;
+    border-radius: 20px;
+    background:
+      radial-gradient(ellipse at 78% 120%, rgba(0, 103, 255, 0.2), transparent 38%),
+      linear-gradient(112deg, rgba(3, 19, 35, 0.98), rgba(2, 22, 47, 0.95));
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header::before {
+    right: 15%;
+    bottom: -118%;
+    width: 34%;
+    height: 170%;
+    opacity: 0.3;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header::after {
+    right: 22%;
+    bottom: 23%;
+    width: 25%;
+    opacity: 0.28;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-hero-copy {
+    align-items: center;
+    flex-direction: row;
+    max-width: 100%;
+    gap: 16px;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header h2 {
+    min-width: 0;
+    max-width: 30ch;
+    overflow: hidden;
+    font-size: clamp(1.25rem, 2vw, 1.58rem);
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header p {
+    display: none;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header .jobs-hero-copy .btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 172px;
+    min-height: 46px;
+    margin-top: 0;
+    padding-inline: 17px;
+    border-radius: 11px;
+    font-size: 0.9rem;
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .header-actions,
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .content-area {
+    grid-column: 1;
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .header-actions {
+    margin: 14px 0 0 16px;
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header {
+    padding: 14px 20px 14px clamp(320px, 31vw, 370px);
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header::before {
+    right: auto;
+    left: 15%;
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header::after {
+    right: auto;
+    left: 22%;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1150px) {
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .user-chip {
+    width: 48px;
+    padding: 5px;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .user-chip #header-user-name,
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .user-chip > svg {
+    display: none;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header {
+    padding-inline-end: 146px;
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header {
+    padding-inline-start: 146px;
+    padding-inline-end: 20px;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header h2 {
+    font-size: 1.16rem;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app[data-active-tab="jobs"] .jobs-header .jobs-hero-copy .btn {
+    min-width: 158px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  body:not(:has(#onboarding-screen:not(.hidden))) .jobs-header {
+    min-height: 158px;
+    padding: 24px;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .jobs-hero-copy {
+    max-width: 72%;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .jobs-header h2 {
+    font-size: clamp(1.75rem, 4vw, 2.2rem);
+  }
+}
+
+@media (max-width: 640px) {
+  body:not(:has(#onboarding-screen:not(.hidden))) .jobs-header {
+    min-height: 184px;
+  }
+}
