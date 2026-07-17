@@ -3309,9 +3309,19 @@ function showMainApp() {
 
 function updateHeader() {
   const userName = document.getElementById("header-user-name");
+  const userInitials = document.getElementById("header-user-initials");
   const displayName = AppState.user?.name || t("common.guest");
   if (userName) {
     userName.textContent = displayName;
+  }
+  if (userInitials) {
+    userInitials.textContent = displayName
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((namePart) => namePart.charAt(0))
+      .join("")
+      .toUpperCase() || "AI";
   }
 
   const applicationsHeroUser = document.getElementById("applications-hero-user");
@@ -3330,7 +3340,13 @@ function switchTab(tabName) {
   AppState.currentTab = nextTab;
 
   document.querySelectorAll(".tab-button").forEach((button) => {
-    button.classList.toggle("active", button.dataset.tab === nextTab);
+    const isActive = button.dataset.tab === nextTab;
+    button.classList.toggle("active", isActive);
+    if (isActive) {
+      button.setAttribute("aria-current", "page");
+    } else {
+      button.removeAttribute("aria-current");
+    }
   });
 
   document.querySelectorAll(".tab-panel").forEach((panel) => {
@@ -4958,6 +4974,17 @@ function bindNavigation() {
   document.querySelectorAll("[data-tab]").forEach((button) => {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
   });
+
+  const mainApp = document.getElementById("main-app");
+  const sidebarToggle = document.getElementById("sidebar-toggle");
+  if (mainApp && sidebarToggle) {
+    sidebarToggle.addEventListener("click", () => {
+      const isCollapsed = mainApp.classList.toggle("sidebar-collapsed");
+      sidebarToggle.setAttribute("aria-expanded", String(!isCollapsed));
+      sidebarToggle.setAttribute("aria-label", isCollapsed ? "Expand navigation" : "Collapse navigation");
+      sidebarToggle.setAttribute("title", isCollapsed ? "Expand navigation" : "Collapse navigation");
+    });
+  }
 
   const settingsButton = document.getElementById("header-settings-button");
   if (settingsButton) {

@@ -7320,39 +7320,167 @@ body:has(.onboarding-welcome-step.active) .step-dot.active {
   }
 }
 
-/* App navigation refresh: desktop rail with a mobile bottom bar. */
+/* App navigation refresh: collapsible desktop sidebar and mobile bottom bar. */
+.app-sidebar {
+  min-width: 0;
+}
+
+.app-sidebar-brand,
+.sidebar-toggle {
+  display: none;
+}
+
 body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
   isolation: isolate;
 }
 
 @media (min-width: 901px) {
   body:not(:has(#onboarding-screen:not(.hidden))) .main-app {
-    grid-template-columns: minmax(190px, 218px) minmax(0, 1fr);
+    grid-template-columns: 252px minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
     align-items: start;
-    width: min(100%, 1440px);
-    gap: 16px;
+    width: min(100%, 1500px);
+    gap: 16px 18px;
+    transition: grid-template-columns 220ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  body:not(:has(#onboarding-screen:not(.hidden))) .app-header {
-    grid-column: 1 / -1;
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app.sidebar-collapsed {
+    grid-template-columns: 78px minmax(0, 1fr);
   }
 
-  body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar {
     position: sticky;
     top: 18px;
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1 / span 2;
     display: flex;
     flex-direction: column;
-    align-self: start;
-    gap: 7px;
-    padding: 9px;
-    border-radius: 20px;
-    background: rgba(6, 15, 30, 0.78);
+    min-height: calc(100svh - 36px);
+    padding: 20px 14px;
+    overflow: visible;
+    border-color: rgba(29, 124, 255, 0.52);
+    border-radius: 24px;
+    background:
+      linear-gradient(180deg, rgba(4, 24, 45, 0.96), rgba(2, 18, 35, 0.92));
     box-shadow:
-      0 18px 44px rgba(0, 0, 0, 0.22),
-      inset 0 1px 0 rgba(255, 255, 255, 0.045);
+      0 24px 70px rgba(0, 0, 0, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: padding 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+    padding: 0 8px;
+    color: #f8fbff;
+    font-family: var(--font-display);
+    font-size: 1.03rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar-brand img {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    object-fit: contain;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-toggle {
+    position: absolute;
+    top: 204px;
+    inset-inline-end: -15px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid rgba(56, 189, 248, 0.62);
+    border-radius: 10px;
+    color: #dff6ff;
+    background: #086dde;
+    box-shadow: 0 0 20px rgba(29, 124, 255, 0.48);
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-toggle:hover {
+    background: #1688f5;
+    transform: scale(1.04);
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-toggle:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 3px;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-toggle svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 220ms ease;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-header {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 76px;
+    padding: 12px 16px;
+    border-radius: 22px;
+    background: rgba(4, 21, 39, 0.78);
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-header .brand-group {
+    display: none;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .header-actions {
+    margin-inline-start: auto;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .user-chip {
+    gap: 9px;
+    min-height: 48px;
+    padding: 5px 10px 5px 6px;
+    border-color: rgba(96, 165, 250, 0.22);
+    border-radius: 14px;
+    background: rgba(8, 23, 42, 0.82);
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .user-avatar {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    color: #e9f6ff;
+    background: rgba(29, 124, 255, 0.62);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .user-chip > svg {
+    width: 15px;
+    height: 15px;
+    color: #8fa3bb;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .header-icon-button {
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 78px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   body:not(:has(#onboarding-screen:not(.hidden))) .content-area {
@@ -7361,56 +7489,128 @@ body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
     min-width: 0;
   }
 
-  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
-    grid-column: 2;
-  }
-
-  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .content-area {
-    grid-column: 1;
-  }
-
   body:not(:has(#onboarding-screen:not(.hidden))) .tab-button {
     position: relative;
     justify-content: flex-start;
     width: 100%;
-    min-height: 52px;
-    padding: 0 13px;
-    border-radius: 14px;
+    min-height: 60px;
+    padding: 0 17px;
+    border-radius: 16px;
     font-size: 0.94rem;
     transition: color 180ms ease, background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
   }
 
   body:not(:has(#onboarding-screen:not(.hidden))) .tab-button .tab-icon {
-    width: 24px;
+    width: 23px;
+    height: 23px;
+    flex: 0 0 23px;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .tab-button .tab-icon svg {
+    width: 21px;
+    height: 21px;
+    stroke-width: 2;
   }
 
   body:not(:has(#onboarding-screen:not(.hidden))) .tab-button.active {
     color: #f8fbff;
-    border-color: rgba(96, 165, 250, 0.42);
-    background: linear-gradient(135deg, rgba(29, 107, 255, 0.94), rgba(27, 169, 238, 0.84));
-    box-shadow: 0 10px 24px rgba(16, 88, 230, 0.26);
-  }
-
-  body:not(:has(#onboarding-screen:not(.hidden))) .tab-button.active::before {
-    position: absolute;
-    top: 50%;
-    inset-inline-start: -10px;
-    width: 3px;
-    height: 23px;
-    border-radius: 999px;
-    background: #56c7ff;
-    box-shadow: 0 0 14px rgba(86, 199, 255, 0.82);
-    content: "";
-    transform: translateY(-50%);
+    border-color: rgba(16, 189, 245, 0.84);
+    background: linear-gradient(135deg, rgba(17, 105, 232, 0.82), rgba(4, 121, 213, 0.54));
+    box-shadow:
+      0 0 0 1px rgba(29, 124, 255, 0.26) inset,
+      0 8px 30px rgba(0, 112, 255, 0.25),
+      0 0 22px rgba(16, 189, 245, 0.17);
   }
 
   body:not(:has(#onboarding-screen:not(.hidden))) .tab-button:hover:not(.active) {
+    color: #f8fbff;
     background: rgba(96, 165, 250, 0.09);
     transform: translateX(2px);
   }
 
+  body:not(:has(#onboarding-screen:not(.hidden))) .tab-label,
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar-brand span {
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity 130ms ease;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-collapsed .app-sidebar {
+    padding-inline: 9px;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-collapsed .app-sidebar-brand {
+    justify-content: center;
+    padding: 0;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-collapsed .app-sidebar-brand span,
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-collapsed .tab-label {
+    width: 0;
+    opacity: 0;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-collapsed .tab-button {
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-collapsed .sidebar-toggle svg {
+    transform: rotate(180deg);
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .main-app {
+    grid-template-columns: minmax(0, 1fr) 252px;
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .main-app.sidebar-collapsed {
+    grid-template-columns: minmax(0, 1fr) 78px;
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar {
+    grid-column: 2;
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .app-header,
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .content-area {
+    grid-column: 1;
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-toggle svg {
+    transform: rotate(180deg);
+  }
+
+  [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-collapsed .sidebar-toggle svg {
+    transform: rotate(0deg);
+  }
+
   [dir="rtl"] body:not(:has(#onboarding-screen:not(.hidden))) .tab-button:hover:not(.active) {
     transform: translateX(-2px);
+  }
+}
+
+@media (min-width: 701px) and (max-width: 900px) {
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar {
+    display: contents;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar-brand,
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-toggle {
+    display: none;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-row: 2;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-header {
+    grid-row: 1;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .content-area {
+    grid-row: 3;
   }
 }
 
@@ -7421,6 +7621,15 @@ body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
 
   body:not(:has(#onboarding-screen:not(.hidden))) .main-app {
     gap: 14px;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar {
+    display: contents;
+  }
+
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar-brand,
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-toggle {
+    display: none;
   }
 
   body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
@@ -7435,7 +7644,7 @@ body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
     padding: 6px;
     border: 1px solid rgba(96, 165, 250, 0.26);
     border-radius: 20px;
-    background: rgba(5, 14, 29, 0.9);
+    background: rgba(5, 14, 29, 0.92);
     box-shadow:
       0 18px 42px rgba(0, 0, 0, 0.38),
       0 0 0 1px rgba(255, 255, 255, 0.025) inset;
@@ -7455,10 +7664,7 @@ body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
     line-height: 1.1;
   }
 
-  body:not(:has(#onboarding-screen:not(.hidden))) .tab-button .tab-icon {
-    height: 20px;
-  }
-
+  body:not(:has(#onboarding-screen:not(.hidden))) .tab-button .tab-icon,
   body:not(:has(#onboarding-screen:not(.hidden))) .tab-button .tab-icon svg {
     width: 19px;
     height: 19px;
@@ -7470,14 +7676,14 @@ body:not(:has(#onboarding-screen:not(.hidden))) .tab-nav {
     background: linear-gradient(135deg, rgba(29, 107, 255, 0.92), rgba(27, 169, 238, 0.82));
     box-shadow: 0 7px 18px rgba(16, 88, 230, 0.22);
   }
-
-  body:not(:has(#onboarding-screen:not(.hidden))) .tab-button.active::before {
-    display: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body:not(:has(#onboarding-screen:not(.hidden))) .tab-button {
+  body:not(:has(#onboarding-screen:not(.hidden))) .main-app,
+  body:not(:has(#onboarding-screen:not(.hidden))) .tab-button,
+  body:not(:has(#onboarding-screen:not(.hidden))) .sidebar-toggle svg,
+  body:not(:has(#onboarding-screen:not(.hidden))) .tab-label,
+  body:not(:has(#onboarding-screen:not(.hidden))) .app-sidebar-brand span {
     transition: none;
   }
 

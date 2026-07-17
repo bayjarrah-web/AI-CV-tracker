@@ -10,7 +10,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260717-01">
+  <link rel="stylesheet" href="styles.css?v=20260717-02">
 </head>
 <body>
   <div class="startup-splash" aria-hidden="true">
@@ -189,6 +189,36 @@
     </section>
 
     <main id="main-app" class="main-app hidden">
+      <aside class="app-sidebar glass-card" aria-label="Application navigation">
+        <div class="app-sidebar-brand">
+          <img src="assets/ai-cv-logo-mark.png" alt="">
+          <span>AI CV Tracker</span>
+        </div>
+
+        <button class="sidebar-toggle" type="button" id="sidebar-toggle" aria-label="Collapse navigation" aria-expanded="true" title="Collapse navigation">
+          <i data-lucide="panel-left-close"></i>
+        </button>
+
+        <nav class="tab-nav" aria-label="Main navigation">
+          <button class="tab-button active" type="button" data-tab="jobs" aria-current="page" title="Applications">
+            <span class="tab-icon"><i data-lucide="briefcase-business"></i></span>
+            <span class="tab-label" data-i18n="tabs.applications">Applications</span>
+          </button>
+          <button class="tab-button" type="button" data-tab="interviews" title="Interviews">
+            <span class="tab-icon"><i data-lucide="calendar-days"></i></span>
+            <span class="tab-label" data-i18n="tabs.interviews">المقابلات</span>
+          </button>
+          <button class="tab-button" type="button" data-tab="stats" title="Stats">
+            <span class="tab-icon"><i data-lucide="chart-no-axes-column-increasing"></i></span>
+            <span class="tab-label" data-i18n="tabs.stats">الإحصائيات</span>
+          </button>
+          <button class="tab-button" type="button" data-tab="analyzer" title="Analyze">
+            <span class="tab-icon"><i data-lucide="sparkles"></i></span>
+            <span class="tab-label" data-i18n="tabs.analyzer">Analyze</span>
+          </button>
+        </nav>
+      </aside>
+
       <header class="app-header glass-card">
         <div class="brand-group">
           <div class="brand-mark">AI</div>
@@ -198,31 +228,16 @@
           </div>
         </div>
         <div class="header-actions">
-          <span class="user-chip" id="header-user-name">ضيف</span>
+          <div class="user-chip">
+            <span class="user-avatar" id="header-user-initials" aria-hidden="true">GU</span>
+            <span id="header-user-name">ضيف</span>
+            <i data-lucide="chevron-down" aria-hidden="true"></i>
+          </div>
           <button class="header-icon-button" type="button" id="header-settings-button" aria-label="Settings" aria-haspopup="dialog" aria-expanded="false">
             <i data-lucide="settings"></i>
           </button>
         </div>
       </header>
-
-      <nav class="tab-nav glass-card" aria-label="Main navigation">
-        <button class="tab-button active" type="button" data-tab="jobs">
-          <span class="tab-icon"><i data-lucide="briefcase"></i></span>
-          <span data-i18n="tabs.applications">Applications</span>
-        </button>
-        <button class="tab-button" type="button" data-tab="interviews">
-          <span class="tab-icon"><i data-lucide="calendar"></i></span>
-          <span data-i18n="tabs.interviews">المقابلات</span>
-        </button>
-        <button class="tab-button" type="button" data-tab="stats">
-          <span class="tab-icon"><i data-lucide="bar-chart-3"></i></span>
-          <span data-i18n="tabs.stats">الإحصائيات</span>
-        </button>
-        <button class="tab-button" type="button" data-tab="analyzer">
-          <span class="tab-icon"><i data-lucide="brain"></i></span>
-          <span data-i18n="tabs.analyzer">Analyze</span>
-        </button>
-      </nav>
 
       <section class="content-area">
         <div class="tab-panel active" id="tab-today"></div>
@@ -583,6 +598,6 @@
     }
   </script>
   <script src="translations.js?v=20260709-01"></script>
-  <script src="app.js?v=20260705-03"></script>
+  <script src="app.js?v=20260717-01"></script>
 </body>
 </html>
