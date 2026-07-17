@@ -2227,9 +2227,9 @@ function isFollowUpDue(job) {
 
 const APPLICATION_STATUS_CARDS = [
   { status: "sent", icon: "send" },
-  { status: "under_review", icon: "scan-search" },
-  { status: "interview", icon: "calendar-check" },
-  { status: "rejected", icon: "x-circle" }
+  { status: "under_review", icon: "clock-3" },
+  { status: "interview", icon: "users-round" },
+  { status: "rejected", icon: "circle-x" }
 ];
 
 function getApplicationStatusCounts() {
